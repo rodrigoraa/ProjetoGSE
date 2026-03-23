@@ -1,0 +1,243 @@
+:root {
+    --primary-color: #004a91;
+    --primary-dark: #003366;
+    --accent-color: #00c2ff;
+    --success-color: #28a745;
+    --warning-bg: #fff3cd;
+    --warning-text: #856404;
+    --danger-color: #dc3545;
+    --text-main: #333;
+    --text-muted: #666;
+    --bg-light: #f8f9fa;
+    --border-color: #e0e0e0;
+    --radius: 8px;
+}
+
+.grid-caixas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.card-caixa {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.card-caixa:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+.card-icon {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    opacity: 0.8;
+}
+
+.card-title {
+    font-weight: 700;
+    color: var(--primary-color);
+    font-size: 1.1em;
+}
+
+.card-count {
+    font-size: 0.85em;
+    color: var(--text-muted);
+    margin-top: 8px;
+    background: var(--bg-light);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.nav-caixas {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+}
+
+.nav-link {
+    padding: 8px 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: var(--text-muted);
+    font-size: 0.9em;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.nav-link:hover {
+    background: var(--bg-light);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.nav-link.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    font-weight: bold;
+}
+
+.nav-link.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #eee;
+}
+
+.toolbar-passivo {
+    background: white;
+    padding: 20px;
+    border-radius: var(--radius);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.form-busca {
+    display: flex;
+    gap: 10px;
+    flex: 1;
+    min-width: 300px;
+}
+
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+input[name="caixa"] {
+    font-weight: bold;
+    color: var(--primary-color);
+    background-color: #f0f8ff;
+}
+
+.alert-box {
+    padding: 15px;
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    border: 1px solid transparent;
+}
+
+.alert-info {
+    background-color: #e8f4ff;
+    color: var(--primary-color);
+    border-color: #b8daff;
+}
+
+.alert-warning {
+    background-color: var(--warning-bg);
+    color: var(--warning-text);
+    border-color: #ffeeba;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-color: #f5c6cb;
+}
+
+.lista-instrucoes {
+    line-height: 1.8;
+    color: #555;
+    margin-bottom: 20px;
+    padding-left: 20px;
+}
+
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.tool-card {
+    background: white;
+    padding: 25px;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    border-top: 4px solid #ccc;
+    transition: transform 0.2s;
+}
+
+.tool-card:hover {
+    transform: translateY(-3px);
+}
+
+.tool-card.blue {
+    border-top-color: #007bff;
+}
+
+.tool-card.green {
+    border-top-color: #28a745;
+}
+
+.tool-card h2 {
+    margin-top: 0;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.badge-caixa {
+    background: #e3f2fd;
+    color: var(--primary-color);
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-weight: 700;
+    font-size: 0.85em;
+    border: 1px solid #bbdefb;
+}
+
+@media (max-width: 768px) {
+    .form-grid-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .toolbar-passivo {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-busca {
+        flex-direction: column;
+    }
+
+    .nav-caixas {
+        gap: 5px;
+    }
+
+    .nav-link {
+        padding: 6px 10px;
+        font-size: 0.8em;
+    }
+}
