@@ -16,45 +16,27 @@ class CertidaoController extends Controller
 
     public function index()
     {
-        $ano_atual = date('Y');
-        $registros = $this->certidaoModel->listarVigentes($ano_atual);
+        $registros = $this->certidaoModel->listarVigentes();
 
         $dados_organizados = [];
         $lista_fornecedores = [];
 
         foreach ($registros as $reg) {
-            $fornecedor = strtoupper($reg['fornecedor']);
-            $tipo = strtoupper($reg['tipo_certidao']);
+            $fornecedor = mb_strtoupper($reg['fornecedor'], 'UTF-8');
+            $tipo = mb_strtoupper($reg['tipo_certidao'], 'UTF-8');
 
-            if (!in_array($fornecedor, $lista_fornecedores)) {
+            if (!in_array($fornecedor, $lista_fornecedores, true)) {
                 $lista_fornecedores[] = $fornecedor;
             }
             $dados_organizados[$fornecedor][$tipo][] = $reg;
         }
         sort($lista_fornecedores);
 
-        $tipos_certidoes = $this->certidaoModel->listarTiposCertidao(true);
-
         $this->view('certidoes/index', [
-            'ano_atual' => $ano_atual,
             'lista_fornecedores' => $lista_fornecedores,
             'dados_organizados' => $dados_organizados,
-            'tipos_certidoes' => $tipos_certidoes
-        ]);
-    }
-
-    public function arquivadas()
-    {
-        $anos_disponiveis = $this->certidaoModel->getAnosDisponiveis();
-
-        $ano_filtro = $_GET['ano'] ?? 'todos';
-
-        $certidoes = $this->certidaoModel->listarPorAno($ano_filtro);
-
-        $this->view('certidoes/arquivadas', [
-            'anos_disponiveis' => $anos_disponiveis,
-            'ano_filtro' => $ano_filtro,
-            'certidoes' => $certidoes
+            'tipos_certidoes' => $this->certidaoModel->listarTiposCertidao(true),
+            'ano_atual' => date('Y')
         ]);
     }
 
@@ -65,146 +47,115 @@ class CertidaoController extends Controller
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             verificar_csrf_token($_POST['csrf_token'] ?? '');
 
-            $fornecedor = $_POST['fornecedor'];
-            $tipo = $_POST['tipo_certidao'];
+            $fornecedor = filter_input(INPUT_POST, 'fornecedor', FILTER_VALIDATE_INT);
+            $tipo = filter_input(INPUT_POST, 'tipo_certidao', FILTER_VALIDATE_INT);
             $emissao = $_POST['data_emissao'];
             $vencimento = $_POST['data_vencimento'];
-            $obs = $_POST['observacao'];
+            $obs = strip_tags(trim($_POST['observacao']));
 
-            $nome_arquivo_final = null;
+            $nome_arquivo_final = $this->processarUploadPdf();
 
-            if (isset($_FILES['arquivo_pdf']) && $_FILES['arquivo_pdf']['error'] == 0) {
-                $extensao = strtolower(pathinfo($_FILES['arquivo_pdf']['name'], PATHINFO_EXTENSION));
-                if ($extensao != "pdf") {
-                    $mensagem = '<p class="error-message">Erro: Apenas arquivos PDF são permitidos.</p>';
-                } else {
-                    $nome_arquivo_final = uniqid('cert_') . '.' . $extensao;
-                    $destino = ROOT_PATH . '/public/uploads/certidoes/' . $nome_arquivo_final;
-                    if (!move_uploaded_file($_FILES['arquivo_pdf']['tmp_name'], $destino)) {
-                        $mensagem = '<p class="error-message">Erro ao salvar o arquivo na pasta.</p>';
-                        $nome_arquivo_final = null;
-                    }
-                }
-            }
-
-            if (empty($mensagem)) {
+            if ($nome_arquivo_final !== false) {
                 if ($this->certidaoModel->cadastrar($fornecedor, $tipo, $emissao, $vencimento, $obs, $nome_arquivo_final)) {
-
                     if (!empty($_POST['renovar_id'])) {
-                        $this->certidaoModel->alternarArquivo($_POST['renovar_id'], 1);
+                        $this->certidaoModel->alternarArquivo((int)$_POST['renovar_id'], 1);
                     }
 
-                    $fornecedores = $this->certidaoModel->listarFornecedores();
-                    $tipos = $this->certidaoModel->listarTiposCertidao();
-
-                    $nomeFornecedor = '';
-                    $nomeTipo = '';
-
-                    foreach ($fornecedores as $f) {
-                        if ($f['id'] == $fornecedor) {
-                            $nomeFornecedor = $f['nome'];
-                            break;
-                        }
-                    }
-
-                    foreach ($tipos as $t) {
-                        if ($t['id'] == $tipo) {
-                            $nomeTipo = $t['nome'];
-                            break;
-                        }
-                    }
-
-                    registrar_log(Model::getConexao(), "Certidão - Cadastrar", "$nomeTipo - $nomeFornecedor");
+                    registrar_log(Model::getConexao(), "Certidao - Cadastrar", "ID Tipo: $tipo | ID Fornec: $fornecedor");
                     redirect('/certidao');
                     exit;
-                } else {
-                    $mensagem = '<p class="error-message">Erro ao salvar no banco de dados.</p>';
                 }
+
+                $mensagem = '<p class="error-message">Erro ao salvar no banco de dados.</p>';
+            } else {
+                $mensagem = '<p class="error-message">Apenas arquivos PDF sao permitidos.</p>';
             }
         }
 
-        // MELHORIA: Usando o Model em vez de SQL direto
-        $fornecedores = $this->certidaoModel->listarFornecedores();
-        $tipos = $this->certidaoModel->listarTiposCertidao();
-
         $this->view('certidoes/cadastrar', [
             'mensagem' => $mensagem,
-            'fornecedores' => $fornecedores,
-            'tipos' => $tipos
+            'fornecedores' => $this->certidaoModel->listarFornecedores(),
+            'tipos' => $this->certidaoModel->listarTiposCertidao()
         ]);
     }
 
     public function editar($id)
     {
-        if (!$id) {
+        $id = (int)$id;
+        $certidao = $this->certidaoModel->buscarPorId($id);
+
+        if (!$certidao) {
             redirect('/certidao');
             exit;
         }
 
         $mensagem = '';
-        $dados_atuais = $this->certidaoModel->buscarPorId($id);
-
-        if (!$dados_atuais) {
-            die("Certidão não encontrada.");
-        }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             verificar_csrf_token($_POST['csrf_token'] ?? '');
 
-            $fornecedor = $_POST['fornecedor'];
-            $tipo = $_POST['tipo_certidao'];
+            $fornecedor = filter_input(INPUT_POST, 'fornecedor', FILTER_VALIDATE_INT);
+            $tipo = filter_input(INPUT_POST, 'tipo_certidao', FILTER_VALIDATE_INT);
             $emissao = $_POST['data_emissao'];
             $vencimento = $_POST['data_vencimento'];
-            $obs = $_POST['observacao'];
+            $obs = strip_tags(trim($_POST['observacao']));
 
-            $nome_arquivo_final = $dados_atuais['arquivo_pdf'];
-
-            if (isset($_FILES['arquivo_pdf']) && $_FILES['arquivo_pdf']['error'] == 0) {
-                $extensao = strtolower(pathinfo($_FILES['arquivo_pdf']['name'], PATHINFO_EXTENSION));
-
-                if ($extensao != "pdf") {
-                    $mensagem = '<p class="error-message">Erro: Apenas PDF permitido.</p>';
-                } else {
-                    if ($dados_atuais['arquivo_pdf']) {
-                        $caminhoAntigo = ROOT_PATH . '/public/uploads/certidoes/' . $dados_atuais['arquivo_pdf'];
-                        if (file_exists($caminhoAntigo)) unlink($caminhoAntigo);
-                    }
-
-                    $novoNome = uniqid('cert_') . '.' . $extensao;
-                    $destino = ROOT_PATH . '/public/uploads/certidoes/' . $novoNome;
-
-                    if (move_uploaded_file($_FILES['arquivo_pdf']['tmp_name'], $destino)) {
-                        $nome_arquivo_final = $novoNome;
-                    } else {
-                        $mensagem = '<p class="error-message">Erro ao salvar arquivo.</p>';
-                    }
-                }
+            $novoArquivo = $this->processarUploadPdf($certidao['arquivo_pdf']);
+            if ($novoArquivo === false) {
+                $mensagem = '<p class="error-message">Apenas arquivos PDF sao permitidos.</p>';
+            } elseif ($this->certidaoModel->atualizar($id, $fornecedor, $tipo, $emissao, $vencimento, $obs, $novoArquivo)) {
+                redirect('/certidao');
+                exit;
+            } else {
+                $mensagem = '<p class="error-message">Erro ao atualizar a certidao.</p>';
             }
 
-            if (empty($mensagem)) {
-                if ($this->certidaoModel->atualizar($id, $fornecedor, $tipo, $emissao, $vencimento, $obs, $nome_arquivo_final)) {
-                    registrar_log(Model::getConexao(), "Certidão - Editar", "Editou: $tipo - $fornecedor");
-                    redirect('/certidao');
-                    exit;
-                } else {
-                    $mensagem = '<p class="error-message">Erro ao atualizar no banco.</p>';
-                }
-            }
+            $certidao = $this->certidaoModel->buscarPorId($id);
         }
 
-        $fornecedores = $this->certidaoModel->listarFornecedores();
-        $tipos = $this->certidaoModel->listarTiposCertidao();
-
         $this->view('certidoes/editar', [
-            'certidao' => $dados_atuais,
             'mensagem' => $mensagem,
-            'fornecedores' => $fornecedores,
-            'tipos' => $tipos
+            'certidao' => $certidao,
+            'fornecedores' => $this->certidaoModel->listarFornecedores(),
+            'tipos' => $this->certidaoModel->listarTiposCertidao()
         ]);
+    }
+
+    public function arquivar($id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('/certidao');
+            exit;
+        }
+
+        verificar_csrf_token($_POST['csrf_token'] ?? '');
+        $this->certidaoModel->alternarArquivo((int)$id, 1);
+        redirect('/certidao');
+        exit;
+    }
+
+    public function desarquivar($id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('/certidao/arquivadas');
+            exit;
+        }
+
+        verificar_csrf_token($_POST['csrf_token'] ?? '');
+        $this->certidaoModel->alternarArquivo((int)$id, 0);
+        redirect('/certidao/arquivadas');
+        exit;
     }
 
     public function excluir($id)
     {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('/certidao');
+            exit;
+        }
+
+        verificar_csrf_token($_POST['csrf_token'] ?? '');
+
         if ($id) {
             $dadosExcluidos = $this->certidaoModel->excluir($id);
 
@@ -216,68 +167,50 @@ class CertidaoController extends Controller
                     }
                 }
 
-                $detalhes = "Apagou: " . $dadosExcluidos['tipo_certidao'] . " - " . $dadosExcluidos['fornecedor'];
-                registrar_log(Model::getConexao(), "Certidão - Apagar", $detalhes);
+                $detalhes = "Apagou: " . ($dadosExcluidos['tipo_certidao'] ?? 'N/A') . " - " . ($dadosExcluidos['fornecedor'] ?? 'N/A');
+                registrar_log(Model::getConexao(), "Certidao - Apagar", $detalhes);
             }
         }
 
-        if (isset($_GET['origem']) && $_GET['origem'] == 'arquivo') {
-            $ano = $_GET['ano'] ?? date('Y');
-            redirect("/certidao/arquivadas?ano=$ano");
+        $origem = $_POST['origem'] ?? 'lista';
+        if ($origem === 'arquivo') {
+            $ano = $_POST['ano'] ?? date('Y');
+            redirect("/certidao/arquivadas?ano=" . urlencode($ano));
         } else {
             redirect('/certidao');
         }
         exit;
     }
 
-    public function arquivar($id)
+    public function arquivadas()
     {
-        $this->certidaoModel->alternarArquivo($id, 1);
-        redirect('/certidao');
-        exit;
-    }
+        $ano_filtro = $_GET['ano'] ?? 'todos';
 
-    public function desarquivar($id)
-    {
-        $this->certidaoModel->alternarArquivo($id, 0);
-        redirect('/certidao/arquivadas');
-        exit;
+        $this->view('certidoes/arquivadas', [
+            'certidoes' => $this->certidaoModel->listarPorAno($ano_filtro),
+            'ano_filtro' => $ano_filtro,
+            'anos_disponiveis' => $this->certidaoModel->getAnosDisponiveis()
+        ]);
     }
 
     public function configurar()
     {
-        $data['fornecedores'] = $this->certidaoModel->listarFornecedores();
-        $data['tipos'] = $this->certidaoModel->listarTiposCertidao();
-
-        $this->view('certidoes/configurar', $data);
+        $this->view('certidoes/configurar', [
+            'fornecedores' => $this->certidaoModel->listarFornecedores(),
+            'tipos' => $this->certidaoModel->listarTiposCertidao()
+        ]);
     }
 
     public function adicionarOpcao()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $nome = strtoupper(trim($_POST['nome']));
-            $tabela = $_POST['tipo_lista'];
+            verificar_csrf_token($_POST['csrf_token'] ?? '');
+            $tipoLista = $_POST['tipo_lista'] ?? '';
+            $nome = trim($_POST['nome'] ?? '');
 
-            if (!empty($nome)) {
-                $db = Model::getConexao();
-                $stmt = $db->prepare("INSERT OR IGNORE INTO $tabela (nome) VALUES (?)");
-                $stmt->execute([$nome]);
+            if ($nome !== '') {
+                $this->certidaoModel->adicionarOpcaoLista($tipoLista, $nome);
             }
-        }
-        redirect('/certidao/configurar');
-    }
-
-    public function excluirOpcao()
-    {
-        $id = $_GET['id'] ?? null;
-        $tabela = $_GET['tipo'] ?? null;
-
-        if ($id && in_array($tabela, ['lista_fornecedores', 'lista_tipos_certidao'])) {
-            $db = Model::getConexao();
-            $stmt = $db->prepare("DELETE FROM $tabela WHERE id = ?");
-            $stmt->execute([$id]);
-
-            registrar_log($db, "Configuração", "Excluiu item ID $id da tabela $tabela");
         }
 
         redirect('/certidao/configurar');
@@ -285,28 +218,69 @@ class CertidaoController extends Controller
 
     public function editarOpcao()
     {
-        $id = $_GET['id'] ?? null;
-        $tabela = $_GET['tipo'] ?? null;
-        $nome_antigo = $_GET['nome_antigo'] ?? null;
-        $novo_nome = strtoupper(trim($_GET['novo_nome'] ?? ''));
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            verificar_csrf_token($_POST['csrf_token'] ?? '');
+            $id = (int)($_POST['id'] ?? 0);
+            $tipoLista = $_POST['tipo'] ?? '';
+            $novoNome = trim($_POST['novo_nome'] ?? '');
 
-        if ($id && $tabela && $nome_antigo && $novo_nome && $novo_nome !== strtoupper($nome_antigo) && in_array($tabela, ['lista_fornecedores', 'lista_tipos_certidao'])) {
-            $db = Model::getConexao();
-
-            try {
-                $db->beginTransaction();
-
-                $stmtLista = $db->prepare("UPDATE $tabela SET nome = ? WHERE id = ?");
-                $stmtLista->execute([$novo_nome, $id]);
-
-                $db->commit();
-                registrar_log($db, "Configurações", "Renomeou em $tabela: de $nome_antigo para $novo_nome");
-            } catch (Exception $e) {
-                $db->rollBack();
-                error_log("Erro ao renomear opção: " . $e->getMessage());
+            if ($id > 0 && $novoNome !== '') {
+                $this->certidaoModel->atualizarOpcaoLista($tipoLista, $id, $novoNome);
             }
         }
 
         redirect('/certidao/configurar');
+    }
+
+    public function excluirOpcao()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            verificar_csrf_token($_POST['csrf_token'] ?? '');
+            $id = (int)($_POST['id'] ?? 0);
+            $tipoLista = $_POST['tipo'] ?? '';
+
+            if ($id > 0) {
+                $this->certidaoModel->excluirOpcaoLista($tipoLista, $id);
+            }
+        }
+
+        redirect('/certidao/configurar');
+    }
+
+    private function processarUploadPdf($arquivoAtual = null)
+    {
+        if (!isset($_FILES['arquivo_pdf']) || $_FILES['arquivo_pdf']['error'] === UPLOAD_ERR_NO_FILE) {
+            return $arquivoAtual;
+        }
+
+        if ($_FILES['arquivo_pdf']['error'] !== UPLOAD_ERR_OK) {
+            return false;
+        }
+
+        $extensao = strtolower(pathinfo($_FILES['arquivo_pdf']['name'], PATHINFO_EXTENSION));
+        if ($extensao !== 'pdf') {
+            return false;
+        }
+
+        $diretorio = ROOT_PATH . '/public/uploads/certidoes/';
+        if (!is_dir($diretorio)) {
+            mkdir($diretorio, 0755, true);
+        }
+
+        $novoNome = uniqid('cert_', true) . '.pdf';
+        $destino = $diretorio . $novoNome;
+
+        if (!move_uploaded_file($_FILES['arquivo_pdf']['tmp_name'], $destino)) {
+            return false;
+        }
+
+        if (!empty($arquivoAtual)) {
+            $caminhoAtual = $diretorio . basename($arquivoAtual);
+            if (is_file($caminhoAtual)) {
+                unlink($caminhoAtual);
+            }
+        }
+
+        return $novoNome;
     }
 }

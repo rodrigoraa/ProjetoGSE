@@ -1,35 +1,39 @@
 <?php
 require_once ROOT_PATH . '/src/Models/Painel.php';
 require_once ROOT_PATH . '/src/Models/Aluno.php';
-require_once ROOT_PATH . '/src/Core/Automacao.php';
 require_once ROOT_PATH . '/src/Models/Certidao.php';
 
 class PainelController extends Controller
 {
+    private $painelModel;
+    private $alunoModel;
+    private $certidaoModel;
 
-    public function index()
+    public function __construct()
     {
         if (!isset($_SESSION['usuario_id'])) {
             redirect('/login');
             exit;
         }
+        $this->painelModel = new Painel();
+        $this->alunoModel = new Aluno();
+        $this->certidaoModel = new Certidao();
+    }
 
-        $msg_backup = $this->executarBackupAutomatico();
+    public function index()
+    {
+        $status_backup = $this->verificarStatusBackupLinux();
 
-        $painelModel = new Painel();
-        $alunoModel = new Aluno();
-
-        $certidaoModel = new Certidao();
-        $certidoes_alerta = $certidaoModel->buscarVencendoProximosDias(30);
+        $certidoes_alerta = $this->certidaoModel->buscarVencendoProximosDias(30);
+        $vencidas         = $this->painelModel->getDvasVencidas();
+        $a_vencer         = $this->painelModel->getDvasAVencer();
 
         $mesAtual = date('m');
-        $diaHoje = date('d');
+        $diaHoje  = date('d');
         $anoAtual = date('Y');
 
-        $lista_aniversariantes_mes = $alunoModel->getAniversariantesDoMes($mesAtual);
-
-        $lista_hoje = $alunoModel->getAniversariantesHoje($diaHoje, $mesAtual);
         $aniversariantes_hoje = [];
+        $lista_hoje = $this->alunoModel->getAniversariantesHoje($diaHoje, $mesAtual);
 
         foreach ($lista_hoje as $aluno) {
             $ano_nasc = date('Y', strtotime($aluno['data_nascimento']));
@@ -38,67 +42,48 @@ class PainelController extends Controller
         }
 
         $dados = [
-            'nome_usuario' => $_SESSION['usuario_nome'],
-            'tipo_usuario' => $_SESSION['usuario_tipo'],
-            'msg_backup'   => $msg_backup,
+            'nome_usuario'         => $_SESSION['usuario_nome'],
+            'tipo_usuario'         => $_SESSION['usuario_tipo'],
+            'msg_backup'           => $status_backup,
 
-            'total_alunos'   => $painelModel->getTotalAlunos(),
-            'total_sem_dva'  => $painelModel->getTotalSemDva(),
+            'total_alunos'         => $this->painelModel->getTotalAlunos(),
+            'total_sem_dva'        => $this->painelModel->getTotalSemDva(),
+            'total_vencidas'       => count($vencidas),
+            'total_avencer'        => count($a_vencer),
 
-            'lista_sem_dva'  => $painelModel->getListaAlunosSemDva(),
+            'lista_sem_dva'        => $this->painelModel->getListaAlunosSemDva(),
+            'lista_vencidas'       => $vencidas,
+            'lista_avencer'        => $a_vencer,
+            'lista_vigentes'       => $this->painelModel->getDvasVigentes(),
 
-            'lista_vencidas' => $painelModel->getDvasVencidas(),
-            'lista_avencer'  => $painelModel->getDvasAVencer(),
-            'lista_vigentes' => $painelModel->getDvasVigentes(),
-
-            'aniversariantes_mes'  => $lista_aniversariantes_mes,
+            'aniversariantes_mes'  => $this->alunoModel->getAniversariantesDoMes($mesAtual),
             'aniversariantes_hoje' => $aniversariantes_hoje,
-
-            'certidoes_alerta' => $certidoes_alerta
+            'certidoes_alerta'     => $certidoes_alerta
         ];
-
-        $dados['total_vencidas'] = count($dados['lista_vencidas']);
-        $dados['total_avencer']  = count($dados['lista_avencer']);
 
         $this->view('painel', $dados);
     }
 
-    private function executarBackupAutomatico()
+    private function verificarStatusBackupLinux()
     {
-        $msg = '';
-        $pasta_backup = ROOT_PATH . '/database/backups/';
-        $arquivo_banco = ROOT_PATH . '/database/secretaria.db';
-        $nome_hoje = 'escola_backup_' . date('Y-m-d');
-        $limite_manter = 5;
+        $diretorio_logs = '/var/backups/escola/logs/';
 
-        $backups_hoje = glob($pasta_backup . $nome_hoje . '*.db');
+        if (!is_dir($diretorio_logs)) return "⚠️ Pasta de logs não acessível.";
 
-        if (empty($backups_hoje)) {
-            if (!is_dir($pasta_backup)) {
-                mkdir($pasta_backup, 0755, true);
-            }
-            $novo_nome = $nome_hoje . '_' . date('H-i-s') . '.db';
+        $logs = glob($diretorio_logs . 'backup_*.log');
+        if (empty($logs)) return "⚠️ Nenhum log de backup encontrado.";
 
-            if (copy($arquivo_banco, $pasta_backup . $novo_nome)) {
-                $msg = "Backup diário realizado com sucesso!";
+        usort($logs, function ($a, $b) {
+            return filemtime($b) - filemtime($a);
+        });
 
-                $nuvem = 'G:/Meu Drive/Backups_Escola/';
-                if (is_dir($nuvem)) {
-                    copy($arquivo_banco, $nuvem . $novo_nome);
-                }
+        $ultimo_log = $logs[0];
+        $data_log = date("d/m H:i", filemtime($ultimo_log));
 
-                $todos = glob($pasta_backup . '*.db');
-                if (count($todos) > $limite_manter) {
-                    usort($todos, function ($a, $b) {
-                        return filemtime($b) - filemtime($a);
-                    });
-                    $excedentes = array_slice($todos, $limite_manter);
-                    foreach ($excedentes as $arq) {
-                        if (file_exists($arq)) unlink($arq);
-                    }
-                }
-            }
+        if (filemtime($ultimo_log) < (time() - 93600)) {
+            return "❌ Backup atrasado! Último registro: $data_log";
         }
-        return $msg;
+
+        return "✅ Sistema protegido. Último backup: $data_log";
     }
 }

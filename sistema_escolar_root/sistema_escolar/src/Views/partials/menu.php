@@ -1,6 +1,6 @@
 <aside class="sidebar">
     <div class="sidebar-header">
-        <h2>🎓 Gestor Escolar</h2>
+        <h2>Gestor Escolar</h2>
     </div>
 
     <nav>
@@ -13,30 +13,30 @@
         ?>
 
         <a href="/painel" class="sidebar-link <?php echo is_active($uri, '/painel'); ?>">
-            <span>📊</span> Painel Geral
+            <span>Painel Geral</span> 
         </a>
         <a href="/aluno" class="sidebar-link <?php echo is_active($uri, '/aluno'); ?>">
-            <span>👥</span> Gestão de Alunos
+            <span>Gestão de Alunos</span>
         </a>
         <a href="/certidao" class="sidebar-link <?php echo is_active($uri, '/certidao'); ?>">
-            <span>📜</span> Certidões
+            <span>Certidões</span> 
         </a>
         <a href="/contrato" class="sidebar-link <?php echo is_active($uri, '/contrato'); ?>">
-            <span>📄</span> Contratos
+            <span>Contratos</span> 
         </a>
         <a href="/passivo" class="sidebar-link <?php echo is_active($uri, '/passivo'); ?>">
-            <span>📦</span> Arquivo Passivo
+            <span>Arquivo Passivo</span> 
         </a>
         <a href="/relatorio" class="sidebar-link">
-            <span>📊</span> Relatórios
+            <span>Relatórios</span> 
         </a>
 
         <a href="/etiqueta" class="sidebar-link">
-            <span>🏷️</span> Etiquetas
+            <span>Etiquetas</span> 
         </a>
 
-        <a href="https://meteo.eesjv.com.br" target="_blank" class="sidebar-link">
-            <span>🌤️</span> Estação Meteorológica
+        <a href="https://meteo.eesjv.com.br" target="_blank" class="sidebar-link" rel="noopener noreferrer">
+            <span>Estação Meteorológica</span>
         </a>
 
         <?php if (isset($_SESSION['usuario_tipo']) && $_SESSION['usuario_tipo'] === 'admin'): ?>
@@ -44,19 +44,19 @@
             <small style="padding-left:20px; color:rgba(255,255,255,0.5); text-transform:uppercase; font-size:0.75rem;">Admin</small>
 
             <a href="/usuario" class="sidebar-link <?php echo is_active($uri, '/usuario'); ?>">
-                <span>⚙️</span> Usuários
+                <span>Usuários</span> 
             </a>
             <a href="/sistema/backups" class="sidebar-link <?php echo is_active($uri, '/backups'); ?>">
-                <span>💾</span> Backups
+                <span>Backups</span> 
             </a>
             <a href="/sistema/logs" class="sidebar-link <?php echo is_active($uri, '/logs'); ?>">
-                <span>👁️</span> Logs
+                <span>Logs</span>
             </a>
         <?php endif; ?>
     </nav>
 
     <div class="sidebar-footer">
-        <div>Olá, <strong><?php echo $_SESSION['usuario_nome'] ?? 'User'; ?></strong></div>
+        <div>Olá, <strong><?php echo e($_SESSION['usuario_nome'] ?? 'User'); ?></strong></div>
         <a href="/login/sair" class="btn-sair">Sair do Sistema</a>
     </div>
 </aside>

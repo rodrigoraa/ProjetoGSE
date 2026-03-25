@@ -40,8 +40,11 @@ class Contrato extends Model
             self::$pdo->commit();
             return true;
         } catch (Throwable $e) {
-            self::$pdo->rollBack();
-            die("<b style='color:red; font-size:20px;'>❌ ERRO FATAL AO SALVAR: " . $e->getMessage() . "</b>");
+            if (self::$pdo->inTransaction()) {
+                self::$pdo->rollBack();
+            }
+            error_log("Erro Critico (Contrato -> salvarContratoCompleto): " . $e->getMessage());
+            return false;
         }
     }
 
@@ -84,7 +87,10 @@ class Contrato extends Model
             self::$pdo->commit();
             return true;
         } catch (Exception $e) {
-            self::$pdo->rollBack();
+            if (self::$pdo->inTransaction()) {
+                self::$pdo->rollBack();
+            }
+            error_log("Erro (Contrato -> atualizarContratoCompleto ID {$id}): " . $e->getMessage());
             return false;
         }
     }
@@ -121,22 +127,44 @@ class Contrato extends Model
 
     public function excluir($id)
     {
-        $sql = "DELETE FROM contratos WHERE id = ?";
-        $stmt = self::$pdo->prepare($sql);
-        return $stmt->execute([$id]);
+        try {
+            self::$pdo->beginTransaction();
+            self::$pdo->prepare("DELETE FROM contrato_produtos WHERE id_contrato = ?")->execute([$id]);
+            self::$pdo->prepare("DELETE FROM contrato_folhas WHERE id_contrato = ?")->execute([$id]);
+            self::$pdo->prepare("DELETE FROM contratos WHERE id = ?")->execute([$id]);
+            self::$pdo->commit();
+            return true;
+        } catch (Exception $e) {
+            if (self::$pdo->inTransaction()) {
+                self::$pdo->rollBack();
+            }
+            error_log("Erro ao excluir contrato {$id}: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function adicionarProdutoUnico($id_contrato, $numero_folha, $nome, $marca, $unidade, $quantidade, $valor_unitario)
     {
         $valor_total = $quantidade * $valor_unitario;
-        $sql = "INSERT INTO contrato_produtos (id_contrato, numero_folha, nome_produto, marca, unidade, quantidade, valor_unitario, valor_total) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO contrato_produtos (id_contrato, numero_folha, nome_produto, marca, unidade, quantidade, valor_unitario, valor_total)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         return self::$pdo->prepare($sql)->execute([$id_contrato, $numero_folha, $nome, $marca, $unidade, $quantidade, $valor_unitario, $valor_total]);
     }
 
     public function buscarProdutoPorId($id_produto)
     {
         $sql = "SELECT * FROM contrato_produtos WHERE id = ?";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([$id_produto]);
+        return $stmt->fetch();
+    }
+
+    public function buscarProdutoPorIdComContrato($id_produto)
+    {
+        $sql = "SELECT p.*, c.id AS id_contrato, c.titulo
+                FROM contrato_produtos p
+                JOIN contratos c ON c.id = p.id_contrato
+                WHERE p.id = ?";
         $stmt = self::$pdo->prepare($sql);
         $stmt->execute([$id_produto]);
         return $stmt->fetch();
@@ -155,23 +183,18 @@ class Contrato extends Model
         $stmt = self::$pdo->prepare($sql);
         return $stmt->execute([$id_produto]);
     }
-    // =========================================================
-    // EXCLUIR FOLHA (Com recálculo de valores e reorganização)
-    // =========================================================
+
     public function excluirFolha($id_contrato, $numero_folha)
     {
         try {
             self::$pdo->beginTransaction();
 
-            // 1. Apaga os produtos e a folha específica
             self::$pdo->prepare("DELETE FROM contrato_produtos WHERE id_contrato = ? AND numero_folha = ?")->execute([$id_contrato, $numero_folha]);
             self::$pdo->prepare("DELETE FROM contrato_folhas WHERE id_contrato = ? AND numero_folha = ?")->execute([$id_contrato, $numero_folha]);
 
-            // 2. Reorganiza a numeração (Se apagar a folha 2, a 3 vira 2, a 4 vira 3...)
             self::$pdo->prepare("UPDATE contrato_produtos SET numero_folha = numero_folha - 1 WHERE id_contrato = ? AND numero_folha > ?")->execute([$id_contrato, $numero_folha]);
             self::$pdo->prepare("UPDATE contrato_folhas SET numero_folha = numero_folha - 1 WHERE id_contrato = ? AND numero_folha > ?")->execute([$id_contrato, $numero_folha]);
 
-            // 3. Pega os dados para fazer a nova matemática
             $sqlContrato = "SELECT valor_total, qtd_folhas FROM contratos WHERE id = ?";
             $stmtC = self::$pdo->prepare($sqlContrato);
             $stmtC->execute([$id_contrato]);
@@ -180,18 +203,19 @@ class Contrato extends Model
             $nova_qtd_folhas = $contrato['qtd_folhas'] - 1;
 
             if ($nova_qtd_folhas > 0) {
-                // 4. Calcula o novo valor e atualiza as folhas restantes
                 $novo_valor_por_folha = $contrato['valor_total'] / $nova_qtd_folhas;
                 self::$pdo->prepare("UPDATE contrato_folhas SET valor_folha = ? WHERE id_contrato = ?")->execute([$novo_valor_por_folha, $id_contrato]);
             }
 
-            // 5. Atualiza o contrato principal
             self::$pdo->prepare("UPDATE contratos SET qtd_folhas = ? WHERE id = ?")->execute([$nova_qtd_folhas, $id_contrato]);
 
             self::$pdo->commit();
             return true;
         } catch (Exception $e) {
-            self::$pdo->rollBack();
+            if (self::$pdo->inTransaction()) {
+                self::$pdo->rollBack();
+            }
+            error_log("Erro (Contrato -> excluirFolha Contrato {$id_contrato}, Folha {$numero_folha}): " . $e->getMessage());
             return false;
         }
     }
@@ -206,7 +230,9 @@ class Contrato extends Model
             $stmtContrato->execute([$id_contrato]);
             $contrato = $stmtContrato->fetch();
 
-            if (!$contrato) throw new Exception("Contrato não encontrado.");
+            if (!$contrato) {
+                throw new Exception("Contrato nao encontrado.");
+            }
 
             $nova_qtd_folhas = $contrato['qtd_folhas'] + 1;
             $novo_valor_por_folha = $contrato['valor_total'] / $nova_qtd_folhas;
@@ -229,7 +255,10 @@ class Contrato extends Model
             self::$pdo->commit();
             return true;
         } catch (Exception $e) {
-            self::$pdo->rollBack();
+            if (self::$pdo->inTransaction()) {
+                self::$pdo->rollBack();
+            }
+            error_log("Erro (Contrato -> adicionarFolha ID {$id_contrato}): " . $e->getMessage());
             return false;
         }
     }
@@ -260,7 +289,9 @@ class Contrato extends Model
             if ($qtd_livres > 0) {
                 $valor_restante = $contrato['valor_total'] - $soma_travadas;
 
-                if ($valor_restante < 0) $valor_restante = 0;
+                if ($valor_restante < 0) {
+                    $valor_restante = 0;
+                }
 
                 $valor_rateado = $valor_restante / $qtd_livres;
 
@@ -271,7 +302,10 @@ class Contrato extends Model
             self::$pdo->commit();
             return true;
         } catch (Exception $e) {
-            self::$pdo->rollBack();
+            if (self::$pdo->inTransaction()) {
+                self::$pdo->rollBack();
+            }
+            error_log("Erro (Contrato -> atualizarValorFolha Contrato {$id_contrato}, Folha {$numero_folha}): " . $e->getMessage());
             return false;
         }
     }

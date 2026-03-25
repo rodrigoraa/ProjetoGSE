@@ -19,33 +19,30 @@
             <main>
                 <div class="toolbar-alunos">
                     <?php $link_voltar = $acao === 'editar' ? $produto['id_contrato'] : $id_contrato; ?>
-                    <a href="/contrato/ver/<?php echo $link_voltar; ?>" class="btn-secondary" style="text-decoration:none;">⬅ Voltar</a>
+                    <a href="/contrato/ver/<?php echo (int)$link_voltar; ?>" class="btn-secondary" style="text-decoration:none;">Voltar</a>
                 </div>
 
                 <form method="POST" class="form-aluno" style="max-width: 600px;">
+                    <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                     <?php if (isset($_GET['folha'])): ?>
                         <input type="hidden" name="numero_folha" value="<?php echo (int)$_GET['folha']; ?>">
                     <?php endif; ?>
 
                     <div class="form-group">
                         <label>Nome do Produto</label>
-                        <input type="text" name="nome_produto" class="sistema" required
-                            value="<?php echo $acao === 'editar' ? htmlspecialchars($produto['nome_produto']) : ''; ?>" placeholder="Ex: Papel A4">
+                        <input type="text" name="nome_produto" class="sistema" required value="<?php echo $acao === 'editar' ? e($produto['nome_produto']) : ''; ?>" placeholder="Ex: Papel A4">
                     </div>
 
                     <div class="form-group">
                         <label>Marca / Fabricante</label>
-                        <input type="text" name="marca" class="sistema"
-                            value="<?php echo $acao === 'editar' ? htmlspecialchars($produto['marca'] ?? '') : ''; ?>" placeholder="Ex: Chamex, HP, Bic...">
+                        <input type="text" name="marca" class="sistema" value="<?php echo $acao === 'editar' ? e($produto['marca'] ?? '') : ''; ?>" placeholder="Ex: Chamex, HP, Bic...">
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
                         <div class="form-group">
                             <label>Unidade</label>
                             <select name="unidade" class="sistema" required>
-                                <?php
-                                $unid_atual = ($acao === 'editar') ? ($produto['unidade'] ?? 'UN') : 'UN';
-                                ?>
+                                <?php $unid_atual = ($acao === 'editar') ? ($produto['unidade'] ?? 'UN') : 'UN'; ?>
                                 <option value="KG" <?php echo ($unid_atual == 'KG') ? 'selected' : ''; ?>>KG</option>
                                 <option value="L" <?php echo ($unid_atual == 'L') ? 'selected' : ''; ?>>L</option>
                                 <option value="UN" <?php echo ($unid_atual == 'UN') ? 'selected' : ''; ?>>UN</option>
@@ -55,19 +52,17 @@
 
                         <div class="form-group">
                             <label>Quantidade</label>
-                            <input type="number" name="quantidade" class="sistema" min="1" required
-                                value="<?php echo $acao === 'editar' ? $produto['quantidade'] : '1'; ?>">
+                            <input type="number" name="quantidade" class="sistema" min="1" required value="<?php echo $acao === 'editar' ? (int)$produto['quantidade'] : '1'; ?>">
                         </div>
 
                         <div class="form-group">
-                            <label>Valor Unitário (R$)</label>
-                            <input type="number" name="valor_unitario" class="sistema" step="0.01" required
-                                value="<?php echo $acao === 'editar' ? $produto['valor_unitario'] : ''; ?>">
+                            <label>Valor Unitario (R$)</label>
+                            <input type="number" name="valor_unitario" class="sistema" step="0.01" required value="<?php echo $acao === 'editar' ? e($produto['valor_unitario']) : ''; ?>">
                         </div>
                     </div>
 
                     <div class="form-actions" style="margin-top: 20px;">
-                        <button type="submit" class="btn-primary" style="width: 100%;">💾 Salvar Informações do Produto</button>
+                        <button type="submit" class="btn-primary" style="width: 100%;">Salvar Informacoes do Produto</button>
                     </div>
                 </form>
             </main>

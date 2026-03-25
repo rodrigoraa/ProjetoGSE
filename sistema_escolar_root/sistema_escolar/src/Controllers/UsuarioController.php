@@ -3,7 +3,6 @@ require_once ROOT_PATH . '/src/Models/Usuario.php';
 
 class UsuarioController extends Controller
 {
-
     public function index()
     {
         $this->verificarAdmin();
@@ -12,14 +11,14 @@ class UsuarioController extends Controller
         $lista = $usuarioModel->listar();
 
         $sucesso = $_SESSION['msg_sucesso'] ?? null;
-        $erro    = $_SESSION['msg_erro'] ?? null;
+        $erro = $_SESSION['msg_erro'] ?? null;
 
         unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
 
         $this->view('usuarios/index', [
             'funcionarios' => $lista,
-            'msg_sucesso'  => $sucesso,
-            'msg_erro'     => $erro
+            'msg_sucesso' => $sucesso,
+            'msg_erro' => $erro
         ]);
     }
 
@@ -33,14 +32,14 @@ class UsuarioController extends Controller
 
             $usuarioModel = new Usuario();
             if ($usuarioModel->cadastrar($_POST['nome'], $_POST['email'], $_POST['senha'], $_POST['tipo'])) {
-                registrar_log(Model::getConexao(), "Usuário - Criar", "Criou: " . $_POST['nome']);
+                registrar_log(Model::getConexao(), "Usuario - Criar", "Criou: " . $_POST['nome']);
 
-                $_SESSION['msg_sucesso'] = "Usuário cadastrado com sucesso!";
+                $_SESSION['msg_sucesso'] = "Usuario cadastrado com sucesso!";
                 redirect('/usuario');
                 exit;
-            } else {
-                $mensagem = '<p class="error-message">Erro: E-mail já cadastrado?</p>';
             }
+
+            $mensagem = '<p class="error-message">Erro: e-mail ja cadastrado?</p>';
         }
         $this->view('usuarios/cadastrar', ['mensagem' => $mensagem]);
     }
@@ -63,14 +62,14 @@ class UsuarioController extends Controller
             $novaSenha = !empty($_POST['senha']) ? $_POST['senha'] : null;
 
             if ($usuarioModel->atualizar($id, $_POST['nome'], $_POST['email'], $_POST['tipo'], $novaSenha)) {
-                registrar_log(Model::getConexao(), "Usuário - Editar", "Editou ID: $id");
+                registrar_log(Model::getConexao(), "Usuario - Editar", "Editou ID: $id");
 
-                $_SESSION['msg_sucesso'] = "Usuário atualizado com sucesso!";
+                $_SESSION['msg_sucesso'] = "Usuario atualizado com sucesso!";
                 redirect('/usuario');
                 exit;
-            } else {
-                $mensagem = '<p class="error-message">Erro ao atualizar.</p>';
             }
+
+            $mensagem = '<p class="error-message">Erro ao atualizar.</p>';
         }
         $this->view('usuarios/editar', ['user' => $user, 'mensagem' => $mensagem]);
     }
@@ -79,21 +78,27 @@ class UsuarioController extends Controller
     {
         $this->verificarAdmin();
 
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('/usuario');
+            exit;
+        }
+
+        verificar_csrf_token($_POST['csrf_token'] ?? '');
+
         if ($id == $_SESSION['usuario_id']) {
-            $_SESSION['msg_erro'] = "Você não pode excluir sua própria conta.";
+            $_SESSION['msg_erro'] = "Voce nao pode excluir sua propria conta.";
             redirect('/usuario');
             exit;
         }
 
         $usuarioModel = new Usuario();
-        
         $resultado = $usuarioModel->excluir($id);
 
         if ($resultado === true) {
-            registrar_log(Model::getConexao(), "Usuário - Excluir", "Excluiu ID: $id");
-            $_SESSION['msg_sucesso'] = "Usuário excluído com sucesso!";
+            registrar_log(Model::getConexao(), "Usuario - Excluir", "Excluiu ID: $id");
+            $_SESSION['msg_sucesso'] = "Usuario excluido com sucesso!";
         } elseif ($resultado === 'tem_registros') {
-            $_SESSION['msg_erro'] = "Não é possível excluir este funcionário pois ele possui DVAs ou registros no sistema. O banco de dados bloqueou a ação para proteger o histórico.";
+            $_SESSION['msg_erro'] = "Nao e possivel excluir este funcionario pois ele possui registros vinculados.";
         } else {
             $_SESSION['msg_erro'] = "Erro desconhecido ao tentar excluir.";
         }
@@ -118,7 +123,6 @@ class UsuarioController extends Controller
             verificar_csrf_token($_POST['csrf_token'] ?? '');
 
             if (password_verify($_POST['senha_atual'], $user['senha'])) {
-
                 $novaSenha = !empty($_POST['nova_senha']) ? $_POST['nova_senha'] : null;
 
                 if ($usuarioModel->atualizarPerfil($id, $_POST['nome'], $_POST['email'], $novaSenha)) {

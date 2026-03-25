@@ -3,26 +3,25 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Painel de Certidões</title>
+    <title>Painel de Certidoes</title>
     <link rel="stylesheet" href="/assets/css/painel.css">
     <link rel="stylesheet" href="/assets/css/certidoes.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
-
     <div class="layout-container">
         <?php include VIEW_PATH . '/partials/menu.php'; ?>
 
         <div class="main-content-wrapper">
             <header style="margin-bottom: 20px;">
-                <h1 style="color: #1e293b; font-size: 1.8rem;">Matriz de Certidões <span style="color: #64748b; font-size: 1.2rem; font-weight: 400;">(<?php echo $ano_atual; ?> em diante)</span></h1>
+                <h1 style="color: #1e293b; font-size: 1.8rem;">Matriz de Certidoes <span style="color: #64748b; font-size: 1.2rem; font-weight: 400;">(<?php echo (int)$ano_atual; ?> em diante)</span></h1>
             </header>
 
             <main>
                 <div class="toolbar-matriz">
                     <div class="toolbar-actions">
-                        <a href="/certidao/cadastrar" class="btn-novo"><i class="fa-solid fa-plus"></i> Nova Certidão</a>
+                        <a href="/certidao/cadastrar" class="btn-novo"><i class="fa-solid fa-plus"></i> Nova Certidao</a>
                         <a href="/certidao/configurar" class="btn-arquivo"><i class="fa-solid fa-gear"></i> Tipos/Fornecedores</a>
                         <a href="/certidao/arquivadas" class="btn-arquivo"><i class="fa-solid fa-folder-open"></i> Arquivadas</a>
                     </div>
@@ -39,7 +38,7 @@
                             <select id="filtroFornecedor" onchange="aplicarFiltros()">
                                 <option value="todos">Todos Fornecedores</option>
                                 <?php foreach ($lista_fornecedores as $f): ?>
-                                    <option value="<?php echo htmlspecialchars($f); ?>"><?php echo htmlspecialchars($f); ?></option>
+                                    <option value="<?php echo e($f); ?>"><?php echo e($f); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -62,8 +61,8 @@
                             <tr>
                                 <th class="th-tipo">TIPO / FORNECEDOR</th>
                                 <?php foreach ($lista_fornecedores as $fornecedor): ?>
-                                    <th class="th-fornecedor" data-fornecedor="<?php echo htmlspecialchars($fornecedor); ?>">
-                                        <span><?php echo $fornecedor; ?></span>
+                                    <th class="th-fornecedor" data-fornecedor="<?php echo e($fornecedor); ?>">
+                                        <span><?php echo e($fornecedor); ?></span>
                                     </th>
                                 <?php endforeach; ?>
                             </tr>
@@ -71,46 +70,45 @@
                         <tbody>
                             <?php if (empty($tipos_certidoes)): ?>
                                 <tr>
-                                    <td colspan="<?php echo count($lista_fornecedores) + 1; ?>" class="empty-state">Nenhuma certidão vigente para este ano.</td>
+                                    <td colspan="<?php echo count($lista_fornecedores) + 1; ?>" class="empty-state">Nenhuma certidao vigente para este ano.</td>
                                 </tr>
                             <?php endif; ?>
 
                             <?php foreach ($tipos_certidoes as $tipo): ?>
                                 <tr>
-                                    <td class="nome-tipo"><?php echo $tipo; ?></td>
+                                    <td class="nome-tipo"><?php echo e($tipo); ?></td>
 
-                                    <?php foreach ($lista_fornecedores as $fornecedor):
-                                        $lista = $dados_organizados[$fornecedor][$tipo] ?? [];
-                                    ?>
-                                        <td class="td-fornecedor" data-fornecedor="<?php echo htmlspecialchars($fornecedor); ?>">
+                                    <?php foreach ($lista_fornecedores as $fornecedor): ?>
+                                        <?php $lista = $dados_organizados[$fornecedor][$tipo] ?? []; ?>
+                                        <td class="td-fornecedor" data-fornecedor="<?php echo e($fornecedor); ?>">
                                             <?php if (empty($lista)): ?>
                                                 <span class="cell-empty">-</span>
                                             <?php else: ?>
-                                                <?php foreach ($lista as $d):
+                                                <?php foreach ($lista as $d): ?>
+                                                    <?php
                                                     $venc = new DateTime($d['data_vencimento']);
                                                     $emiss = new DateTime($d['data_emissao']);
                                                     $hoje = new DateTime();
                                                     $dias = (int)$hoje->diff($venc)->format("%r%a");
-
                                                     $bg = 'status-vigente';
                                                     $st = $dias . " dias";
 
                                                     if ($dias < 0) {
                                                         $bg = 'status-vencida';
-                                                        $st = "Há " . abs($dias) . " dias";
+                                                        $st = "Ha " . abs($dias) . " dias";
                                                     } elseif ($dias <= 15) {
                                                         $bg = 'status-avencer';
                                                         $st = "Em " . $dias . " dias";
                                                     }
-                                                ?>
-                                                    <div class="cert-card <?php echo $bg; ?>" data-status="<?php echo $bg; ?>">
+                                                    ?>
+                                                    <div class="cert-card <?php echo e($bg); ?>" data-status="<?php echo e($bg); ?>">
                                                         <div class="cert-header">
-                                                            <span class="cert-badge"><?php echo $st; ?></span>
+                                                            <span class="cert-badge"><?php echo e($st); ?></span>
                                                         </div>
 
                                                         <div class="cert-body">
                                                             <div class="cert-date">
-                                                                <span class="date-lbl">Emissão</span>
+                                                                <span class="date-lbl">Emissao</span>
                                                                 <span class="date-val"><?php echo $emiss->format('d/m/y'); ?></span>
                                                             </div>
                                                             <div class="cert-date text-right">
@@ -120,18 +118,26 @@
                                                         </div>
 
                                                         <div class="cert-actions">
-                                                            <a href="/certidao/cadastrar?f=<?php echo $d['id_fornecedor']; ?>&t=<?php echo $d['id_tipo_certidao']; ?>&renovar_id=<?php echo $d['id']; ?>" class="action-btn text-success" title="Renovar Certidão"><i class="fa-solid fa-rotate"></i></a>
-                                                            <a href="/certidao/arquivar/<?php echo $d['id']; ?>" class="action-btn text-warning" title="Arquivar Certidão" onclick="return confirm('Mover para os arquivos?');"><i class="fa-solid fa-box-archive"></i></a>
+                                                            <a href="/certidao/cadastrar?f=<?php echo (int)$d['id_fornecedor']; ?>&t=<?php echo (int)$d['id_tipo_certidao']; ?>&renovar_id=<?php echo (int)$d['id']; ?>" class="action-btn text-success" title="Renovar Certidao"><i class="fa-solid fa-rotate"></i></a>
+
+                                                            <form action="/certidao/arquivar/<?php echo (int)$d['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Mover para os arquivos?');">
+                                                                <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
+                                                                <button type="submit" class="action-btn text-warning" title="Arquivar Certidao" style="border:0; cursor:pointer;"><i class="fa-solid fa-box-archive"></i></button>
+                                                            </form>
 
                                                             <?php if (!empty($d['arquivo_pdf'])): ?>
-                                                                <a href="/uploads/certidoes/<?php echo $d['arquivo_pdf']; ?>" target="_blank" class="action-btn text-info" title="Ver PDF"><i class="fa-solid fa-file-pdf"></i></a>
+                                                                <a href="/uploads/certidoes/<?php echo rawurlencode($d['arquivo_pdf']); ?>" target="_blank" class="action-btn text-info" title="Ver PDF"><i class="fa-solid fa-file-pdf"></i></a>
                                                             <?php else: ?>
                                                                 <span class="action-btn disabled"><i class="fa-solid fa-file-pdf"></i></span>
                                                             <?php endif; ?>
 
-                                                            <a href="/certidao/editar/<?php echo $d['id']; ?>" class="action-btn text-primary" title="Editar Informações"><i class="fa-solid fa-pen"></i></a>
+                                                            <a href="/certidao/editar/<?php echo (int)$d['id']; ?>" class="action-btn text-primary" title="Editar Informacoes"><i class="fa-solid fa-pen"></i></a>
 
-                                                            <a href="/certidao/excluir/<?php echo $d['id']; ?>" class="action-btn text-danger" title="Apagar" onclick="return confirm('Apagar permanentemente?');"><i class="fa-solid fa-trash-can"></i></a>
+                                                            <form action="/certidao/excluir/<?php echo (int)$d['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Apagar permanentemente?');">
+                                                                <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
+                                                                <input type="hidden" name="origem" value="lista">
+                                                                <button type="submit" class="action-btn text-danger" title="Apagar" style="border:0; cursor:pointer;"><i class="fa-solid fa-trash-can"></i></button>
+                                                            </form>
                                                         </div>
                                                     </div>
                                                 <?php endforeach; ?>
@@ -152,33 +158,16 @@
             const filtroStatus = document.getElementById('filtroStatus').value;
             const filtroFornecedor = document.getElementById('filtroFornecedor').value;
 
-            const headersFornecedor = document.querySelectorAll('.th-fornecedor');
-            const celulasFornecedor = document.querySelectorAll('.td-fornecedor');
-
-            headersFornecedor.forEach(th => {
-                if (filtroFornecedor === 'todos' || th.getAttribute('data-fornecedor') === filtroFornecedor) {
-                    th.style.display = '';
-                } else {
-                    th.style.display = 'none';
-                }
+            document.querySelectorAll('.th-fornecedor').forEach((th) => {
+                th.style.display = filtroFornecedor === 'todos' || th.getAttribute('data-fornecedor') === filtroFornecedor ? '' : 'none';
             });
 
-            celulasFornecedor.forEach(td => {
-                if (filtroFornecedor === 'todos' || td.getAttribute('data-fornecedor') === filtroFornecedor) {
-                    td.style.display = '';
-                } else {
-                    td.style.display = 'none';
-                }
+            document.querySelectorAll('.td-fornecedor').forEach((td) => {
+                td.style.display = filtroFornecedor === 'todos' || td.getAttribute('data-fornecedor') === filtroFornecedor ? '' : 'none';
             });
 
-            const certidoes = document.querySelectorAll('.cert-card');
-
-            certidoes.forEach(cert => {
-                if (filtroStatus === 'todos' || cert.getAttribute('data-status') === filtroStatus) {
-                    cert.style.display = 'flex';
-                } else {
-                    cert.style.display = 'none';
-                }
+            document.querySelectorAll('.cert-card').forEach((cert) => {
+                cert.style.display = filtroStatus === 'todos' || cert.getAttribute('data-status') === filtroStatus ? 'flex' : 'none';
             });
         }
     </script>

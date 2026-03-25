@@ -30,51 +30,38 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Título do Pedido / Fornecedor</th>
-                                <th>Divisão</th>
+                                <th>Titulo do Pedido / Fornecedor</th>
+                                <th>Divisao</th>
                                 <th>Valor Total</th>
                                 <th>Data de Registro</th>
-                                <th style="text-align: center;">Ações</th>
+                                <th style="text-align: center;">Acoes</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($contratos)): ?>
                                 <tr>
-                                    <td colspan="6" style="text-align: center; padding: 30px; color: #666;">
-                                        <div style="font-size: 1.2rem; margin-bottom: 10px;">📂</div>
-                                        Nenhum pedido encontrado no sistema.
-                                    </td>
+                                    <td colspan="6" style="text-align: center; padding: 30px; color: #666;">Nenhum pedido encontrado no sistema.</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($contratos as $c): ?>
                                     <tr>
-                                        <td><span style="color: #999;">#</span><?php echo $c['id']; ?></td>
-                                        <td>
-                                            <strong><?php echo htmlspecialchars($c['titulo']); ?></strong>
-                                        </td>
-                                        <td>
-                                            <span class="badge-folhas"><?php echo $c['qtd_folhas']; ?> folha(s)</span>
-                                        </td>
-                                        <td style="color: #0066cc; font-weight: bold;">
-                                            R$ <?php echo number_format($c['valor_total'], 2, ',', '.'); ?>
-                                        </td>
+                                        <td><span style="color: #999;">#</span><?php echo (int)$c['id']; ?></td>
+                                        <td><strong><?php echo e($c['titulo']); ?></strong></td>
+                                        <td><span class="badge-folhas"><?php echo (int)$c['qtd_folhas']; ?> folha(s)</span></td>
+                                        <td style="color: #0066cc; font-weight: bold;">R$ <?php echo number_format($c['valor_total'], 2, ',', '.'); ?></td>
                                         <td style="font-size: 0.9rem; color: #666;">
                                             <?php echo date('d/m/Y', strtotime($c['criado_em'])); ?>
                                             <small style="display:block; color: #aaa;"><?php echo date('H:i', strtotime($c['criado_em'])); ?></small>
                                         </td>
                                         <td style="text-align: center;">
                                             <div style="display: flex; gap: 5px; justify-content: center; align-items: center;">
-                                                <a href="/contrato/ver/<?php echo $c['id']; ?>" class="btn-secondary" style="padding: 6px 12px; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
-                                                    👁️ Ver Produtos
-                                                </a>
+                                                <a href="/contrato/ver/<?php echo (int)$c['id']; ?>" class="btn-secondary" style="padding: 6px 12px; font-size: 0.85rem; text-decoration: none;">Ver Produtos</a>
 
                                                 <?php if ($_SESSION['usuario_tipo'] === 'admin'): ?>
-                                                    <a href="/contrato/excluir/<?php echo $c['id']; ?>"
-                                                        class="btn-danger"
-                                                        style="padding: 6px 12px; font-size: 0.85rem; text-decoration: none; background-color: #d32f2f; color: white; border-radius: 4px; display: inline-flex; align-items: center; gap: 5px;"
-                                                        onclick="return confirm('⚠️ ATENÇÃO: Deseja realmente excluir este contrato? Isso apagará todas as folhas e produtos vinculados!')">
-                                                        🗑️ Apagar
-                                                    </a>
+                                                    <form action="/contrato/excluir/<?php echo (int)$c['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Deseja realmente excluir este contrato? Isso apagara todas as folhas e produtos vinculados.');">
+                                                        <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
+                                                        <button type="submit" class="btn-danger" style="padding: 6px 12px; font-size: 0.85rem; border:0; cursor:pointer;">Apagar</button>
+                                                    </form>
                                                 <?php endif; ?>
                                             </div>
                                         </td>

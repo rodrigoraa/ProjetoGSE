@@ -22,13 +22,13 @@
                     <a href="/aluno/cadastrar" class="btn-primary" style="text-decoration:none;">+ Novo Aluno</a>
 
                     <form action="/aluno" method="GET" class="form-busca">
-                        <input type="search" name="busca" value="<?php echo htmlspecialchars($termo); ?>" placeholder="Nome do aluno..." class="sistema" style="margin-bottom:0;">
+                        <input type="search" name="busca" value="<?php echo e($termo); ?>" placeholder="Nome do aluno..." class="sistema" style="margin-bottom:0;">
                         <button type="submit" class="btn-secondary">Buscar</button>
                     </form>
                 </div>
 
                 <div class="relatorio">
-                    <h3 class="form-section-title">Alunos Cadastrados (<?php echo $total_registros; ?>)</h3>
+                    <h3 class="form-section-title">Alunos Cadastrados (<?php echo (int)$total_registros; ?>)</h3>
 
                     <table class="tabela-filtrada">
                         <thead>
@@ -36,7 +36,7 @@
                                 <th>Nome Completo</th>
                                 <th>Turma</th>
                                 <th>Data Nasc.</th>
-                                <th>Ações</th>
+                                <th>Acoes</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -49,17 +49,20 @@
                             <?php foreach ($lista_alunos as $aluno): ?>
                                 <tr>
                                     <td class="nome-aluno">
-                                        <a href="/aluno/perfil/<?php echo $aluno['id']; ?>"><?php echo htmlspecialchars($aluno['nome_completo']); ?></a>
+                                        <a href="/aluno/perfil/<?php echo (int)$aluno['id']; ?>"><?php echo e($aluno['nome_completo']); ?></a>
                                     </td>
-                                    <td><?php echo htmlspecialchars($aluno['nome_turma'] ?? 'Sem turma'); ?></td>
+                                    <td><?php echo e($aluno['nome_turma'] ?? 'Sem turma'); ?></td>
                                     <td><?php echo date('d/m/Y', strtotime($aluno['data_nascimento'])); ?></td>
 
                                     <td class="col-acoes">
-                                        <a href="/aluno/perfil/<?php echo $aluno['id']; ?>" class="editar">👁️ Perfil</a>
-                                        <a href="/aluno/editar/<?php echo $aluno['id']; ?>" class="editar">✏️ Editar</a>
+                                        <a href="/aluno/perfil/<?php echo (int)$aluno['id']; ?>" class="editar">Perfil</a>
+                                        <a href="/aluno/editar/<?php echo (int)$aluno['id']; ?>" class="editar">Editar</a>
 
                                         <?php if ($_SESSION['usuario_tipo'] === 'admin'): ?>
-                                            <a href="/aluno/excluir/<?php echo $aluno['id']; ?>" class="btn-danger" style="text-decoration:none;" onclick="return confirm('Tem certeza absoluta? Isso apagará o aluno e a DVA dele.');">🗑️ Apagar</a>
+                                            <form action="/aluno/excluir/<?php echo (int)$aluno['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Tem certeza absoluta? Isso apagara o aluno e a DVA dele.');">
+                                                <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
+                                                <button type="submit" class="btn-danger" style="text-decoration:none; border:0; cursor:pointer;">Apagar</button>
+                                            </form>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -71,9 +74,9 @@
                         <div class="paginacao">
                             <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
                                 <?php if ($i == $pagina_atual): ?>
-                                    <span class="ativo"><?php echo $i; ?></span>
+                                    <span class="ativo"><?php echo (int)$i; ?></span>
                                 <?php else: ?>
-                                    <a href="/aluno?pagina=<?php echo $i; ?>&busca=<?php echo $termo; ?>"><?php echo $i; ?></a>
+                                    <a href="/aluno?pagina=<?php echo (int)$i; ?>&busca=<?php echo urlencode($termo); ?>"><?php echo (int)$i; ?></a>
                                 <?php endif; ?>
                             <?php endfor; ?>
                         </div>

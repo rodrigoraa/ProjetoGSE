@@ -23,19 +23,35 @@ class Router
         if (file_exists($controllerFile)) {
 
             require_once $controllerFile;
+            
+            if (class_exists($controllerName)) {
+                $controllerInstance = new $controllerName();
 
-            $controller = new $controllerName();
-
-            if (method_exists($controller, $actionName)) {
-
-                call_user_func_array([$controller, $actionName], $params);
+                if (method_exists($controllerInstance, $actionName)) {
+                    call_user_func_array([$controllerInstance, $actionName], $params);
+                    return; 
+                } else {
+                    error_log("Roteamento: Ação '{$actionName}' não encontrada em '{$controllerName}'. URL tentada: {$url}");
+                }
             } else {
-
-                echo "<h1>Erro 404</h1><p>Ação '$actionName' não encontrada.</p>";
+                error_log("Roteamento: Arquivo '{$controllerFile}' existe, mas a classe '{$controllerName}' não foi encontrada dentro dele.");
             }
         } else {
-
-            echo "<h1>Erro 404</h1><p>Controller '$controllerName' não encontrado.</p>";
+            error_log("Roteamento: Controller '{$controllerName}' (Arquivo: {$controllerFile}) não encontrado. URL tentada: {$url}");
         }
+
+        $this->mostrarErro404();
+    }
+
+    private function mostrarErro404()
+    {
+        header("HTTP/1.0 404 Not Found");
+        
+        echo "<div style='font-family: sans-serif; text-align: center; margin-top: 10%; color: #334155;'>";
+        echo "<h1>Página não encontrada (404)</h1>";
+        echo "<p>Desculpe, a página que você está procurando não existe, foi removida ou você não tem permissão para acessá-la.</p>";
+        echo "<a href='/' style='display: inline-block; margin-top: 20px; padding: 10px 20px; background-color: #0f172a; color: white; text-decoration: none; border-radius: 6px;'>Voltar para a página inicial</a>";
+        echo "</div>";
+        exit;
     }
 }

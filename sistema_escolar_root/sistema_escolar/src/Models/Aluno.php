@@ -83,6 +83,7 @@ class Aluno extends Model
             return $idAluno;
         } catch (Exception $e) {
             self::$pdo->rollBack();
+            error_log("Erro no Model Aluno (cadastrar): " . $e->getMessage());
             return false;
         }
     }
@@ -128,6 +129,7 @@ class Aluno extends Model
             return true;
         } catch (Exception $e) {
             self::$pdo->rollBack();
+            error_log("Erro no Model Aluno (atualizar ID {$id}): " . $e->getMessage());
             return false;
         }
     }
@@ -147,6 +149,7 @@ class Aluno extends Model
             }
             return false;
         } catch (Exception $e) {
+            error_log("Erro no Model Aluno (excluir ID {$id}): " . $e->getMessage());
             return false;
         }
     }

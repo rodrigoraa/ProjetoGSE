@@ -3,71 +3,122 @@ require_once ROOT_PATH . '/src/Models/Contrato.php';
 
 class ContratoController extends Controller
 {
-    public function index()
+    private $contratoModel;
+
+    public function __construct()
     {
         if (!isset($_SESSION['usuario_id'])) {
             redirect('/login');
             exit;
         }
+        $this->contratoModel = new Contrato();
+    }
 
-        $contratoModel = new Contrato();
-        $contratos = $contratoModel->listarTodos();
-
+    public function index()
+    {
+        $contratos = $this->contratoModel->listarTodos();
         $this->view('contratos/index', ['contratos' => $contratos]);
     }
 
     public function cadastrar()
     {
+        $erro = '';
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            verificar_csrf_token($_POST['csrf_token']);
+            verificar_csrf_token($_POST['csrf_token'] ?? '');
 
-            $titulo = $_POST['titulo'] ?? 'Contrato Sem Título';
+            $titulo = trim($_POST['titulo'] ?? '');
+            if ($titulo === '') {
+                $titulo = 'Contrato Sem Titulo';
+            }
+
             $valor_total = (float)($_POST['valor_total'] ?? 0);
             $qtd_folhas = (int)($_POST['qtd_folhas'] ?? 1);
 
-            $produtos = [];
-            if (isset($_POST['produto_nome'])) {
-                for ($i = 0; $i < count($_POST['produto_nome']); $i++) {
-                    $produtos[] = [
-                        'nome'  => $_POST['produto_nome'][$i],
-                        'marca' => $_POST['produto_marca'][$i] ?? '',
-                        'unidade' => $_POST['produto_unidade'][$i] ?? 'UN',
-                        'quantidade' => (int)$_POST['produto_qtd'][$i],
-                        'valor_unitario' => (float)$_POST['produto_valor'][$i]
-                    ];
-                }
-            }
-
-            $contratoModel = new Contrato();
-            if ($contratoModel->salvarContratoCompleto($titulo, $valor_total, $qtd_folhas, $produtos)) {
-                registrar_log(Model::getConexao(), 'CADASTRO_CONTRATO', "Novo contrato '$titulo' cadastrado.");
-                redirect('/contrato');
-                exit;
+            if ($valor_total <= 0 || $qtd_folhas <= 0) {
+                $erro = "O valor total e a quantidade de folhas devem ser maiores que zero.";
             } else {
-                $erro = "Erro ao salvar contrato.";
+                $produtos = $this->processarProdutosPost();
+
+                if ($this->contratoModel->salvarContratoCompleto($titulo, $valor_total, $qtd_folhas, $produtos)) {
+                    registrar_log(Model::getConexao(), 'CADASTRO_CONTRATO', "Novo contrato '$titulo' cadastrado.");
+                    redirect('/contrato');
+                    exit;
+                }
+                $erro = "Erro interno ao salvar no banco de dados.";
             }
         }
 
-        $this->view('contratos/cadastrar');
+        $this->view('contratos/cadastrar', ['erro' => $erro]);
     }
 
-    public function ver($id)
+    public function editar($id)
     {
-        if (!$id) {
+        $id = (int)$id;
+        $contrato = $this->contratoModel->buscarPorId($id);
+
+        if (!$contrato) {
+            $this->mostrarErro404("Contrato nao encontrado.");
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            verificar_csrf_token($_POST['csrf_token'] ?? '');
+
+            $titulo = trim($_POST['titulo'] ?? '');
+            if ($titulo === '') {
+                $titulo = 'Contrato Sem Titulo';
+            }
+
+            $valor_total = (float)($_POST['valor_total'] ?? 0);
+            $qtd_folhas = (int)($_POST['qtd_folhas'] ?? 1);
+
+            if ($valor_total > 0 && $qtd_folhas > 0) {
+                $produtos = $this->processarProdutosPost();
+
+                if ($this->contratoModel->atualizarContratoCompleto($id, $titulo, $valor_total, $qtd_folhas, $produtos)) {
+                    registrar_log(Model::getConexao(), 'EDITAR_CONTRATO', "Contrato #{$id} atualizado.");
+                    redirect("/contrato/ver/{$id}");
+                    exit;
+                }
+            }
+        }
+
+        $this->view('contratos/editar', [
+            'contrato' => $contrato,
+            'produtos' => $this->contratoModel->buscarProdutos($id)
+        ]);
+    }
+
+    public function excluir($id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirect('/contrato');
             exit;
         }
 
-        $contratoModel = new Contrato();
-        $contrato = $contratoModel->buscarPorId($id);
+        verificar_csrf_token($_POST['csrf_token'] ?? '');
 
-        if (!$contrato) {
-            die("<h1>Erro 404</h1><p>Contrato não encontrado.</p>");
+        if ($_SESSION['usuario_tipo'] !== 'admin') {
+            redirect('/contrato');
+            exit;
         }
 
-        $produtos = $contratoModel->buscarProdutos($id);
-        $folhas = $contratoModel->buscarFolhas($id);
+        $id = (int)$id;
+        $this->contratoModel->excluir($id);
+        redirect('/contrato');
+        exit;
+    }
 
+    public function ver($id)
+    {
+        $id = (int)$id;
+        $contrato = $this->contratoModel->buscarPorId($id);
+
+        if (!$contrato) {
+            $this->mostrarErro404("Contrato nao encontrado.");
+        }
+
+        $produtos = $this->contratoModel->buscarProdutos($id);
+        $folhas = $this->contratoModel->buscarFolhas($id);
         $aba_ativa = isset($_GET['folha']) ? (int)$_GET['folha'] : 1;
 
         $this->view('contratos/ver', [
@@ -78,184 +129,158 @@ class ContratoController extends Controller
         ]);
     }
 
-    public function excluir($id)
+    public function adicionar_folha($id_contrato)
     {
-        if ($_SESSION['usuario_tipo'] !== 'admin') {
-            die("<h1>Acesso Negado</h1><p>Apenas administradores podem excluir contratos.</p>");
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect("/contrato/ver/" . (int)$id_contrato);
+            exit;
         }
 
-        $contratoModel = new Contrato();
-        $contrato = $contratoModel->buscarPorId($id);
-
-        if ($contrato) {
-            if ($contratoModel->excluir($id)) {
-                registrar_log(Model::getConexao(), 'EXCLUSAO_CONTRATO', "O Contrato '{$contrato['titulo']}' (ID: $id) foi excluído.");
-            }
-        }
-
-        redirect('/contrato');
+        verificar_csrf_token($_POST['csrf_token'] ?? '');
+        $id_contrato = (int)$id_contrato;
+        $this->contratoModel->adicionarFolha($id_contrato);
+        redirect("/contrato/ver/{$id_contrato}");
         exit;
     }
 
-    public function editar($id)
+    public function excluir_folha($id_contrato, $numero_folha)
     {
-        if (!isset($_SESSION['usuario_id'])) {
-            redirect('/login');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect("/contrato/ver/" . (int)$id_contrato);
             exit;
         }
 
-        $contratoModel = new Contrato();
-        $contrato = $contratoModel->buscarPorId($id);
-
-        if (!$contrato) {
-            die("<h1>Erro 404</h1><p>Contrato não encontrado.</p>");
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            verificar_csrf_token($_POST['csrf_token']);
-
-            $titulo = $_POST['titulo'] ?? 'Contrato Sem Título';
-            $valor_total = (float)($_POST['valor_total'] ?? 0);
-            $qtd_folhas = (int)($_POST['qtd_folhas'] ?? 1);
-
-            $produtos = [];
-            if (isset($_POST['produto_nome'])) {
-                for ($i = 0; $i < count($_POST['produto_nome']); $i++) {
-                    $produtos[] = [
-                        'nome' => $_POST['produto_nome'][$i],
-                        'marca' => $_POST['produto_marca'][$i] ?? '',
-                        'unidade' => $_POST['produto_unidade'][$i] ?? 'UN',
-                        'quantidade' => (int)$_POST['produto_qtd'][$i],
-                        'valor_unitario' => (float)$_POST['produto_valor'][$i]
-                    ];
-                }
-            }
-
-            if ($contratoModel->atualizarContratoCompleto($id, $titulo, $valor_total, $qtd_folhas, $produtos)) {
-                registrar_log(Model::getConexao(), 'EDITA_CONTRATO', "Contrato #$id editado com sucesso.");
-                redirect('/contrato/ver/' . $id);
-                exit;
-            } else {
-                $erro = "Erro ao atualizar contrato.";
-            }
-        }
-
-        $produtos = $contratoModel->buscarProdutos($id);
-
-        $this->view('contratos/editar', [
-            'contrato' => $contrato,
-            'produtos' => $produtos
-        ]);
-    }
-
-    public function editar_produto($id_produto)
-    {
-        $model = new Contrato();
-        $produto = $model->buscarProdutoPorId($id_produto);
-
-        if (!$produto) {
-            die("Produto não encontrado.");
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $nome  = $_POST['nome_produto'];
-            $marca = $_POST['marca'];
-            $unidade = $_POST['unidade'] ?? 'UN';
-            $qtd   = (int)$_POST['quantidade'];
-            $valor = (float)$_POST['valor_unitario'];
-
-            $model->atualizarProduto($id_produto, $nome, $marca, $unidade, $qtd, $valor);
-
-            redirect('/contrato/ver/' . $produto['id_contrato']);
-            exit;
-        }
-
-        $this->view('contratos/produto_form', ['produto' => $produto, 'acao' => 'editar']);
-    }
-
-    public function excluir_produto($id_produto)
-    {
-        $model = new Contrato();
-        $produto = $model->buscarProdutoPorId($id_produto);
-
-        if ($produto) {
-            $model->excluirProduto($id_produto);
-            redirect('/contrato/ver/' . $produto['id_contrato']);
-        }
+        verificar_csrf_token($_POST['csrf_token'] ?? '');
+        $id_contrato = (int)$id_contrato;
+        $numero_folha = (int)$numero_folha;
+        $this->contratoModel->excluirFolha($id_contrato, $numero_folha);
+        redirect("/contrato/ver/{$id_contrato}");
         exit;
     }
 
     public function adicionar_produto_inline($id_contrato)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            verificar_csrf_token($_POST['csrf_token'] ?? '');
+
+            $id_contrato = (int)$id_contrato;
             $numero_folha = (int)$_POST['numero_folha'];
-            $nome  = $_POST['nome_produto'];
-            $marca = $_POST['marca'];
-            $unidade = $_POST['unidade'] ?? 'UN';
-            $qtd   = (int)$_POST['quantidade'];
-            $valor = (float)$_POST['valor_unitario'];
+            $qtd = (int)$_POST['quantidade'];
+            $valor_unit = (float)$_POST['valor_unitario'];
 
-            $model = new Contrato();
-            $model->adicionarProdutoUnico($id_contrato, $numero_folha, $nome, $marca, $unidade, $qtd, $valor);
+            $this->contratoModel->adicionarProdutoUnico(
+                $id_contrato,
+                $numero_folha,
+                trim($_POST['nome_produto']),
+                trim($_POST['marca']),
+                $_POST['unidade'] ?? 'UN',
+                $qtd,
+                $valor_unit
+            );
 
-            redirect('/contrato/ver/' . $id_contrato . '?folha=' . $numero_folha);
+            redirect("/contrato/ver/{$id_contrato}?folha={$numero_folha}");
             exit;
         }
     }
-    public function excluir_folha($id_contrato, $numero_folha)
+
+    public function editar_produto($id_produto)
     {
-        if (!isset($_SESSION['usuario_id'])) {
-            redirect('/login');
-            exit;
+        $id_produto = (int)$id_produto;
+        $produto = $this->contratoModel->buscarProdutoPorIdComContrato($id_produto);
+
+        if (!$produto) {
+            $this->mostrarErro404("Produto nao encontrado.");
         }
 
-        $model = new Contrato();
-        $contrato = $model->buscarPorId($id_contrato);
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            verificar_csrf_token($_POST['csrf_token'] ?? '');
 
-        if ($contrato) {
-            if ($contrato['qtd_folhas'] <= 1) {
-                echo "<script>alert('Não é possível apagar a única folha do contrato. Exclua o contrato inteiro se necessário.'); window.location.href='/contrato/ver/{$id_contrato}';</script>";
+            $quantidade = (int)($_POST['quantidade'] ?? 0);
+            $valor_unitario = (float)($_POST['valor_unitario'] ?? 0);
+
+            if ($quantidade > 0 && $valor_unitario >= 0) {
+                $this->contratoModel->atualizarProduto(
+                    $id_produto,
+                    trim($_POST['nome_produto'] ?? ''),
+                    trim($_POST['marca'] ?? ''),
+                    $_POST['unidade'] ?? 'UN',
+                    $quantidade,
+                    $valor_unitario
+                );
+
+                $folha = (int)($produto['numero_folha'] ?? 1);
+                redirect("/contrato/ver/{$produto['id_contrato']}?folha={$folha}");
                 exit;
             }
-
-            if ($model->excluirFolha($id_contrato, $numero_folha)) {
-                registrar_log(Model::getConexao(), 'EXCLUSAO_FOLHA', "Folha $numero_folha do Contrato #$id_contrato excluída.");
-            }
         }
 
-        redirect('/contrato/ver/' . $id_contrato . '?folha=1');
-        exit;
+        $this->view('contratos/produto_form', [
+            'acao' => 'editar',
+            'produto' => $produto
+        ]);
     }
-    public function adicionar_folha($id_contrato)
+
+    public function excluir_produto($id_produto)
     {
-        if (!isset($_SESSION['usuario_id'])) {
-            redirect('/login');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('/contrato');
             exit;
         }
 
-        $model = new Contrato();
-        $contrato = $model->buscarPorId($id_contrato);
+        verificar_csrf_token($_POST['csrf_token'] ?? '');
 
-        if ($contrato) {
-            if ($model->adicionarFolha($id_contrato)) {
-                registrar_log(Model::getConexao(), 'NOVA_FOLHA', "Nova folha adicionada ao Contrato #$id_contrato.");
-            }
+        $id_produto = (int)$id_produto;
+        $produto = $this->contratoModel->buscarProdutoPorId($id_produto);
+
+        if ($produto) {
+            $this->contratoModel->excluirProduto($id_produto);
+            $folha = (int)($produto['numero_folha'] ?? 1);
+            redirect("/contrato/ver/{$produto['id_contrato']}?folha={$folha}");
+            exit;
         }
 
-        redirect('/contrato/ver/' . $id_contrato);
+        redirect('/contrato');
         exit;
     }
+
     public function editar_valor_folha($id_contrato)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            verificar_csrf_token($_POST['csrf_token'] ?? '');
+
+            $id_contrato = (int)$id_contrato;
             $numero_folha = (int)$_POST['numero_folha'];
             $novo_valor = (float)$_POST['novo_valor'];
 
-            $model = new Contrato();
-            $model->atualizarValorFolha($id_contrato, $numero_folha, $novo_valor);
+            $this->contratoModel->atualizarValorFolha($id_contrato, $numero_folha, $novo_valor);
 
-            redirect('/contrato/ver/' . $id_contrato . '?folha=' . $numero_folha);
+            redirect("/contrato/ver/{$id_contrato}?folha={$numero_folha}");
             exit;
         }
+    }
+
+    private function processarProdutosPost()
+    {
+        $produtos = [];
+        if (isset($_POST['produto_nome']) && is_array($_POST['produto_nome'])) {
+            foreach ($_POST['produto_nome'] as $i => $nome) {
+                if (!empty($nome)) {
+                    $produtos[] = [
+                        'nome' => trim($nome),
+                        'marca' => trim($_POST['produto_marca'][$i] ?? ''),
+                        'unidade' => $_POST['produto_unidade'][$i] ?? 'UN',
+                        'quantidade' => (int)$_POST['produto_qtd'][$i],
+                        'valor_unitario' => (float)$_POST['produto_valor'][$i]
+                    ];
+                }
+            }
+        }
+        return $produtos;
+    }
+
+    private function mostrarErro404($msg)
+    {
+        header("HTTP/1.0 404 Not Found");
+        die("<h1>Erro 404</h1><p>" . e($msg) . "</p><a href='/contrato'>Voltar</a>");
     }
 }
