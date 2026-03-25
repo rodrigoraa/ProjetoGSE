@@ -55,7 +55,7 @@
                                         </td>
                                         <td style="text-align: center;">
                                             <div style="display: flex; gap: 5px; justify-content: center; align-items: center;">
-                                                <a href="/contrato/ver/<?php echo (int)$c['id']; ?>" class="btn-secondary" style="padding: 6px 12px; font-size: 0.85rem; text-decoration: none;">Ver Produtos</a>
+                                                <a href="/contrato/ver/<?php echo (int)$c['id']; ?>" class="btn-secondary" style="padding: 6px 12px; font-size: 0.85rem; text-decoration: none;">Ver detalhes do pedido</a>
 
                                                 <?php if ($_SESSION['usuario_tipo'] === 'admin'): ?>
                                                     <form action="/contrato/excluir/<?php echo (int)$c['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Deseja realmente excluir este contrato? Isso apagara todas as folhas e produtos vinculados.');">

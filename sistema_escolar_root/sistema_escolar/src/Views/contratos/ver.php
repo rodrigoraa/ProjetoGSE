@@ -79,7 +79,7 @@
                                         <p style="margin: 5px 0 0 0; font-size: 0.9rem; display: flex; align-items: center; gap: 10px;">
                                             <span>
                                                 Valor da folha: <strong>R$ <?php echo number_format($f['valor_folha'], 2, ',', '.'); ?></strong>
-                                                <button type="button" onclick="document.getElementById('edit-valor-<?php echo (int)$num_folha; ?>').style.display='inline-flex'" style="background:none; border:none; cursor:pointer; font-size:1rem; padding:0;">Editar</button>
+                                                <button type="button" class="btn-warning" onclick="document.getElementById('edit-valor-<?php echo (int)$num_folha; ?>').style.display='inline-flex'" style="background:none; border:none; cursor:pointer; font-size:1rem; padding:0;">Editar</button>
                                             </span>
 
                                             <form id="edit-valor-<?php echo (int)$num_folha; ?>" action="/contrato/editar_valor_folha/<?php echo (int)$contrato['id']; ?>" method="POST" style="display: none; align-items: center; gap: 5px; margin:0;">
