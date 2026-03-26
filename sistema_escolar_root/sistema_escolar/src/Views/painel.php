@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel - Sistema</title>
-    <link rel="stylesheet" href="/assets/css/painel.css">
+    <link rel="stylesheet" href="./assets/css/painel.css">
 </head>
 
 <body>
@@ -53,7 +53,7 @@
 
                 <?php if (!empty($aniversariantes_hoje)): ?>
                     <div class="niver-hoje">
-                        <h2>🎈 Feliz aniversário hoje</h2>
+                        <h2>🎈 Feliz aniversário</h2>
                         <?php foreach ($aniversariantes_hoje as $niver): ?>
                             <div class="niver-card">
                                 <span>🎈 Hoje é o dia de <strong><?php echo htmlspecialchars($niver['nome_completo']); ?></strong>, completando <strong><?php echo $niver['idade_nova']; ?> anos</strong>.</span>
