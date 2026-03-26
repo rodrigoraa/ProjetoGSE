@@ -24,6 +24,7 @@
                     <div class="toolbar-actions">
                         <a href="/contrato" class="btn-secondary">Voltar</a>
                         <a href="/contrato/editar/<?php echo (int)$contrato['id']; ?>" class="btn-warning">✏️ Editar Geral</a>
+                        <a href="/contrato/imprimir/<?php echo (int)$contrato['id']; ?>" target="_blank" class="btn-primary" style="background-color: #4CAF50;">🖨️ Imprimir Pedido</a>
                     </div>
                 </div>
 
@@ -36,15 +37,15 @@
                     <h2 class="contrato-summary-title"><?php echo e($contrato['titulo']); ?></h2>
                     <div class="resumo-financeiro">
                         <div>
-                            <p class="resumo-label">Valor total do Pedido</p>
+                            <p class="resumo-label">Teto do Pedido</p>
                             <p class="resumo-valor money-primary">R$ <?php echo number_format($contrato['valor_total'], 2, ',', '.'); ?></p>
                         </div>
                         <div>
-                            <p class="resumo-label">Valor total dos itens</p>
+                            <p class="resumo-label">Total Gasto (Todas as notas)</p>
                             <p class="resumo-valor">R$ <?php echo number_format($total_produtos_geral, 2, ',', '.'); ?></p>
                         </div>
                         <div>
-                            <p class="resumo-label">Saldo Final</p>
+                            <p class="resumo-label">Saldo Final Restante</p>
                             <p class="resumo-valor summary-highlight" style="color: <?php echo ($saldo_geral < 0) ? '#ff4c4c' : '#28a745'; ?>;">R$ <?php echo number_format($saldo_geral, 2, ',', '.'); ?></p>
                         </div>
                     </div>
@@ -60,7 +61,7 @@
 
                         <form action="/contrato/adicionar_folha/<?php echo (int)$contrato['id']; ?>" method="POST" onsubmit="return confirm('Deseja adicionar uma nova folha a este pedido?');">
                             <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
-                            <button type="submit" class="tab-btn">Nova Folha</button>
+                            <button type="submit" class="tab-btn">➕</button>
                         </form>
                     </div>
 
@@ -70,45 +71,38 @@
                         $produtos_desta_folha = array_filter($produtos, function ($p) use ($num_folha) {
                             return ($p['numero_folha'] ?: 1) == $num_folha;
                         });
-                        $total_gasto_folha = array_sum(array_column($produtos_desta_folha, 'valor_total'));
-                        $saldo_folha = $f['valor_folha'] - $total_gasto_folha;
                         ?>
                         <div id="aba-<?php echo (int)$num_folha; ?>" class="tab-content <?php echo ($num_folha == ($aba_ativa ?? 1)) ? 'active' : ''; ?>">
                             <div class="relatorio">
                                 <div class="folha-header">
                                     <div>
-                                        <h3 class="form-section-title contrato-summary-title">Itens da Folha <?php echo (int)$num_folha; ?></h3>
+                                        <h3 class="form-section-title contrato-summary-title">Itens da nota <?php echo (int)$num_folha; ?></h3>
                                         <div class="folha-meta">
                                             <span>
-                                                Valor da folha: <strong>R$ <?php echo number_format($f['valor_folha'], 2, ',', '.'); ?></strong>
-                                                <button type="button" class="btn-warning btn-sm" onclick="toggleEditarValor(<?php echo (int)$num_folha; ?>)">✏️ Editar</button>
+                                                Total acumulado desta nota: <strong style="font-size: 1.1em; color: #007bff;">R$ <?php echo number_format($f['valor_folha'], 2, ',', '.'); ?></strong>
                                             </span>
-
-                                            <form id="edit-valor-<?php echo (int)$num_folha; ?>" class="valor-folha-editor" action="/contrato/editar_valor_folha/<?php echo (int)$contrato['id']; ?>" method="POST">
-                                                <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
-                                                <input type="hidden" name="numero_folha" value="<?php echo (int)$num_folha; ?>">
-                                                <input type="number" name="novo_valor" step="0.01" class="sistema valor-folha-input" value="<?php echo e($f['valor_folha']); ?>" required>
-                                                <button type="submit" class="btn-primary btn-sm">Salvar</button>
-                                                <button type="button" class="btn-secondary btn-sm" onclick="toggleEditarValor(<?php echo (int)$num_folha; ?>, false)">Cancelar</button>
-                                            </form>
-
-                                            <span class="folha-saldo">Saldo: <strong style="color: <?php echo ($saldo_folha < 0) ? '#ff4c4c' : '#28a745'; ?>">R$ <?php echo number_format($saldo_folha, 2, ',', '.'); ?></strong></span>
                                         </div>
                                     </div>
-                                    <div class="action-group">
+
+                                    <div class="action-group" style="display: flex; gap: 10px; align-items: center;">
                                         <button type="button" onclick="toggleFormProduto(<?php echo (int)$num_folha; ?>)" class="btn-primary">+ Adicionar Produto</button>
 
+                                        <form action="/contrato/duplicar_folha/<?php echo (int)$contrato['id']; ?>/<?php echo (int)$num_folha; ?>" method="POST" style="margin: 0;" onsubmit="return confirm('Deseja realmente duplicar esta folha e todos os seus produtos?');">
+                                            <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
+                                            <button type="submit" class="btn-secondary">📄 Duplicar nota</button>
+                                        </form>
+
                                         <?php if (count($folhas) > 1): ?>
-                                            <form action="/contrato/excluir_folha/<?php echo (int)$contrato['id']; ?>/<?php echo (int)$num_folha; ?>" method="POST" onsubmit="return confirm('Tem certeza que deseja apagar a Folha <?php echo (int)$num_folha; ?> e todos os produtos cadastrados nela?');">
+                                            <form action="/contrato/excluir_folha/<?php echo (int)$contrato['id']; ?>/<?php echo (int)$num_folha; ?>" method="POST" style="margin: 0;" onsubmit="return confirm('Tem certeza que deseja apagar a Folha <?php echo (int)$num_folha; ?> e todos os produtos cadastrados nela?');">
                                                 <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
-                                                <button type="submit" class="btn-danger">🗑️ Apagar Folha</button>
+                                                <button type="submit" class="btn-danger">🗑️ Apagar nota</button>
                                             </form>
                                         <?php endif; ?>
                                     </div>
                                 </div>
 
                                 <div id="form-produto-<?php echo (int)$num_folha; ?>" class="inline-form-container" style="display:none;">
-                                    <h4 class="contrato-summary-title money-primary">Novo item para a Folha #<?php echo (int)$num_folha; ?></h4>
+                                    <h4 class="contrato-summary-title money-primary">Novo item para a nota #<?php echo (int)$num_folha; ?></h4>
                                     <form action="/contrato/adicionar_produto_inline/<?php echo (int)$contrato['id']; ?>" method="POST" class="grid-form-inline">
                                         <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                                         <input type="hidden" name="numero_folha" value="<?php echo (int)$num_folha; ?>">
@@ -148,7 +142,7 @@
                                     <tbody>
                                         <?php if (empty($produtos_desta_folha)): ?>
                                             <tr>
-                                                <td colspan="7" class="muted-cell">Nenhum produto lancado nesta folha.</td>
+                                                <td colspan="7" class="muted-cell">Nenhum produto lancado nesta nota.</td>
                                             </tr>
                                         <?php else: ?>
                                             <?php foreach ($produtos_desta_folha as $p): ?>
@@ -192,12 +186,6 @@
         function toggleFormProduto(numeroFolha) {
             const form = document.getElementById('form-produto-' + numeroFolha);
             form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
-        }
-
-        function toggleEditarValor(numeroFolha, abrir = true) {
-            const form = document.getElementById('edit-valor-' + numeroFolha);
-            const deveAbrir = abrir && !form.classList.contains('is-open');
-            form.classList.toggle('is-open', deveAbrir);
         }
     </script>
 </body>

@@ -243,20 +243,42 @@ class ContratoController extends Controller
         exit;
     }
 
-    public function editar_valor_folha($id_contrato)
+    public function duplicar_folha($id_contrato, $numero_folha)
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            verificar_csrf_token($_POST['csrf_token'] ?? '');
-
-            $id_contrato = (int)$id_contrato;
-            $numero_folha = (int)$_POST['numero_folha'];
-            $novo_valor = (float)$_POST['novo_valor'];
-
-            $this->contratoModel->atualizarValorFolha($id_contrato, $numero_folha, $novo_valor);
-
-            redirect("/contrato/ver/{$id_contrato}?folha={$numero_folha}");
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect("/contrato/ver/" . (int)$id_contrato);
             exit;
         }
+
+        verificar_csrf_token($_POST['csrf_token'] ?? '');
+
+        $id_contrato = (int)$id_contrato;
+        $numero_folha = (int)$numero_folha;
+
+        $nova_folha = $this->contratoModel->duplicarFolha($id_contrato, $numero_folha);
+
+        $aba = $nova_folha ? $nova_folha : $numero_folha;
+        redirect("/contrato/ver/{$id_contrato}?folha={$aba}");
+        exit;
+    }
+
+    public function imprimir($id)
+    {
+        $id = (int)$id;
+        $contrato = $this->contratoModel->buscarPorId($id);
+
+        if (!$contrato) {
+            $this->mostrarErro404("Contrato não encontrado.");
+        }
+
+        $produtos = $this->contratoModel->buscarProdutos($id);
+        $folhas = $this->contratoModel->buscarFolhas($id);
+
+        $this->view('contratos/imprimir', [
+            'contrato' => $contrato,
+            'produtos' => $produtos,
+            'folhas' => $folhas
+        ]);
     }
 
     private function processarProdutosPost()

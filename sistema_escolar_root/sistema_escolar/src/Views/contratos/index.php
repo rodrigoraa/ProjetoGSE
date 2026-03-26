@@ -49,7 +49,7 @@
                                     <tr>
                                         <td><span class="table-id">#</span><?php echo (int)$c['id']; ?></td>
                                         <td><strong><?php echo e($c['titulo']); ?></strong></td>
-                                        <td><span class="badge-folhas"><?php echo (int)$c['qtd_folhas']; ?> folha(s)</span></td>
+                                        <td><span class="badge-folhas"><?php echo (int)$c['qtd_folhas']; ?> nota(s)</span></td>
                                         <td class="money-primary">R$ <?php echo number_format($c['valor_total'], 2, ',', '.'); ?></td>
                                         <td class="table-date">
                                             <?php echo date('d/m/Y', strtotime($c['criado_em'])); ?>

@@ -33,7 +33,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Em quantas folhas este pedido será dividido?</label>
+                        <label>Em quantas notas este pedido será dividido?</label>
                         <input type="number" name="qtd_folhas" id="qtd_folhas" class="sistema" value="1" min="1" required oninput="calcularTotais()">
                     </div>
 
@@ -61,7 +61,6 @@
                         <div style="display: flex; justify-content: space-between;">
                             <div>
                                 <p><strong>Orçamento do Pedido:</strong> R$ <span id="lbl_total_contrato">0.00</span></p>
-                                <p style="font-size: 0.9rem; color: #555;">Valor por Folha: R$ <span id="lbl_valor_folha">0.00</span></p>
                             </div>
                             <div style="text-align: right;">
                                 <p><strong>Soma dos Produtos:</strong> R$ <span id="lbl_total_produtos">0.00</span></p>
@@ -120,14 +119,9 @@
                 totalProdutos += (qtd * valor);
             });
 
-            let valorPorFolha = totalContrato / qtdFolhas;
             let saldo = totalContrato - totalProdutos;
 
             document.getElementById('lbl_total_contrato').innerText = totalContrato.toLocaleString('pt-BR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-            document.getElementById('lbl_valor_folha').innerText = valorPorFolha.toLocaleString('pt-BR', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
