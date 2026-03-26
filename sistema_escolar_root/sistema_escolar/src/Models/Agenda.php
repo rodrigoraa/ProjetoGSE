@@ -3,12 +3,8 @@ require_once ROOT_PATH . '/src/Core/Model.php';
 
 class Agenda extends Model
 {
-    /**
-     * Busca avisos para exibir como alerta no Dashboard (Hoje + próximos 7 dias)
-     */
     public function listarAlertasPainel()
     {
-        // Usamos date('now', 'localtime') para garantir a data correta do servidor
         $sql = "SELECT a.*, u.nome as autor_nome 
                 FROM agenda_avisos a 
                 LEFT JOIN usuarios u ON a.usuario_id = u.id 

@@ -59,10 +59,8 @@
                             <?php endif; ?>
 
                             <?php foreach ($logs as $log):
-                                // Formatação de Data
                                 $data = date('d/m/Y H:i:s', strtotime($log['data_hora']));
 
-                                // Lógica de Cores (Classes do CSS sistema.css)
                                 $classeAcao = '';
                                 $textoAcao = strtolower($log['acao']);
 

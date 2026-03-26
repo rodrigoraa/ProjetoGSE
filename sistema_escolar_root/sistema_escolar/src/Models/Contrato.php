@@ -49,7 +49,6 @@ class Contrato extends Model
             }
 
             self::$pdo->commit();
-            // Recalcula o valor da folha 1 que recebeu os produtos iniciais
             $this->recalcularValorFolha($id_contrato, 1);
             return true;
         } catch (Throwable $e) {
@@ -148,7 +147,7 @@ class Contrato extends Model
         $sql = "INSERT INTO contrato_produtos (id_contrato, numero_folha, nome_produto, marca, unidade, quantidade, valor_unitario, valor_total) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $resultado = self::$pdo->prepare($sql)->execute([$id_contrato, $numero_folha, $nome, $marca, $unidade, $quantidade, $valor_unitario, $valor_total]);
 
-        if ($resultado) $this->recalcularValorFolha($id_contrato, $numero_folha); // Soma ao adicionar
+        if ($resultado) $this->recalcularValorFolha($id_contrato, $numero_folha);
         return $resultado;
     }
 
@@ -175,7 +174,7 @@ class Contrato extends Model
         $sql = "UPDATE contrato_produtos SET nome_produto = ?, marca = ?, unidade = ?, quantidade = ?, valor_unitario = ?, valor_total = ? WHERE id = ?";
         $resultado = self::$pdo->prepare($sql)->execute([$nome, $marca, $unidade, $quantidade, $valor_unitario, $valor_total, $id_produto]);
 
-        if ($resultado) $this->recalcularValorFolha($produto['id_contrato'], $produto['numero_folha']); // Soma ao editar
+        if ($resultado) $this->recalcularValorFolha($produto['id_contrato'], $produto['numero_folha']);
         return $resultado;
     }
 

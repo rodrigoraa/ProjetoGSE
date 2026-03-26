@@ -23,7 +23,6 @@ class AgendaController extends Controller
     public function cadastrar()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Proteção contra ataques CSRF
             verificar_csrf_token($_POST['csrf_token'] ?? '');
 
             $titulo = trim($_POST['titulo'] ?? '');
@@ -48,10 +47,8 @@ class AgendaController extends Controller
             $id_aviso = (int)$id_aviso;
             $usuario_id = $_SESSION['usuario_id'];
 
-            // Verifica o tipo do usuário (se não existir na sessão, assume como 'comum')
             $usuario_tipo = $_SESSION['usuario_tipo'] ?? 'comum';
 
-            // Chama a função de exclusão no Model (que já tem a trava de segurança)
             $this->agendaModel->excluir($id_aviso, $usuario_id, $usuario_tipo);
 
             redirect('/agenda');

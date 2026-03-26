@@ -212,7 +212,7 @@ class RelatorioController extends Controller
                     endif; ?>
                 </tbody>
             </table>
-            <div class="footer">Este relatório é um documento interno e contém dados sensíveis.</div>
+            <div class="footer">Este relatório é um documento interno.</div>
         </body>
 
         </html>

@@ -112,8 +112,8 @@
             $eventos_calendario[] = [
                 'title' => $aviso['titulo'],
                 'start' => $aviso['data_aviso'],
-                'description' => $aviso['descricao'], // guardamos a descrição para exibir no clique
-                'color' => '#0056b3' // O azul do seu sistema
+                'description' => $aviso['descricao'],
+                'color' => '#0056b3'
             ];
         }
     }
@@ -129,9 +129,8 @@
                 locale: 'pt-br',
                 initialView: 'dayGridMonth',
 
-                // --- NOVIDADES AQUI ---
-                height: 550, // Define uma altura fixa para não estourar a tela (ajuste se precisar)
-                contentHeight: 'auto', // Evita que os dias fiquem muito esticados
+                height: 550,
+                contentHeight: 'auto',
 
                 headerToolbar: {
                     left: 'prev,next today',
@@ -145,21 +144,16 @@
                 },
                 events: eventos,
 
-                // Ao clicar em um EVENTO JÁ EXISTENTE (Aviso)
                 eventClick: function(info) {
                     let detalhes = info.event.extendedProps.description || 'Nenhum detalhe adicional.';
                     alert('Assunto: ' + info.event.title + '\n\nDetalhes: ' + detalhes);
                 },
 
-                // --- NOVA FUNÇÃO: Ao clicar em um DIA VAZIO no calendário ---
                 dateClick: function(info) {
-                    // 1. Preenche a data clicada direto no input do formulário
                     document.querySelector('input[name="data_aviso"]').value = info.dateStr;
 
-                    // 2. Foca o cursor no campo de Título para você já sair digitando
                     document.querySelector('input[name="titulo"]').focus();
 
-                    // 3. Rola a página suavemente para o topo (onde está o formulário)
                     window.scrollTo({
                         top: 0,
                         behavior: 'smooth'

@@ -20,7 +20,7 @@ class PainelController extends Controller
         $this->painelModel = new Painel();
         $this->alunoModel = new Aluno();
         $this->certidaoModel = new Certidao();
-        $this->agendaModel = new Agenda(); // 3. Instanciado o Model
+        $this->agendaModel = new Agenda();
     }
 
     public function index()
@@ -31,7 +31,6 @@ class PainelController extends Controller
         $vencidas         = $this->painelModel->getDvasVencidas();
         $a_vencer         = $this->painelModel->getDvasAVencer();
 
-        // 4. Buscando os alertas da agenda (próximos 7 dias)
         $alertas_agenda = $this->agendaModel->listarAlertasPainel();
 
         $mesAtual = date('m');
@@ -65,7 +64,7 @@ class PainelController extends Controller
             'aniversariantes_mes'  => $this->alunoModel->getAniversariantesDoMes($mesAtual),
             'aniversariantes_hoje' => $aniversariantes_hoje,
             'certidoes_alerta'     => $certidoes_alerta,
-            'alertas_agenda'       => $alertas_agenda // 5. Passando para a View
+            'alertas_agenda'       => $alertas_agenda 
         ];
 
         $this->view('painel', $dados);
