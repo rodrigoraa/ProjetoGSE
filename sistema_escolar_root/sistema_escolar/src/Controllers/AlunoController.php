@@ -110,6 +110,51 @@ class AlunoController extends Controller
         ]);
     }
 
+    public function editar($id)
+    {
+        $this->autenticar();
+
+        $alunoModel = new Aluno();
+        $aluno = $alunoModel->buscarPorId($id);
+
+        if (!$aluno) {
+            definir_flash('erro', 'Aluno não encontrado', 'O registro que você tenta editar não existe.');
+            redirect('/aluno');
+            exit;
+        }
+
+        $mensagem = '';
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            verificar_csrf_token($_POST['csrf_token'] ?? '');
+
+            $nome = strip_tags(trim($_POST['nome']));
+            $dataNasc = $_POST['data_nascimento'];
+            $idTurma = filter_input(INPUT_POST, 'id_turma', FILTER_VALIDATE_INT);
+            $dataDva = $_POST['data_dva'] ?: null;
+            $tel_aluno = strip_tags(trim($_POST['telefone_aluno'] ?? ''));
+            $tel_responsavel = strip_tags(trim($_POST['telefone_responsavel'] ?? ''));
+
+            if (empty($nome) || empty($dataNasc) || !$idTurma) {
+                $mensagem = alerta_html('erro', 'Campos obrigatórios', 'Preencha nome, data de nascimento e turma.');
+            } else {
+                $sucesso = $alunoModel->atualizar($id, $nome, $dataNasc, $idTurma, $dataDva, $tel_aluno, $tel_responsavel);
+
+                if ($sucesso) {
+                    registrar_log(Model::getConexao(), "Editar Aluno", "Editou: $nome (ID: $id)");
+                    definir_flash('sucesso', 'Alterações salvas', "Os dados de $nome foram atualizados.");
+                    redirect('/aluno');
+                    exit;
+                }
+                $mensagem = alerta_html('erro', 'Erro ao salvar', 'Não foi possível atualizar os dados no banco.');
+            }
+        }
+
+        $this->view('alunos/editar', [
+            'aluno' => $aluno,
+            'turmas' => $alunoModel->getTurmas(),
+            'mensagem' => $mensagem
+        ]);
+    }
     public function excluir($id)
     {
         $this->autenticar();

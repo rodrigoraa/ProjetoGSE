@@ -167,7 +167,7 @@ class RelatorioController extends Controller
         <body>
             <table class="header-table">
                 <tr>
-                    <td><span class="title">EESJV - Sistema Escolar</span></td>
+                    <td><span class="title">GSE - EE SÃO JOSÉ</span></td>
                     <td style="text-align: right;">Gerado em: <?php echo date('d/m/Y H:i'); ?></td>
                 </tr>
             </table>
@@ -178,25 +178,32 @@ class RelatorioController extends Controller
                 <thead>
                     <tr>
                         <th width="5%">#</th>
-                        <th width="40%">Nome do Aluno</th>
-                        <th width="15%">Turma</th>
-                        <th width="20%">Vencimento DVA</th>
-                        <th width="20%">Situação</th>
+                        <th width="35%">Nome do Aluno</th>
+                        <th width="15%">Data Nasc.</th>
+                        <th width="10%">Turma</th>
+                        <th width="18%">Vencimento DVA</th>
+                        <th width="17%">Situação</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($dados)): ?>
                         <tr>
-                            <td colspan="5" class="text-center">Nenhum registro encontrado.</td>
+                            <td colspan="6" class="text-center">Nenhum registro encontrado.</td>
                         </tr>
                         <?php else: $i = 1;
                         foreach ($dados as $d):
                             $situacao = $this->calcularSituacao($d['data_vencimento']);
                             $class = ($situacao == 'Vencida') ? 'status-vencida' : (($situacao == 'A Vencer') ? 'status-avencer' : '');
+
+                            // Criamos a variável para formatar a data que vem do banco
+                            $nascimento = $d['data_nascimento'] ? date('d/m/Y', strtotime($d['data_nascimento'])) : '-';
                         ?>
                             <tr>
                                 <td class="text-center"><?php echo $i++; ?></td>
                                 <td><?php echo htmlspecialchars($d['nome_completo']); ?></td>
+
+                                <td class="text-center"><?php echo $nascimento; ?></td>
+
                                 <td><?php echo htmlspecialchars($d['nome_turma'] ?? '-'); ?></td>
                                 <td><?php echo $d['data_vencimento'] ? date('d/m/Y', strtotime($d['data_vencimento'])) : '-'; ?></td>
                                 <td class="<?php echo $class; ?>"><?php echo $situacao; ?></td>
