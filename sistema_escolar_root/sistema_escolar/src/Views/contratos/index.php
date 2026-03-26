@@ -32,7 +32,7 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Título do Pedido / Fornecedor</th>
+                                <th>Título do Pedido</th>
                                 <th>Divisão</th>
                                 <th>Valor Total</th>
                                 <th>Data de Registro</th>

@@ -29,12 +29,12 @@
                     <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
 
                     <div class="form-group">
-                        <label>Título do Pedido / Fornecedor</label>
+                        <label>Título do Pedido</label>
                         <input type="text" name="titulo" class="sistema" value="<?php echo htmlspecialchars($contrato['titulo']); ?>" required>
                     </div>
 
                     <div class="form-group">
-                        <label>Teto do Orçamento do Pedido (R$)</label>
+                        <label>Valor total do Pedido (R$)</label>
                         <input type="number" name="valor_total" id="valor_total" class="sistema" step="0.01" value="<?php echo $contrato['valor_total']; ?>" required>
                         <small style="color: #666; margin-top: 5px; display: block;">
                             Nota: Alterar este valor não afeta os produtos ou a quantidade de notas criadas, apenas atualiza o limite financeiro disponível no saldo geral.

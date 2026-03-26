@@ -55,7 +55,7 @@
                     <div class="tabs-header">
                         <?php foreach ($folhas as $f): ?>
                             <button class="tab-btn <?php echo ($f['numero_folha'] == ($aba_ativa ?? 1)) ? 'active' : ''; ?>" type="button" onclick="abrirAba(event, <?php echo (int)$f['numero_folha']; ?>)">
-                                Folha <?php echo (int)$f['numero_folha']; ?>
+                                Nota <?php echo (int)$f['numero_folha']; ?>
                             </button>
                         <?php endforeach; ?>
 
