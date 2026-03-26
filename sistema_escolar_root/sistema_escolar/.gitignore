@@ -1,9 +1,0 @@
-.env
-.env.*
-!.env.example
-
-logs/*.log
-logs/*.txt
-
-database/backups/
-public/uploads/
