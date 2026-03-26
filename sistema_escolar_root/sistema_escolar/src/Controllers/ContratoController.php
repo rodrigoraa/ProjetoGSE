@@ -28,7 +28,7 @@ class ContratoController extends Controller
 
             $titulo = trim($_POST['titulo'] ?? '');
             if ($titulo === '') {
-                $titulo = 'Contrato Sem Titulo';
+                $titulo = 'Contrato Sem Título';
             }
 
             $valor_total = (float)($_POST['valor_total'] ?? 0);
@@ -57,7 +57,7 @@ class ContratoController extends Controller
         $contrato = $this->contratoModel->buscarPorId($id);
 
         if (!$contrato) {
-            $this->mostrarErro404("Contrato nao encontrado.");
+            $this->mostrarErro404("Contrato não encontrado.");
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -65,7 +65,7 @@ class ContratoController extends Controller
 
             $titulo = trim($_POST['titulo'] ?? '');
             if ($titulo === '') {
-                $titulo = 'Contrato Sem Titulo';
+                $titulo = 'Contrato Sem Título';
             }
 
             $valor_total = (float)($_POST['valor_total'] ?? 0);
@@ -114,7 +114,7 @@ class ContratoController extends Controller
         $contrato = $this->contratoModel->buscarPorId($id);
 
         if (!$contrato) {
-            $this->mostrarErro404("Contrato nao encontrado.");
+            $this->mostrarErro404("Contrato não encontrado.");
         }
 
         $produtos = $this->contratoModel->buscarProdutos($id);
@@ -189,7 +189,7 @@ class ContratoController extends Controller
         $produto = $this->contratoModel->buscarProdutoPorIdComContrato($id_produto);
 
         if (!$produto) {
-            $this->mostrarErro404("Produto nao encontrado.");
+            $this->mostrarErro404("Produto não encontrado.");
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

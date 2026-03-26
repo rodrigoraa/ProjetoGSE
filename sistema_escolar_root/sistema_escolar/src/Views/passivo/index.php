@@ -19,18 +19,23 @@
             </header>
 
             <main>
+                <?php $flash = consumir_flash(); ?>
+                <?php if (!empty($flash)): ?>
+                    <?php echo $flash; ?>
+                <?php endif; ?>
+
                 <div class="relatorio" style="padding: 20px; display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center;">
                     <form action="/passivo" method="GET" style="display: flex; gap: 10px; flex: 1; min-width: 300px; max-width: 800px;">
                         <select name="filtro_caixa" class="sistema" style="margin-bottom: 0; width: 150px; cursor: pointer;" onchange="this.form.submit()">
-                            <option value="">Todas as Caixas</option>
+                            <option value="">📦 Todas as Caixas</option>
                             <?php foreach ($lista_caixas as $cx): ?>
                                 <option value="<?php echo e($cx); ?>" <?php echo ($cx == $caixa_atual) ? 'selected' : ''; ?>>
-                                    <?php echo e($cx); ?>
+                                    📦 <?php echo e($cx); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
 
-                        <input type="search" name="busca" value="<?php echo e($termo); ?>" placeholder="Pesquisar nome ou numero..." class="sistema" style="margin-bottom: 0; flex: 1;">
+                        <input type="search" name="busca" value="<?php echo e($termo); ?>" placeholder="Pesquisar nome ou número..." class="sistema" style="margin-bottom: 0; flex: 1;">
                         <button type="submit" class="btn-primary">Buscar</button>
 
                         <?php if (!empty($termo) || !empty($caixa_atual)): ?>
@@ -50,7 +55,7 @@
                 <div class="relatorio">
                     <?php if ($modo_exibicao == 'dashboard'): ?>
                         <div style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
-                            <h3 style="margin: 0; color: var(--primary-color);">Visao Geral do Arquivo</h3>
+                            <h3 style="margin: 0; color: var(--primary-color);">Visão Geral do Arquivo</h3>
                         </div>
 
                         <?php if (empty($resumo_caixas)): ?>
@@ -71,7 +76,7 @@
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
                             <h3 style="margin: 0; color: var(--primary-color);">
                                 <?php if (!empty($caixa_atual)): ?>
-                                    Conteudo da Caixa: <strong><?php echo e($caixa_atual); ?></strong>
+                                    Conteúdo da Caixa: <strong><?php echo e($caixa_atual); ?></strong>
                                 <?php else: ?>
                                     Resultados da Busca
                                 <?php endif; ?>
@@ -93,7 +98,7 @@
                                             &laquo; <?php echo e($nav_caixas['prev']); ?>
                                         </a>
                                     <?php else: ?>
-                                        <span class="nav-link disabled">&laquo; Inicio</span>
+                                        <span class="nav-link disabled">&laquo; Início</span>
                                     <?php endif; ?>
 
                                     <?php foreach ($nav_caixas['lista_visual'] as $cx): ?>
@@ -103,7 +108,7 @@
                                     <?php endforeach; ?>
 
                                     <?php if ($nav_caixas['next']): ?>
-                                        <a href="/passivo?filtro_caixa=<?php echo urlencode($nav_caixas['next']); ?>" class="nav-link" title="Proxima Caixa">
+                                        <a href="/passivo?filtro_caixa=<?php echo urlencode($nav_caixas['next']); ?>" class="nav-link" title="Próxima Caixa">
                                             <?php echo e($nav_caixas['next']); ?> &raquo;
                                         </a>
                                     <?php else: ?>
@@ -117,9 +122,9 @@
                                     <tr>
                                         <th>Nome Completo</th>
                                         <th>Data Nasc.</th>
-                                        <th>Numero</th>
+                                        <th>Número</th>
                                         <th>Caixa</th>
-                                        <th style="text-align: right;">Acoes</th>
+                                        <th style="text-align: right;">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -140,11 +145,11 @@
                                                 </span>
                                             </td>
                                             <td class="col-acoes" style="text-align: right;">
-                                                <a href="/passivo/editar/<?php echo (int)$reg['id']; ?>" style="color: #007bff; margin-right: 10px;">Editar</a>
+                                                <a href="/passivo/editar/<?php echo (int)$reg['id']; ?>" style="color: #007bff; margin-right: 10px;">✏️ Editar</a>
                                                 <?php if ($_SESSION['usuario_tipo'] === 'admin'): ?>
                                                     <form action="/passivo/excluir/<?php echo (int)$reg['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Apagar?');">
                                                         <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
-                                                        <button type="submit" style="color: #dc3545; border:0; background:none; cursor:pointer;">Apagar</button>
+                                                        <button type="submit" style="color: #dc3545; border:0; background:none; cursor:pointer;">🗑️ Apagar</button>
                                                     </form>
                                                 <?php endif; ?>
                                             </td>

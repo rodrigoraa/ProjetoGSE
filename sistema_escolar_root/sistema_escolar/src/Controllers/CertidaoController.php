@@ -262,6 +262,23 @@ class CertidaoController extends Controller
             return false;
         }
 
+        $tmpPath = $_FILES['arquivo_pdf']['tmp_name'];
+        if (!is_uploaded_file($tmpPath)) {
+            return false;
+        }
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo ? finfo_file($finfo, $tmpPath) : false;
+        if ($finfo) {
+            finfo_close($finfo);
+        }
+
+        $mimePermitido = in_array($mimeType, ['application/pdf', 'application/x-pdf'], true);
+        $cabecalho = file_get_contents($tmpPath, false, null, 0, 4);
+        if (!$mimePermitido || $cabecalho !== '%PDF') {
+            return false;
+        }
+
         $diretorio = ROOT_PATH . '/public/uploads/certidoes/';
         if (!is_dir($diretorio)) {
             mkdir($diretorio, 0755, true);

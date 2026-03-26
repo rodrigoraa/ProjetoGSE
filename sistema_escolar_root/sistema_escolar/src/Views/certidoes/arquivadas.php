@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Arquivo de Certidoes</title>
+    <title>Arquivo de Certidões</title>
     <link rel="stylesheet" href="/assets/css/painel.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="/assets/css/certidoes.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,14 +15,14 @@
 
         <div class="main-content-wrapper">
             <header style="margin-bottom: 20px;">
-                <h1 style="color: #1e293b; font-size: 1.8rem;"><i class="fa-solid fa-folder-open" style="color: #64748b; margin-right: 10px;"></i> Certidoes Arquivadas</h1>
+                <h1 style="color: #1e293b; font-size: 1.8rem;"><i class="fa-solid fa-folder-open" style="color: #64748b; margin-right: 10px;"></i> Certidões Arquivadas</h1>
             </header>
 
             <main>
                 <div class="toolbar-arquivo">
                     <form action="/certidao/arquivadas" method="GET" class="form-filtro-ano">
                         <div class="filtro-box" style="padding: 6px 12px; border-radius: 8px;">
-                            <label for="ano" style="margin-bottom: 0;"><i class="fa-regular fa-calendar-days"></i> Ano do Historico:</label>
+                            <label for="ano" style="margin-bottom: 0;"><i class="fa-regular fa-calendar-days"></i> Ano do Histórico:</label>
                             <select name="ano" id="ano" onchange="this.form.submit()">
                                 <option value="todos" <?php echo ($ano_filtro === 'todos') ? 'selected' : ''; ?>>Todos os Anos</option>
                                 <?php foreach ($anos_disponiveis as $ano): ?>
@@ -40,17 +40,17 @@
                         <thead>
                             <tr>
                                 <th>Fornecedor</th>
-                                <th>Tipo de Certidao</th>
-                                <th>Emissao</th>
+                                <th>Tipo de Certidão</th>
+                                <th>Emissão</th>
                                 <th>Vencimento</th>
                                 <th style="text-align:center;">Documento</th>
-                                <th style="text-align:right;">Acoes</th>
+                                <th style="text-align:right;">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($certidoes)): ?>
                                 <tr>
-                                    <td colspan="6" class="empty-state" style="padding: 50px 20px;">Nenhuma certidao arquivada encontrada para o ano de <?php echo e($ano_filtro); ?>.</td>
+                                    <td colspan="6" class="empty-state" style="padding: 50px 20px;">Nenhuma certidão arquivada encontrada para o ano de <?php echo e($ano_filtro); ?>.</td>
                                 </tr>
                             <?php endif; ?>
 
@@ -69,19 +69,19 @@
                                     </td>
                                     <td style="text-align: right;">
                                         <div class="cert-actions" style="border: none; padding: 0; margin: 0; justify-content: flex-end; gap: 8px;">
-                                            <form action="/certidao/desarquivar/<?php echo (int)$reg['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Deseja desarquivar esta certidao e envia-la para a tela inicial?');">
+                                            <form action="/certidao/desarquivar/<?php echo (int)$reg['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Deseja desarquivar esta certidão e enviá-la para a tela inicial?');">
                                                 <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                                                 <button type="submit" class="action-btn text-success" title="Desarquivar" style="border:0; cursor:pointer;"><i class="fa-solid fa-rotate-left"></i></button>
                                             </form>
 
-                                            <a href="/certidao/editar/<?php echo (int)$reg['id']; ?>" class="action-btn text-primary" title="Editar informacoes"><i class="fa-solid fa-pen"></i></a>
+                                            <a href="/certidao/editar/<?php echo (int)$reg['id']; ?>" class="action-btn text-primary" title="✏️ Editar Informações"><i class="fa-solid fa-pen"></i></a>
 
                                             <?php if ($_SESSION['usuario_tipo'] == 'admin'): ?>
-                                                <form action="/certidao/excluir/<?php echo (int)$reg['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Deseja excluir esta certidao permanentemente do historico?');">
+                                                <form action="/certidao/excluir/<?php echo (int)$reg['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Deseja excluir esta certidão permanentemente do histórico?');">
                                                     <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                                                     <input type="hidden" name="origem" value="arquivo">
                                                     <input type="hidden" name="ano" value="<?php echo e($ano_filtro); ?>">
-                                                    <button type="submit" class="action-btn text-danger" title="Apagar Definitivamente" style="border:0; cursor:pointer;"><i class="fa-solid fa-trash-can"></i></button>
+                                                    <button type="submit" class="action-btn text-danger" title="🗑️ Apagar Definitivamente" style="border:0; cursor:pointer;"><i class="fa-solid fa-trash-can"></i></button>
                                                 </form>
                                             <?php endif; ?>
                                         </div>

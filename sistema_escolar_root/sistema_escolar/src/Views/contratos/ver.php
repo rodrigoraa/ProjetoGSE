@@ -16,13 +16,15 @@
         <div class="main-content-wrapper">
             <header>
                 <h1>Detalhes do Pedido</h1>
-                <div style="color: var(--text-muted);">ID: #<?php echo (int)$contrato['id']; ?> | Registrado em: <?php echo date('d/m/Y', strtotime($contrato['criado_em'])); ?></div>
+                <div class="contrato-meta">ID: #<?php echo (int)$contrato['id']; ?> | Registrado em: <?php echo date('d/m/Y', strtotime($contrato['criado_em'])); ?></div>
             </header>
 
             <main>
                 <div class="toolbar-alunos">
-                    <a href="/contrato" class="btn-secondary" style="text-decoration:none;">Voltar</a>
-                    <a href="/contrato/editar/<?php echo (int)$contrato['id']; ?>" class="btn-warning" style="text-decoration:none; background-color: #ffc107; color: #000; padding: 10px 15px; border-radius: 5px; font-weight: bold;">Editar Geral</a>
+                    <div class="toolbar-actions">
+                        <a href="/contrato" class="btn-secondary">Voltar</a>
+                        <a href="/contrato/editar/<?php echo (int)$contrato['id']; ?>" class="btn-warning">✏️ Editar Geral</a>
+                    </div>
                 </div>
 
                 <?php
@@ -31,32 +33,32 @@
                 ?>
 
                 <div class="contrato-header">
-                    <h2 style="margin-bottom: 5px;"><?php echo e($contrato['titulo']); ?></h2>
+                    <h2 class="contrato-summary-title"><?php echo e($contrato['titulo']); ?></h2>
                     <div class="resumo-financeiro">
                         <div>
                             <p class="resumo-label">Valor total do Pedido</p>
-                            <p class="resumo-valor" style="color: #0066cc;">R$ <?php echo number_format($contrato['valor_total'], 2, ',', '.'); ?></p>
+                            <p class="resumo-valor money-primary">R$ <?php echo number_format($contrato['valor_total'], 2, ',', '.'); ?></p>
                         </div>
                         <div>
                             <p class="resumo-label">Valor total dos itens</p>
-                            <p class="resumo-valor" style="color: #333;">R$ <?php echo number_format($total_produtos_geral, 2, ',', '.'); ?></p>
+                            <p class="resumo-valor">R$ <?php echo number_format($total_produtos_geral, 2, ',', '.'); ?></p>
                         </div>
-                        <div style="text-align: right;">
+                        <div>
                             <p class="resumo-label">Saldo Final</p>
-                            <p class="resumo-valor" style="font-size: 1.5rem; color: <?php echo ($saldo_geral < 0) ? '#ff4c4c' : '#28a745'; ?>;">R$ <?php echo number_format($saldo_geral, 2, ',', '.'); ?></p>
+                            <p class="resumo-valor summary-highlight" style="color: <?php echo ($saldo_geral < 0) ? '#ff4c4c' : '#28a745'; ?>;">R$ <?php echo number_format($saldo_geral, 2, ',', '.'); ?></p>
                         </div>
                     </div>
                 </div>
 
                 <div class="tabs-container">
-                    <div class="tabs-header" style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div class="tabs-header">
                         <?php foreach ($folhas as $f): ?>
                             <button class="tab-btn <?php echo ($f['numero_folha'] == ($aba_ativa ?? 1)) ? 'active' : ''; ?>" type="button" onclick="abrirAba(event, <?php echo (int)$f['numero_folha']; ?>)">
                                 Folha <?php echo (int)$f['numero_folha']; ?>
                             </button>
                         <?php endforeach; ?>
 
-                        <form action="/contrato/adicionar_folha/<?php echo (int)$contrato['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Deseja adicionar uma nova folha a este pedido?');">
+                        <form action="/contrato/adicionar_folha/<?php echo (int)$contrato['id']; ?>" method="POST" onsubmit="return confirm('Deseja adicionar uma nova folha a este pedido?');">
                             <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                             <button type="submit" class="tab-btn">Nova Folha</button>
                         </form>
@@ -73,48 +75,48 @@
                         ?>
                         <div id="aba-<?php echo (int)$num_folha; ?>" class="tab-content <?php echo ($num_folha == ($aba_ativa ?? 1)) ? 'active' : ''; ?>">
                             <div class="relatorio">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <div class="folha-header">
                                     <div>
-                                        <h3 class="form-section-title" style="margin: 0;">Itens da Folha <?php echo (int)$num_folha; ?></h3>
-                                        <p style="margin: 5px 0 0 0; font-size: 0.9rem; display: flex; align-items: center; gap: 10px;">
+                                        <h3 class="form-section-title contrato-summary-title">Itens da Folha <?php echo (int)$num_folha; ?></h3>
+                                        <div class="folha-meta">
                                             <span>
                                                 Valor da folha: <strong>R$ <?php echo number_format($f['valor_folha'], 2, ',', '.'); ?></strong>
-                                                <button type="button" class="btn-warning" onclick="document.getElementById('edit-valor-<?php echo (int)$num_folha; ?>').style.display='inline-flex'" style="padding: 4px 8px; font-size: 0.8rem; background: #ffc107; color: #000; text-decoration: none; border-radius: 4px;">Editar</button>
+                                                <button type="button" class="btn-warning btn-sm" onclick="toggleEditarValor(<?php echo (int)$num_folha; ?>)">✏️ Editar</button>
                                             </span>
 
-                                            <form id="edit-valor-<?php echo (int)$num_folha; ?>" action="/contrato/editar_valor_folha/<?php echo (int)$contrato['id']; ?>" method="POST" style="display: none; align-items: center; gap: 5px; margin:0;">
+                                            <form id="edit-valor-<?php echo (int)$num_folha; ?>" class="valor-folha-editor" action="/contrato/editar_valor_folha/<?php echo (int)$contrato['id']; ?>" method="POST">
                                                 <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                                                 <input type="hidden" name="numero_folha" value="<?php echo (int)$num_folha; ?>">
-                                                <input type="number" name="novo_valor" step="0.01" class="sistema" style="width: 120px; margin: 0; padding: 4px;" value="<?php echo e($f['valor_folha']); ?>" required>
-                                                <button type="submit" class="btn-primary" style="padding: 4px 8px; font-size: 0.8rem;">Salvar</button>
-                                                <button type="button" class="btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="document.getElementById('edit-valor-<?php echo (int)$num_folha; ?>').style.display='none'">Cancelar</button>
+                                                <input type="number" name="novo_valor" step="0.01" class="sistema valor-folha-input" value="<?php echo e($f['valor_folha']); ?>" required>
+                                                <button type="submit" class="btn-primary btn-sm">Salvar</button>
+                                                <button type="button" class="btn-secondary btn-sm" onclick="toggleEditarValor(<?php echo (int)$num_folha; ?>, false)">Cancelar</button>
                                             </form>
 
-                                            | Saldo: <strong style="color: <?php echo ($saldo_folha < 0) ? '#ff4c4c' : '#28a745'; ?>">R$ <?php echo number_format($saldo_folha, 2, ',', '.'); ?></strong>
-                                        </p>
+                                            <span class="folha-saldo">Saldo: <strong style="color: <?php echo ($saldo_folha < 0) ? '#ff4c4c' : '#28a745'; ?>">R$ <?php echo number_format($saldo_folha, 2, ',', '.'); ?></strong></span>
+                                        </div>
                                     </div>
-                                    <div style="display: flex; gap: 10px;">
-                                        <button type="button" onclick="toggleFormProduto(<?php echo (int)$num_folha; ?>)" class="btn-primary" style="padding: 8px 15px;">+ Adicionar Produto</button>
+                                    <div class="action-group">
+                                        <button type="button" onclick="toggleFormProduto(<?php echo (int)$num_folha; ?>)" class="btn-primary">+ Adicionar Produto</button>
 
                                         <?php if (count($folhas) > 1): ?>
-                                            <form action="/contrato/excluir_folha/<?php echo (int)$contrato['id']; ?>/<?php echo (int)$num_folha; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja apagar a Folha <?php echo (int)$num_folha; ?> e todos os produtos cadastrados nela?');">
+                                            <form action="/contrato/excluir_folha/<?php echo (int)$contrato['id']; ?>/<?php echo (int)$num_folha; ?>" method="POST" onsubmit="return confirm('Tem certeza que deseja apagar a Folha <?php echo (int)$num_folha; ?> e todos os produtos cadastrados nela?');">
                                                 <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
-                                                <button type="submit" class="btn-danger" style="padding: 8px 15px; border:0; cursor:pointer;">Apagar Folha</button>
+                                                <button type="submit" class="btn-danger">🗑️ Apagar Folha</button>
                                             </form>
                                         <?php endif; ?>
                                     </div>
                                 </div>
 
                                 <div id="form-produto-<?php echo (int)$num_folha; ?>" class="inline-form-container" style="display:none;">
-                                    <h4 style="margin-top:0; color:#0066cc; margin-bottom: 15px;">Novo item para a Folha #<?php echo (int)$num_folha; ?></h4>
-                                    <form action="/contrato/adicionar_produto_inline/<?php echo (int)$contrato['id']; ?>" method="POST" class="grid-form-inline" style="display: grid; grid-template-columns: 2fr 1fr 1fr 0.8fr 1fr auto; gap: 10px; align-items: end;">
+                                    <h4 class="contrato-summary-title money-primary">Novo item para a Folha #<?php echo (int)$num_folha; ?></h4>
+                                    <form action="/contrato/adicionar_produto_inline/<?php echo (int)$contrato['id']; ?>" method="POST" class="grid-form-inline">
                                         <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                                         <input type="hidden" name="numero_folha" value="<?php echo (int)$num_folha; ?>">
 
-                                        <div><label style="font-size:0.8rem; display:block;">Produto</label><input type="text" name="nome_produto" class="sistema" required style="margin:0;"></div>
-                                        <div><label style="font-size:0.8rem; display:block;">Marca</label><input type="text" name="marca" class="sistema" style="margin:0;" placeholder="Ex: Chamex"></div>
+                                        <div><label class="form-grid-label">Produto</label><input type="text" name="nome_produto" class="sistema" required style="margin:0;"></div>
+                                        <div><label class="form-grid-label">Marca</label><input type="text" name="marca" class="sistema" style="margin:0;" placeholder="Ex: Chamex"></div>
                                         <div>
-                                            <label style="font-size:0.8rem; display:block;">Unidade</label>
+                                            <label class="form-grid-label">Unidade</label>
                                             <select name="unidade" class="sistema" style="margin:0;">
                                                 <option value="KG">KG</option>
                                                 <option value="L">L</option>
@@ -122,11 +124,11 @@
                                                 <option value="PCT">PCT</option>
                                             </select>
                                         </div>
-                                        <div><label style="font-size:0.8rem; display:block;">Qtd</label><input type="number" name="quantidade" min="1" value="1" class="sistema" required style="margin:0;"></div>
-                                        <div><label style="font-size:0.8rem; display:block;">Valor Unit.</label><input type="number" name="valor_unitario" step="0.01" class="sistema" required style="margin:0;"></div>
-                                        <div style="display: flex; gap: 5px;">
-                                            <button type="submit" class="btn-primary" style="height: 38px;">Salvar</button>
-                                            <button type="button" onclick="toggleFormProduto(<?php echo (int)$num_folha; ?>)" class="btn-secondary" style="height: 38px;">X</button>
+                                        <div><label class="form-grid-label">Qtd</label><input type="number" name="quantidade" min="1" value="1" class="sistema" required style="margin:0;"></div>
+                                        <div><label class="form-grid-label">Valor Unit.</label><input type="number" name="valor_unitario" step="0.01" class="sistema" required style="margin:0;"></div>
+                                        <div class="inline-form-actions">
+                                            <button type="submit" class="btn-primary">Salvar</button>
+                                            <button type="button" onclick="toggleFormProduto(<?php echo (int)$num_folha; ?>)" class="btn-secondary btn-icon">X</button>
                                         </div>
                                     </form>
                                 </div>
@@ -146,23 +148,25 @@
                                     <tbody>
                                         <?php if (empty($produtos_desta_folha)): ?>
                                             <tr>
-                                                <td colspan="7" style="text-align: center; padding: 20px; color: #999;">Nenhum produto lancado nesta folha.</td>
+                                                <td colspan="7" class="muted-cell">Nenhum produto lancado nesta folha.</td>
                                             </tr>
                                         <?php else: ?>
                                             <?php foreach ($produtos_desta_folha as $p): ?>
                                                 <tr>
                                                     <td><strong><?php echo e($p['nome_produto']); ?></strong></td>
                                                     <td><?php echo e($p['marca'] ?: '-'); ?></td>
-                                                    <td><span class="badge-unidade" style="background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; border: 1px solid #ddd;"><?php echo e($p['unidade'] ?? 'UN'); ?></span></td>
+                                                    <td><span class="badge-unidade"><?php echo e($p['unidade'] ?? 'UN'); ?></span></td>
                                                     <td><?php echo (int)$p['quantidade']; ?></td>
                                                     <td>R$ <?php echo number_format($p['valor_unitario'], 2, ',', '.'); ?></td>
-                                                    <td style="color: #28a745; font-weight: bold;">R$ <?php echo number_format($p['valor_total'], 2, ',', '.'); ?></td>
+                                                    <td class="money-success">R$ <?php echo number_format($p['valor_total'], 2, ',', '.'); ?></td>
                                                     <td style="text-align: center; white-space: nowrap;">
-                                                        <a href="/contrato/editar_produto/<?php echo (int)$p['id']; ?>" class="btn-warning" style="padding: 4px 8px; font-size: 0.8rem; background: #ffc107; color: #000; text-decoration: none; border-radius: 4px;">Editar</a>
-                                                        <form action="/contrato/excluir_produto/<?php echo (int)$p['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Excluir este item definitivamente?');">
-                                                            <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
-                                                            <button type="submit" class="btn-danger" style="padding: 4px 8px; font-size: 0.8rem; border:0; cursor:pointer;">Apagar</button>
-                                                        </form>
+                                                        <div class="table-actions">
+                                                            <a href="/contrato/editar_produto/<?php echo (int)$p['id']; ?>" class="btn-warning btn-sm">✏️ Editar</a>
+                                                            <form action="/contrato/excluir_produto/<?php echo (int)$p['id']; ?>" method="POST" onsubmit="return confirm('Excluir este item definitivamente?');">
+                                                                <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
+                                                                <button type="submit" class="btn-danger btn-sm">🗑️ Apagar</button>
+                                                            </form>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             <?php endforeach; ?>
@@ -188,6 +192,12 @@
         function toggleFormProduto(numeroFolha) {
             const form = document.getElementById('form-produto-' + numeroFolha);
             form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+        }
+
+        function toggleEditarValor(numeroFolha, abrir = true) {
+            const form = document.getElementById('edit-valor-' + numeroFolha);
+            const deveAbrir = abrir && !form.classList.contains('is-open');
+            form.classList.toggle('is-open', deveAbrir);
         }
     </script>
 </body>

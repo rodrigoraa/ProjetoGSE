@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Editar Usuário</title>
+    <title>✏️ Editar Usuário</title>
     <link rel="stylesheet" href="/assets/css/painel.css">
     <link rel="stylesheet" href="/assets/css/usuarios.css">
 </head>
@@ -14,7 +14,7 @@
 
         <div class="main-content-wrapper">
             <header>
-                <h1>Editar Usuário</h1>
+                <h1>✏️ Editar Usuário</h1>
             </header>
             <main>
                 <?php if (!empty($mensagem))

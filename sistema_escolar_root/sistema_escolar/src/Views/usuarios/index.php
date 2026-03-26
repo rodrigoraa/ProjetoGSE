@@ -3,12 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Gerenciar Usuarios</title>
+    <title>Gerenciar Usuários</title>
     <link rel="stylesheet" href="/assets/css/painel.css">
     <style>
-        .alert { padding: 15px; margin-bottom: 20px; border-radius: 4px; border: 1px solid transparent; }
-        .alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
-        .alert-danger { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; }
         .btn-acao { text-decoration: none; font-weight: bold; padding: 5px 10px; border-radius: 4px; font-size: 0.9em; }
         .btn-editar { color: #007bff; background: #e7f1ff; }
         .btn-editar:hover { background: #d0e2ff; }
@@ -24,20 +21,17 @@
 
         <div class="main-content-wrapper">
             <header>
-                <h1>Gerenciar Usuarios</h1>
+                <h1>Gerenciar Usuários</h1>
             </header>
 
             <main>
-                <?php if (!empty($msg_sucesso)): ?>
-                    <div class="alert alert-success"><?php echo e($msg_sucesso); ?></div>
-                <?php endif; ?>
-
-                <?php if (!empty($msg_erro)): ?>
-                    <div class="alert alert-danger"><?php echo e($msg_erro); ?></div>
+                <?php $flash = consumir_flash(); ?>
+                <?php if (!empty($flash)): ?>
+                    <?php echo $flash; ?>
                 <?php endif; ?>
 
                 <div style="margin-bottom:20px;">
-                    <a href="/usuario/cadastrar" class="btn-primary" style="text-decoration:none;">+ Novo Usuario</a>
+                    <a href="/usuario/cadastrar" class="btn-primary" style="text-decoration:none;">+ Novo Usuário</a>
                 </div>
 
                 <div class="relatorio">
@@ -45,9 +39,9 @@
                         <thead>
                             <tr>
                                 <th>Nome</th>
-                                <th>Email</th>
+                                <th>E-mail</th>
                                 <th>Tipo</th>
-                                <th style="text-align: center;">Acoes</th>
+                                <th style="text-align: center;">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -55,7 +49,7 @@
 
                             <?php if (empty($dados)): ?>
                                 <tr>
-                                    <td colspan="4" style="text-align:center; padding:20px;">Nenhum usuario encontrado.</td>
+                                    <td colspan="4" style="text-align:center; padding:20px;">Nenhum usuário encontrado.</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($dados as $u): ?>
@@ -68,15 +62,15 @@
                                             </span>
                                         </td>
                                         <td class="col-acoes" style="text-align: center;">
-                                            <a href="/usuario/editar/<?php echo (int)$u['id']; ?>" class="btn-acao btn-editar">Editar</a>
+                                            <a href="/usuario/editar/<?php echo (int)$u['id']; ?>" class="btn-acao btn-editar">✏️ Editar</a>
 
                                             <?php if ($u['id'] != $_SESSION['usuario_id']): ?>
-                                                <form action="/usuario/excluir/<?php echo (int)$u['id']; ?>" method="POST" class="inline-form" onsubmit="return confirm('Tem certeza que deseja apagar o usuario <?php echo e($u['nome']); ?>?');">
+                                                <form action="/usuario/excluir/<?php echo (int)$u['id']; ?>" method="POST" class="inline-form" onsubmit="return confirm('Tem certeza que deseja apagar o usuário <?php echo e($u['nome']); ?>?');">
                                                     <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
-                                                    <button type="submit" class="btn-acao btn-excluir">Apagar</button>
+                                                    <button type="submit" class="btn-acao btn-excluir">🗑️ Apagar</button>
                                                 </form>
                                             <?php else: ?>
-                                                <span style="font-size:0.8em; color:#999;">(Voce)</span>
+                                                <span style="font-size:0.8em; color:#999;">(Você)</span>
                                             <?php endif; ?>
                                         </td>
                                     </tr>

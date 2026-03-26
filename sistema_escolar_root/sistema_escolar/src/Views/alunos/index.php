@@ -18,6 +18,11 @@
             </header>
 
             <main>
+                <?php $flash = consumir_flash(); ?>
+                <?php if (!empty($flash)): ?>
+                    <?php echo $flash; ?>
+                <?php endif; ?>
+
                 <div class="toolbar-alunos">
                     <a href="/aluno/cadastrar" class="btn-primary" style="text-decoration:none;">+ Novo Aluno</a>
 
@@ -36,7 +41,7 @@
                                 <th>Nome Completo</th>
                                 <th>Turma</th>
                                 <th>Data Nasc.</th>
-                                <th>Acoes</th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -55,13 +60,13 @@
                                     <td><?php echo date('d/m/Y', strtotime($aluno['data_nascimento'])); ?></td>
 
                                     <td class="col-acoes">
-                                        <a href="/aluno/perfil/<?php echo (int)$aluno['id']; ?>" class="editar">Perfil</a>
-                                        <a href="/aluno/editar/<?php echo (int)$aluno['id']; ?>" class="editar">Editar</a>
+                                        <a href="/aluno/perfil/<?php echo (int)$aluno['id']; ?>" class="editar">👤 Perfil</a>
+                                        <a href="/aluno/editar/<?php echo (int)$aluno['id']; ?>" class="editar">✏️ Editar</a>
 
                                         <?php if ($_SESSION['usuario_tipo'] === 'admin'): ?>
                                             <form action="/aluno/excluir/<?php echo (int)$aluno['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Tem certeza absoluta? Isso apagara o aluno e a DVA dele.');">
                                                 <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
-                                                <button type="submit" class="btn-danger" style="text-decoration:none; border:0; cursor:pointer;">Apagar</button>
+                                                <button type="submit" class="btn-danger" style="text-decoration:none; border:0; cursor:pointer;">🗑️ Apagar</button>
                                             </form>
                                         <?php endif; ?>
                                     </td>

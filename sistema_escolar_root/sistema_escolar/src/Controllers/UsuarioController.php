@@ -10,15 +10,8 @@ class UsuarioController extends Controller
         $usuarioModel = new Usuario();
         $lista = $usuarioModel->listar();
 
-        $sucesso = $_SESSION['msg_sucesso'] ?? null;
-        $erro = $_SESSION['msg_erro'] ?? null;
-
-        unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
-
         $this->view('usuarios/index', [
-            'funcionarios' => $lista,
-            'msg_sucesso' => $sucesso,
-            'msg_erro' => $erro
+            'funcionarios' => $lista
         ]);
     }
 
@@ -34,12 +27,22 @@ class UsuarioController extends Controller
             if ($usuarioModel->cadastrar($_POST['nome'], $_POST['email'], $_POST['senha'], $_POST['tipo'])) {
                 registrar_log(Model::getConexao(), "Usuario - Criar", "Criou: " . $_POST['nome']);
 
-                $_SESSION['msg_sucesso'] = "Usuario cadastrado com sucesso!";
+                definir_flash(
+                    'sucesso',
+                    'Usuário cadastrado com sucesso',
+                    'O novo usuário foi criado e já pode acessar o sistema.',
+                    'Confira se o tipo de acesso está correto antes de encerrar.'
+                );
                 redirect('/usuario');
                 exit;
             }
 
-            $mensagem = '<p class="error-message">Erro: e-mail ja cadastrado?</p>';
+            $mensagem = alerta_html(
+                'erro',
+                'Não foi possível cadastrar o usuário',
+                'Este e-mail pode já estar sendo usado por outra conta ou algum dado informado é inválido.',
+                'Revise nome, e-mail, senha e tipo de acesso antes de tentar novamente.'
+            );
         }
         $this->view('usuarios/cadastrar', ['mensagem' => $mensagem]);
     }
@@ -64,12 +67,22 @@ class UsuarioController extends Controller
             if ($usuarioModel->atualizar($id, $_POST['nome'], $_POST['email'], $_POST['tipo'], $novaSenha)) {
                 registrar_log(Model::getConexao(), "Usuario - Editar", "Editou ID: $id");
 
-                $_SESSION['msg_sucesso'] = "Usuario atualizado com sucesso!";
+                definir_flash(
+                    'sucesso',
+                    'Usuário atualizado com sucesso',
+                    'As informações do usuário foram salvas.',
+                    'Se você alterou o tipo de acesso, a nova permissão já vale para os próximos acessos.'
+                );
                 redirect('/usuario');
                 exit;
             }
 
-            $mensagem = '<p class="error-message">Erro ao atualizar.</p>';
+            $mensagem = alerta_html(
+                'erro',
+                'Não foi possível atualizar o usuário',
+                'As alterações não foram salvas.',
+                'Confira se o e-mail informado não está em uso por outra conta e tente novamente.'
+            );
         }
         $this->view('usuarios/editar', ['user' => $user, 'mensagem' => $mensagem]);
     }
@@ -86,7 +99,12 @@ class UsuarioController extends Controller
         verificar_csrf_token($_POST['csrf_token'] ?? '');
 
         if ($id == $_SESSION['usuario_id']) {
-            $_SESSION['msg_erro'] = "Voce nao pode excluir sua propria conta.";
+            definir_flash(
+                'erro',
+                'Não é permitido apagar a própria conta',
+                'O sistema bloqueia a exclusão do usuário atualmente conectado.',
+                'Se você realmente precisar remover essa conta, entre com outro administrador.'
+            );
             redirect('/usuario');
             exit;
         }
@@ -96,11 +114,26 @@ class UsuarioController extends Controller
 
         if ($resultado === true) {
             registrar_log(Model::getConexao(), "Usuario - Excluir", "Excluiu ID: $id");
-            $_SESSION['msg_sucesso'] = "Usuario excluido com sucesso!";
+            definir_flash(
+                'sucesso',
+                'Usuário apagado com sucesso',
+                'A conta selecionada foi removida do sistema.',
+                'Confirme se não havia mais necessidade de acesso para esse usuário.'
+            );
         } elseif ($resultado === 'tem_registros') {
-            $_SESSION['msg_erro'] = "Nao e possivel excluir este funcionario pois ele possui registros vinculados.";
+            definir_flash(
+                'erro',
+                'Não foi possível apagar este usuário',
+                'Essa conta possui registros vinculados no sistema e, por isso, não pode ser excluída.',
+                'Se necessário, mantenha a conta inativa ou reavalie os vínculos existentes antes de tentar novamente.'
+            );
         } else {
-            $_SESSION['msg_erro'] = "Erro desconhecido ao tentar excluir.";
+            definir_flash(
+                'erro',
+                'Não foi possível apagar o usuário',
+                'O sistema encontrou um problema inesperado durante a exclusão.',
+                'Tente novamente em alguns instantes. Se continuar falhando, avise o suporte.'
+            );
         }
 
         redirect('/usuario');
@@ -122,16 +155,47 @@ class UsuarioController extends Controller
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             verificar_csrf_token($_POST['csrf_token'] ?? '');
 
-            if (password_verify($_POST['senha_atual'], $user['senha'])) {
+            if (!password_verify($_POST['senha_atual'], $user['senha'])) {
+                $mensagem = alerta_html(
+                    'erro',
+                    'Senha atual incorreta',
+                    'A senha informada para confirmar as alterações não confere com a sua conta.',
+                    'Digite novamente a senha usada no login para salvar o perfil.'
+                );
+            } elseif (!empty($_POST['nova_senha']) && $_POST['nova_senha'] !== ($_POST['confirma_senha'] ?? '')) {
+                $mensagem = alerta_html(
+                    'erro',
+                    'A nova senha não foi confirmada corretamente',
+                    'Os campos de nova senha e confirmação estão diferentes.',
+                    'Repita a mesma senha nos dois campos para atualizar o acesso.'
+                );
+            } elseif (!empty($_POST['nova_senha']) && strlen($_POST['nova_senha']) < 6) {
+                $mensagem = alerta_html(
+                    'erro',
+                    'A nova senha está muito curta',
+                    'Para sua segurança, a nova senha precisa ter pelo menos 6 caracteres.',
+                    'Escolha uma senha maior e tente novamente.'
+                );
+            } else {
                 $novaSenha = !empty($_POST['nova_senha']) ? $_POST['nova_senha'] : null;
 
                 if ($usuarioModel->atualizarPerfil($id, $_POST['nome'], $_POST['email'], $novaSenha)) {
                     $_SESSION['usuario_nome'] = $_POST['nome'];
-                    $mensagem = '<p class="success-message">Perfil atualizado com sucesso!</p>';
+                    $mensagem = alerta_html(
+                        'sucesso',
+                        'Perfil atualizado com sucesso',
+                        'Suas informações foram salvas.',
+                        'Se você trocou a senha, use a nova senha no próximo login.'
+                    );
                     $user = $usuarioModel->buscarPorId($id);
+                } else {
+                    $mensagem = alerta_html(
+                        'erro',
+                        'Não foi possível atualizar o perfil',
+                        'O sistema não conseguiu salvar suas alterações agora.',
+                        'Revise os dados informados e tente novamente.'
+                    );
                 }
-            } else {
-                $mensagem = '<p class="error-message">Senha atual incorreta.</p>';
             }
         }
 

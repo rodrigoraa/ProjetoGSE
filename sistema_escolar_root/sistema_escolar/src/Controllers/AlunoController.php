@@ -66,20 +66,40 @@ class AlunoController extends Controller
             $dados_form = $_POST;
 
             if (empty($nome) || empty($dataNasc) || !$idTurma) {
-                $mensagem = '<p class="error-message">Preencha Nome, Data de Nascimento e Turma.</p>';
+                $mensagem = alerta_html(
+                    'erro',
+                    'Faltam dados obrigatórios',
+                    'Para cadastrar o aluno, informe nome completo, data de nascimento e turma.',
+                    'Revise os campos do formulário e tente novamente.'
+                );
             } elseif ($alunoModel->existeAluno($nome, $dataNasc)) {
-                $mensagem = '<p class="error-message">Aluno ja cadastrado com este nome e data.</p>';
+                $mensagem = alerta_html(
+                    'aviso',
+                    'Possível cadastro duplicado',
+                    'Já existe um aluno cadastrado com este nome e esta data de nascimento.',
+                    'Confirme se o aluno já está na lista antes de criar um novo registro.'
+                );
             } else {
                 $idNovo = $alunoModel->cadastrar($nome, $dataNasc, $idTurma, $dataDva, $tel_aluno, $tel_responsavel);
 
                 if ($idNovo) {
                     registrar_log(Model::getConexao(), "Cadastrar Aluno", "Novo aluno: $nome (ID: $idNovo)");
-                    $_SESSION['sucesso'] = "Aluno cadastrado com sucesso!";
+                    definir_flash(
+                        'sucesso',
+                        'Aluno cadastrado com sucesso',
+                        "O cadastro de $nome foi salvo com sucesso.",
+                        'Você já pode abrir o perfil do aluno para conferir os dados ou continuar cadastrando outros.'
+                    );
                     redirect('/aluno');
                     exit;
                 }
 
-                $mensagem = '<p class="error-message">Erro tecnico ao salvar no banco.</p>';
+                $mensagem = alerta_html(
+                    'erro',
+                    'Não foi possível salvar o cadastro',
+                    'O sistema não conseguiu gravar o novo aluno neste momento.',
+                    'Tente novamente em alguns instantes. Se o erro continuar, avise o suporte com o nome do aluno que tentou cadastrar.'
+                );
             }
         }
 
@@ -102,7 +122,12 @@ class AlunoController extends Controller
         verificar_csrf_token($_POST['csrf_token'] ?? '');
 
         if ($_SESSION['usuario_tipo'] !== 'admin') {
-            $_SESSION['mensagem_erro'] = "Acesso negado: apenas administradores podem excluir registros.";
+            definir_flash(
+                'erro',
+                'Você não tem permissão para apagar este aluno',
+                'Somente administradores podem excluir registros de alunos.',
+                'Se essa exclusão for necessária, peça apoio a um usuário administrador.'
+            );
             redirect('/aluno');
             exit;
         }
@@ -113,7 +138,12 @@ class AlunoController extends Controller
 
             if ($nomeExcluido) {
                 registrar_log(Model::getConexao(), "Apagar Aluno", "Excluiu: $nomeExcluido (ID: $id)");
-                $_SESSION['sucesso'] = "Aluno removido com sucesso.";
+                definir_flash(
+                    'sucesso',
+                    'Aluno removido com sucesso',
+                    "O registro de $nomeExcluido foi apagado.",
+                    'Se a exclusão foi indevida, será necessário cadastrar o aluno novamente.'
+                );
             }
         }
 
@@ -129,7 +159,12 @@ class AlunoController extends Controller
         $aluno = $alunoModel->buscarPorId($id);
 
         if (!$aluno) {
-            $_SESSION['mensagem_erro'] = "Aluno nao encontrado.";
+            definir_flash(
+                'erro',
+                'Aluno não encontrado',
+                'Não localizamos o aluno solicitado.',
+                'Ele pode ter sido removido ou o link acessado não é mais válido.'
+            );
             redirect('/aluno');
             exit;
         }

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title><?php echo $acao === 'editar' ? 'Editar Produto' : 'Novo Produto'; ?></title>
+    <title><?php echo $acao === 'editar' ? '✏️ Editar Produto' : 'Novo Produto'; ?></title>
     <link rel="stylesheet" href="/assets/css/painel.css">
     <link rel="stylesheet" href="/assets/css/alunos.css">
     <link rel="stylesheet" href="/assets/css/contrato.css">
@@ -14,7 +14,7 @@
         <?php include VIEW_PATH . '/partials/menu.php'; ?>
         <div class="main-content-wrapper">
             <header>
-                <h1><?php echo $acao === 'editar' ? 'Editar Produto' : 'Adicionar Novo Produto'; ?></h1>
+                <h1><?php echo $acao === 'editar' ? '✏️ Editar Produto' : 'Adicionar Novo Produto'; ?></h1>
             </header>
             <main>
                 <div class="toolbar-alunos">
@@ -56,13 +56,13 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Valor Unitario (R$)</label>
+                            <label>Valor Unitário (R$)</label>
                             <input type="number" name="valor_unitario" class="sistema" step="0.01" required value="<?php echo $acao === 'editar' ? e($produto['valor_unitario']) : ''; ?>">
                         </div>
                     </div>
 
                     <div class="form-actions" style="margin-top: 20px;">
-                        <button type="submit" class="btn-primary" style="width: 100%;">Salvar Informacoes do Produto</button>
+                        <button type="submit" class="btn-primary" style="width: 100%;">Salvar Informações do Produto</button>
                     </div>
                 </form>
             </main>

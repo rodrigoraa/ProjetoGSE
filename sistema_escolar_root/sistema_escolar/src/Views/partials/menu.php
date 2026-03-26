@@ -1,6 +1,22 @@
+<script>
+    (() => {
+        const faviconHref = '/assets/image/logo_escola.png';
+        let favicon = document.querySelector('link[rel="icon"]');
+
+        if (!favicon) {
+            favicon = document.createElement('link');
+            favicon.rel = 'icon';
+            favicon.type = 'image/png';
+            document.head.appendChild(favicon);
+        }
+
+        favicon.href = faviconHref;
+    })();
+</script>
+
 <aside class="sidebar">
     <div class="sidebar-header">
-        <h2>Gestor Escolar</h2>
+        <h2>GSE</h2>
     </div>
 
     <nav>
@@ -13,43 +29,52 @@
         ?>
 
         <a href="/painel" class="sidebar-link <?php echo is_active($uri, '/painel'); ?>">
-            <span>Painel Geral</span> 
+            <span class="sidebar-icon">🏠</span>
+            <span>Painel Geral</span>
         </a>
         <a href="/aluno" class="sidebar-link <?php echo is_active($uri, '/aluno'); ?>">
+            <span class="sidebar-icon">🎓</span>
             <span>Gestão de Alunos</span>
         </a>
         <a href="/certidao" class="sidebar-link <?php echo is_active($uri, '/certidao'); ?>">
-            <span>Certidões</span> 
+            <span class="sidebar-icon">📄</span>
+            <span>Certidões</span>
         </a>
         <a href="/contrato" class="sidebar-link <?php echo is_active($uri, '/contrato'); ?>">
-            <span>Contratos</span> 
+            <span class="sidebar-icon">📝</span>
+            <span>Contratos</span>
         </a>
         <a href="/passivo" class="sidebar-link <?php echo is_active($uri, '/passivo'); ?>">
-            <span>Arquivo Passivo</span> 
+            <span class="sidebar-icon">📦</span>
+            <span>Arquivo Passivo</span>
         </a>
         <a href="/relatorio" class="sidebar-link">
-            <span>Relatórios</span> 
+            <span class="sidebar-icon">📊</span>
+            <span>Relatórios</span>
         </a>
-
         <a href="/etiqueta" class="sidebar-link">
-            <span>Etiquetas</span> 
+            <span class="sidebar-icon">🏷️</span>
+            <span>Etiquetas</span>
         </a>
-
-        <a href="https://meteo.eesjv.com.br" target="_blank" class="sidebar-link" rel="noopener noreferrer">
+        <a href="https://meteo.eesjv.com.br" target="_blank" rel="noopener noreferrer" class="sidebar-link">
+            <span class="sidebar-icon">🌦️</span>
             <span>Estação Meteorológica</span>
         </a>
 
         <?php if (isset($_SESSION['usuario_tipo']) && $_SESSION['usuario_tipo'] === 'admin'): ?>
-            <div style="border-top:1px solid rgba(255,255,255,0.1); margin:15px 0;"></div>
-            <small style="padding-left:20px; color:rgba(255,255,255,0.5); text-transform:uppercase; font-size:0.75rem;">Admin</small>
+            <div class="sidebar-divider"></div>
+            <small class="sidebar-section-label">Admin</small>
 
             <a href="/usuario" class="sidebar-link <?php echo is_active($uri, '/usuario'); ?>">
-                <span>Usuários</span> 
+                <span class="sidebar-icon">👥</span>
+                <span>Usuários</span>
             </a>
             <a href="/sistema/backups" class="sidebar-link <?php echo is_active($uri, '/backups'); ?>">
-                <span>Backups</span> 
+                <span class="sidebar-icon">💾</span>
+                <span>Backups</span>
             </a>
             <a href="/sistema/logs" class="sidebar-link <?php echo is_active($uri, '/logs'); ?>">
+                <span class="sidebar-icon">📜</span>
                 <span>Logs</span>
             </a>
         <?php endif; ?>

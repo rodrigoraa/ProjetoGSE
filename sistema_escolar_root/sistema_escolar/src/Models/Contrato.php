@@ -231,7 +231,7 @@ class Contrato extends Model
             $contrato = $stmtContrato->fetch();
 
             if (!$contrato) {
-                throw new Exception("Contrato nao encontrado.");
+                throw new Exception("Contrato não encontrado.");
             }
 
             $nova_qtd_folhas = $contrato['qtd_folhas'] + 1;

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Gestao de Backups</title>
+    <title>Gestão de Backups</title>
     <link rel="stylesheet" href="/assets/css/painel.css">
     <link rel="stylesheet" href="/assets/css/sistema.css">
 </head>
@@ -14,7 +14,7 @@
 
         <div class="main-content-wrapper">
             <header>
-                <h1>Gestao de Backups</h1>
+                <h1>Gestão de Backups</h1>
             </header>
             <main>
                 <div class="backup-controls">
@@ -30,8 +30,8 @@
                 </div>
 
                 <div class="relatorio">
-                    <h3>Historico Local (<?php echo count($lista); ?> arquivos)</h3>
-                    <p style="font-size:0.9em; color:#666; margin-bottom:15px;">O sistema protege automaticamente o arquivo mais recente contra exclusao acidental.</p>
+                    <h3>Histórico Local (<?php echo count($lista); ?> arquivos)</h3>
+                    <p style="font-size:0.9em; color:#666; margin-bottom:15px;">O sistema protege automaticamente o arquivo mais recente contra exclusão acidental.</p>
 
                     <table class="tabela-filtrada">
                         <thead>
@@ -39,7 +39,7 @@
                                 <th>Arquivo</th>
                                 <th>Data/Hora</th>
                                 <th>Tamanho</th>
-                                <th style="text-align: center;">Acoes</th>
+                                <th style="text-align: center;">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -76,7 +76,7 @@
                                                 <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                                                 <input type="hidden" name="acao" value="apagar">
                                                 <input type="hidden" name="arquivo" value="<?php echo e($nome); ?>">
-                                                <button type="submit" class="btn-delete" title="Excluir">Apagar</button>
+                                                <button type="submit" class="btn-delete" title="🗑️ Apagar">🗑️ Apagar</button>
                                             </form>
                                         <?php endif; ?>
                                     </td>

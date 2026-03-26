@@ -26,13 +26,16 @@ class EmailService
             $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $this->mail->Port       = $_ENV['MAIL_PORT'] ?? 587;
 
-            $this->mail->SMTPOptions = array(
-                'ssl' => array(
-                    'verify_peer' => false,
-                    'verify_peer_name' => false,
-                    'allow_self_signed' => true
-                )
-            );
+            $allowSelfSigned = filter_var($_ENV['MAIL_ALLOW_SELF_SIGNED'] ?? false, FILTER_VALIDATE_BOOLEAN);
+            if ($allowSelfSigned) {
+                $this->mail->SMTPOptions = array(
+                    'ssl' => array(
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                        'allow_self_signed' => true
+                    )
+                );
+            }
 
             $fromEmail = $_ENV['MAIL_FROM'] ?? $_ENV['MAIL_USERNAME'];
             $fromName  = $_ENV['MAIL_FROM_NAME'] ?? 'Sistema Escolar';
@@ -48,6 +51,10 @@ class EmailService
     public function enviar($destinatario, $assunto, $corpo)
     {
         try {
+            if (!filter_var($destinatario, FILTER_VALIDATE_EMAIL)) {
+                return false;
+            }
+
             $this->mail->addAddress($destinatario);
             $this->mail->Subject = $assunto;
             $this->mail->Body    = $corpo;

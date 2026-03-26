@@ -2,6 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="/assets/image/logo_escola.png">
     <title>Recuperar Senha</title>
     <link rel="stylesheet" href="/assets/css/login.css">
 </head>

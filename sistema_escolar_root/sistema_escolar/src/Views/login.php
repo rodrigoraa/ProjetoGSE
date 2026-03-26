@@ -7,6 +7,7 @@ $erro = $erro ?? null;
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="/assets/image/logo_escola.png">
     <title>Login - Sistema Escolar</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -16,6 +17,7 @@ $erro = $erro ?? null;
 <body class="login-container">
 
     <form action="/login/entrar" method="POST" class="login">
+        <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
 
         <h2>Login</h2>
 

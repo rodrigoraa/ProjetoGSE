@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Editar Pedido</title>
+    <title>✏️ Editar Pedido</title>
     <link rel="stylesheet" href="/assets/css/painel.css">
     <link rel="stylesheet" href="/assets/css/alunos.css">
     <link rel="stylesheet" href="/assets/css/contrato.css">
@@ -15,18 +15,20 @@
 
         <div class="main-content-wrapper">
             <header>
-                <h1>Editar Pedido #<?php echo $contrato['id']; ?></h1>
+                <h1>✏️ Editar Pedido #<?php echo $contrato['id']; ?></h1>
             </header>
 
             <main>
                 <div class="toolbar-alunos">
-                    <a href="/contrato/ver/<?php echo $contrato['id']; ?>" class="btn-secondary" style="text-decoration:none;">⬅ Voltar</a>
+                    <div class="toolbar-actions">
+                        <a href="/contrato/ver/<?php echo $contrato['id']; ?>" class="btn-secondary page-back-link">Voltar</a>
+                    </div>
                 </div>
 
                 <form action="/contrato/editar/<?php echo $contrato['id']; ?>" method="POST" class="form-aluno">
                     <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
 
-                    <h3 class="form-section-title">📝 Dados Principais</h3>
+                    <h3 class="form-section-title">Dados Principais</h3>
 
                     <div class="form-group">
                         <label>Título do Pedido / Fornecedor</label>
@@ -45,13 +47,14 @@
                         </div>
                     </div>
 
-                    <h3 class="form-section-title" style="margin-top: 30px;">📦 Gerenciar Produtos</h3>
+                    <h3 class="form-section-title section-heading">Gerenciar Produtos</h3>
 
-                    <div style="display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr auto; gap: 10px; padding: 0 10px; margin-bottom: 5px; color: #666; font-size: 0.85rem; font-weight: bold;">
+                    <div class="produtos-header-grid">
                         <span>Produto</span>
                         <span>Marca</span>
-                        <span>Unidade</span> <span>Qtd</span>
-                        <span>Unitário</span>
+                        <span>Unidade</span>
+                        <span>Qtd</span>
+                        <span>Unitario</span>
                         <span></span>
                     </div>
 
@@ -59,7 +62,6 @@
                         <?php foreach ($produtos as $p): ?>
                             <div class="produto-linha">
                                 <input type="text" name="produto_nome[]" class="sistema" value="<?php echo htmlspecialchars($p['nome_produto']); ?>" required placeholder="Produto" style="margin:0;">
-
                                 <input type="text" name="produto_marca[]" class="sistema" value="<?php echo htmlspecialchars($p['marca'] ?? ''); ?>" placeholder="Marca" style="margin:0;">
 
                                 <select name="produto_unidade[]" class="sistema" style="margin:0;">
@@ -78,21 +80,21 @@
 
                     <button type="button" class="btn-secondary" onclick="adicionarProduto()" style="margin-bottom: 20px; margin-top: 10px;">+ Adicionar Novo Item</button>
 
-                    <div class="resumo-contrato">
-                        <div style="display: flex; justify-content: space-between;">
+                    <div class="summary-card">
+                        <div class="summary-row">
                             <div>
-                                <p><strong>Orçamento do Pedido:</strong> R$ <span id="lbl_total_contrato">0.00</span></p>
+                                <p><strong>Orcamento do Pedido:</strong> R$ <span id="lbl_total_contrato">0.00</span></p>
                                 <p style="font-size: 0.9rem; color: #555;">Valor por Folha: R$ <span id="lbl_valor_folha">0.00</span></p>
                             </div>
-                            <div style="text-align: right;">
+                            <div>
                                 <p><strong>Soma dos Produtos:</strong> R$ <span id="lbl_total_produtos">0.00</span></p>
-                                <p><strong>Saldo Restante:</strong> R$ <span id="lbl_saldo" style="font-size: 1.2rem; font-weight: bold;">0.00</span></p>
+                                <p><strong>Saldo Restante:</strong> R$ <span id="lbl_saldo" class="summary-highlight">0.00</span></p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-actions" style="margin-top: 30px;">
-                        <button type="submit" class="btn-primary" style="width: 100%; padding: 15px; font-size: 1.1rem;">💾 Salvar Todas as Alterações</button>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary full-width-submit">Salvar Todas as Alteracoes</button>
                     </div>
                 </form>
             </main>

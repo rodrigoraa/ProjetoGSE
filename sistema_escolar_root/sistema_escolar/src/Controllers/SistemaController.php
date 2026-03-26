@@ -44,7 +44,7 @@ class SistemaController extends Controller
                 $mensagem = "<div class='alert success'>Backup gerado com sucesso: <strong>" . e($nome) . "</strong></div>";
                 registrar_log(Model::getConexao(), "Sistema", "Criou backup manual via painel.");
             } else {
-                $mensagem = "<div class='alert error'>Erro ao gerar backup. Verifique as permissoes da pasta.</div>";
+                $mensagem = "<div class='alert error'>Erro ao gerar backup. Verifique as permissões da pasta.</div>";
             }
         }
 
@@ -73,7 +73,7 @@ class SistemaController extends Controller
         $mais_recente = !empty($lista_atual) ? basename($lista_atual[0]) : null;
 
         if ($arquivo_alvo == $mais_recente) {
-            $mensagem = "<div class='alert warning'>Protecao: o backup mais recente nao pode ser excluido.</div>";
+            $mensagem = "<div class='alert warning'>Proteção: o backup mais recente não pode ser excluído.</div>";
             return;
         }
 

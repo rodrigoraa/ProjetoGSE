@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Painel de Certidoes</title>
+    <title>Painel de Certidões</title>
     <link rel="stylesheet" href="/assets/css/painel.css">
     <link rel="stylesheet" href="/assets/css/certidoes.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,13 +15,13 @@
 
         <div class="main-content-wrapper">
             <header style="margin-bottom: 20px;">
-                <h1 style="color: #1e293b; font-size: 1.8rem;">Matriz de Certidoes <span style="color: #64748b; font-size: 1.2rem; font-weight: 400;">(<?php echo (int)$ano_atual; ?> em diante)</span></h1>
+                <h1 style="color: #1e293b; font-size: 1.8rem;">Matriz de Certidões <span style="color: #64748b; font-size: 1.2rem; font-weight: 400;">(<?php echo (int)$ano_atual; ?> em diante)</span></h1>
             </header>
 
             <main>
                 <div class="toolbar-matriz">
                     <div class="toolbar-actions">
-                        <a href="/certidao/cadastrar" class="btn-novo"><i class="fa-solid fa-plus"></i> Nova Certidao</a>
+                        <a href="/certidao/cadastrar" class="btn-novo"><i class="fa-solid fa-plus"></i> Nova Certidão</a>
                         <a href="/certidao/configurar" class="btn-arquivo"><i class="fa-solid fa-gear"></i> Tipos/Fornecedores</a>
                         <a href="/certidao/arquivadas" class="btn-arquivo"><i class="fa-solid fa-folder-open"></i> Arquivadas</a>
                     </div>
@@ -36,7 +36,7 @@
                         <div class="filtro-box">
                             <label for="filtroFornecedor"><i class="fa-solid fa-truck-fast"></i></label>
                             <select id="filtroFornecedor" onchange="aplicarFiltros()">
-                                <option value="todos">Todos Fornecedores</option>
+                                <option value="todos">Todos os Fornecedores</option>
                                 <?php foreach ($lista_fornecedores as $f): ?>
                                     <option value="<?php echo e($f); ?>"><?php echo e($f); ?></option>
                                 <?php endforeach; ?>
@@ -70,7 +70,7 @@
                         <tbody>
                             <?php if (empty($tipos_certidoes)): ?>
                                 <tr>
-                                    <td colspan="<?php echo count($lista_fornecedores) + 1; ?>" class="empty-state">Nenhuma certidao vigente para este ano.</td>
+                                    <td colspan="<?php echo count($lista_fornecedores) + 1; ?>" class="empty-state">Nenhuma certidão vigente para este ano.</td>
                                 </tr>
                             <?php endif; ?>
 
@@ -95,7 +95,7 @@
 
                                                     if ($dias < 0) {
                                                         $bg = 'status-vencida';
-                                                        $st = "Ha " . abs($dias) . " dias";
+                                                        $st = "Há " . abs($dias) . " dias";
                                                     } elseif ($dias <= 15) {
                                                         $bg = 'status-avencer';
                                                         $st = "Em " . $dias . " dias";
@@ -108,7 +108,7 @@
 
                                                         <div class="cert-body">
                                                             <div class="cert-date">
-                                                                <span class="date-lbl">Emissao</span>
+                                                                <span class="date-lbl">Emissão</span>
                                                                 <span class="date-val"><?php echo $emiss->format('d/m/y'); ?></span>
                                                             </div>
                                                             <div class="cert-date text-right">
@@ -118,11 +118,11 @@
                                                         </div>
 
                                                         <div class="cert-actions">
-                                                            <a href="/certidao/cadastrar?f=<?php echo (int)$d['id_fornecedor']; ?>&t=<?php echo (int)$d['id_tipo_certidao']; ?>&renovar_id=<?php echo (int)$d['id']; ?>" class="action-btn text-success" title="Renovar Certidao"><i class="fa-solid fa-rotate"></i></a>
+                                                            <a href="/certidao/cadastrar?f=<?php echo (int)$d['id_fornecedor']; ?>&t=<?php echo (int)$d['id_tipo_certidao']; ?>&renovar_id=<?php echo (int)$d['id']; ?>" class="action-btn text-success" title="Renovar Certidão"><i class="fa-solid fa-rotate"></i></a>
 
                                                             <form action="/certidao/arquivar/<?php echo (int)$d['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Mover para os arquivos?');">
                                                                 <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
-                                                                <button type="submit" class="action-btn text-warning" title="Arquivar Certidao" style="border:0; cursor:pointer;"><i class="fa-solid fa-box-archive"></i></button>
+                                                                <button type="submit" class="action-btn text-warning" title="Arquivar Certidão" style="border:0; cursor:pointer;"><i class="fa-solid fa-box-archive"></i></button>
                                                             </form>
 
                                                             <?php if (!empty($d['arquivo_pdf'])): ?>
@@ -131,12 +131,12 @@
                                                                 <span class="action-btn disabled"><i class="fa-solid fa-file-pdf"></i></span>
                                                             <?php endif; ?>
 
-                                                            <a href="/certidao/editar/<?php echo (int)$d['id']; ?>" class="action-btn text-primary" title="Editar Informacoes"><i class="fa-solid fa-pen"></i></a>
+                                                            <a href="/certidao/editar/<?php echo (int)$d['id']; ?>" class="action-btn text-primary" title="✏️ Editar Informações"><i class="fa-solid fa-pen"></i></a>
 
                                                             <form action="/certidao/excluir/<?php echo (int)$d['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Apagar permanentemente?');">
                                                                 <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                                                                 <input type="hidden" name="origem" value="lista">
-                                                                <button type="submit" class="action-btn text-danger" title="Apagar" style="border:0; cursor:pointer;"><i class="fa-solid fa-trash-can"></i></button>
+                                                                <button type="submit" class="action-btn text-danger" title="🗑️ Apagar" style="border:0; cursor:pointer;"><i class="fa-solid fa-trash-can"></i></button>
                                                             </form>
                                                         </div>
                                                     </div>

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Editar Certidão</title>
+    <title>✏️ Editar Certidão</title>
     <link rel="stylesheet" href="/assets/css/painel.css">
     <link rel="stylesheet" href="/assets/css/certidoes.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -17,7 +17,7 @@
         <div class="main-content-wrapper">
             <header style="margin-bottom: 25px;">
                 <h1 style="color: #1e293b; font-size: 1.8rem;">
-                    <i class="fa-solid fa-pen-to-square" style="color: #64748b; margin-right: 10px;"></i> Editar Certidão
+                    <i class="fa-solid fa-pen-to-square" style="color: #64748b; margin-right: 10px;"></i> ✏️ Editar Certidão
                 </h1>
             </header>
             <main>

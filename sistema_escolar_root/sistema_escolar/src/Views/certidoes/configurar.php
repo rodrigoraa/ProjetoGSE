@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Configuracoes de Certidoes</title>
+    <title>Configurações de Certidões</title>
     <link rel="stylesheet" href="/assets/css/painel.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="/assets/css/certidoes.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,7 +15,7 @@
 
         <div class="main-content-wrapper">
             <header style="margin-bottom: 25px;">
-                <h1 style="color: #1e293b; font-size: 1.8rem;"><i class="fa-solid fa-gear" style="color: #64748b; margin-right: 10px;"></i> Configurar Opcoes do Sistema</h1>
+                <h1 style="color: #1e293b; font-size: 1.8rem;"><i class="fa-solid fa-gear" style="color: #64748b; margin-right: 10px;"></i> Configurar Opções do Sistema</h1>
             </header>
 
             <div class="grid-2-col" style="align-items: start;">
@@ -54,7 +54,7 @@
                 </div>
 
                 <div class="config-card">
-                    <div class="config-header"><i class="fa-solid fa-certificate" style="color: #64748b; margin-right: 8px;"></i> Tipos de Certidao</div>
+                    <div class="config-header"><i class="fa-solid fa-certificate" style="color: #64748b; margin-right: 8px;"></i> Tipos de Certidão</div>
 
                     <form action="/certidao/adicionarOpcao" method="POST" class="config-form">
                         <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
@@ -65,7 +65,7 @@
 
                     <div class="config-list-container">
                         <?php if (empty($tipos)): ?>
-                            <div class="empty-list">Nenhum tipo de certidao registrado.</div>
+                            <div class="empty-list">Nenhum tipo de certidão registrado.</div>
                         <?php else: ?>
                             <ul class="config-list">
                                 <?php foreach ($tipos as $t): ?>

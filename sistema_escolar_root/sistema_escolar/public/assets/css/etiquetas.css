@@ -48,6 +48,7 @@ body.pagina-etiqueta {
 .folha-ambiente {
     display: flex;
     justify-content: center;
+    align-items: flex-start;
     padding: 20px 0;
 }
 
@@ -59,6 +60,7 @@ body.pagina-etiqueta {
     flex-direction: column;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     overflow: hidden;
+    margin: 0 auto;
 }
 
 .etiqueta-ficha {
@@ -512,4 +514,125 @@ body.pagina-com-sidebar {
     background: rgba(255, 255, 255, 0.1);
     border-left: 4px solid #3498db;
     color: #fff;
+}
+
+/* --- FICHA DO ALUNO: AJUSTE FINO DE IMPRESSAO --- */
+.etiqueta-print-wrapper {
+    overflow: visible;
+}
+
+body.pagina-etiqueta .layout-container {
+    display: block;
+}
+
+body.pagina-etiqueta .main-content-wrapper.etiqueta-print-wrapper {
+    width: calc(100vw - var(--sidebar-width)) !important;
+    max-width: calc(100vw - var(--sidebar-width)) !important;
+    margin-left: var(--sidebar-width) !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+}
+
+body.pagina-etiqueta .main-content-wrapper.etiqueta-print-wrapper main {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+body.pagina-etiqueta .folha-ambiente {
+    width: 100%;
+    justify-content: center !important;
+}
+
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 0;
+    }
+
+    html,
+    body.pagina-etiqueta {
+        width: 210mm;
+        min-height: 297mm;
+        background: #fff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    body.pagina-etiqueta .layout-container,
+    body.pagina-etiqueta .main-content-wrapper,
+    body.pagina-etiqueta .etiqueta-print-wrapper,
+    body.pagina-etiqueta main,
+    body.pagina-etiqueta .folha-ambiente {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+    }
+
+    body.pagina-etiqueta .folha-a4 {
+        width: 210mm !important;
+        height: 297mm !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: 0 !important;
+        overflow: hidden !important;
+        break-inside: avoid-page;
+        page-break-inside: avoid;
+    }
+
+    body.pagina-etiqueta .etiqueta-ficha {
+        height: 148.5mm !important;
+        min-height: 148.5mm !important;
+        max-height: 148.5mm !important;
+        padding: 3mm 4mm !important;
+        overflow: hidden !important;
+        break-inside: avoid-page;
+        page-break-inside: avoid;
+    }
+
+    body.pagina-etiqueta .cabecalho-escola {
+        margin-bottom: 1.5mm !important;
+    }
+
+    body.pagina-etiqueta .logo-ficha {
+        height: 11mm !important;
+    }
+
+    body.pagina-etiqueta .nome-escola {
+        font-size: 16pt !important;
+    }
+
+    body.pagina-etiqueta .tabela-principal td,
+    body.pagina-etiqueta .tabela-interna td {
+        height: 8.3mm !important;
+        max-height: 8.3mm !important;
+        font-size: 9pt !important;
+    }
+
+    body.pagina-etiqueta .celula-travada {
+        padding: 0 2mm !important;
+    }
+
+    body.pagina-etiqueta .label-ficha {
+        font-size: 8pt !important;
+    }
+
+    body.pagina-etiqueta .input-ficha {
+        font-size: 9pt !important;
+    }
+
+    body.pagina-etiqueta .header-grade td {
+        font-size: 7.5pt !important;
+    }
+
+    body.pagina-etiqueta .tabela-principal,
+    body.pagina-etiqueta .tabela-interna {
+        width: 100% !important;
+    }
 }
