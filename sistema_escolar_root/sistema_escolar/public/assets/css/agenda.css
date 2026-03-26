@@ -1,0 +1,94 @@
+/* Container Principal */
+#calendar {
+    max-width: 100%;
+    margin: 20px auto;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+/* Título do Mês/Ano */
+.fc-toolbar-title {
+    font-size: 1.4rem !important;
+    font-weight: 700 !important;
+    color: #1e293b;
+    text-transform: capitalize;
+}
+
+/* Botões Modernos */
+.fc-button-primary {
+    background-color: #0f172a !important;
+    border-color: #0f172a !important;
+    font-weight: 500 !important;
+    text-transform: capitalize !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.fc-button-primary:hover {
+    background-color: #334155 !important;
+    transform: translateY(-1px);
+}
+
+.fc-button-primary:disabled {
+    background-color: #94a3b8 !important;
+    border-color: #94a3b8 !important;
+}
+
+/* Estilização dos Eventos (Avisos) */
+.fc-event {
+    border: none !important;
+    padding: 3px 6px !important;
+    border-radius: 4px !important;
+    font-weight: 500 !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+    transition: filter 0.2s;
+}
+
+.fc-event:hover {
+    filter: brightness(0.9);
+}
+
+/* Ajuste nos dias do calendário */
+.fc-daygrid-day-number {
+    color: #64748b;
+    font-weight: 500;
+    padding: 8px !important;
+    text-decoration: none !important;
+}
+
+.fc-col-header-cell-cushion {
+    color: #475569;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    padding: 10px 0 !important;
+    text-decoration: none !important;
+}
+
+/* Destaque para o dia atual */
+.fc-day-today {
+    background-color: #f8fafc !important;
+}
+
+.fc-day-today .fc-daygrid-day-number {
+    background-color: #0f172a;
+    color: white !important;
+    border-radius: 50%;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    margin: 4px;
+    padding: 0 !important;
+}
+
+/* Bordas da grade mais suaves */
+.fc-theme-standard td, .fc-theme-standard th {
+    border: 1px solid #f1f5f9 !important;
+}

@@ -60,6 +60,10 @@
             <span class="sidebar-icon">🌦️</span>
             <span>Estação Meteorológica</span>
         </a>
+        <a href="/agenda" class="sidebar-link">
+            <span class="sidebar-icon">📅</span>
+            <span>Agenda de Avisos</span>
+        </a>
 
         <?php if (isset($_SESSION['usuario_tipo']) && $_SESSION['usuario_tipo'] === 'admin'): ?>
             <div class="sidebar-divider"></div>

@@ -2,12 +2,14 @@
 require_once ROOT_PATH . '/src/Models/Painel.php';
 require_once ROOT_PATH . '/src/Models/Aluno.php';
 require_once ROOT_PATH . '/src/Models/Certidao.php';
+require_once ROOT_PATH . '/src/Models/Agenda.php'; // 1. Importado o Model da Agenda
 
 class PainelController extends Controller
 {
     private $painelModel;
     private $alunoModel;
     private $certidaoModel;
+    private $agendaModel; // 2. Definida a propriedade
 
     public function __construct()
     {
@@ -18,6 +20,7 @@ class PainelController extends Controller
         $this->painelModel = new Painel();
         $this->alunoModel = new Aluno();
         $this->certidaoModel = new Certidao();
+        $this->agendaModel = new Agenda(); // 3. Instanciado o Model
     }
 
     public function index()
@@ -27,6 +30,9 @@ class PainelController extends Controller
         $certidoes_alerta = $this->certidaoModel->buscarVencendoProximosDias(30);
         $vencidas         = $this->painelModel->getDvasVencidas();
         $a_vencer         = $this->painelModel->getDvasAVencer();
+
+        // 4. Buscando os alertas da agenda (próximos 7 dias)
+        $alertas_agenda = $this->agendaModel->listarAlertasPainel();
 
         $mesAtual = date('m');
         $diaHoje  = date('d');
@@ -58,7 +64,8 @@ class PainelController extends Controller
 
             'aniversariantes_mes'  => $this->alunoModel->getAniversariantesDoMes($mesAtual),
             'aniversariantes_hoje' => $aniversariantes_hoje,
-            'certidoes_alerta'     => $certidoes_alerta
+            'certidoes_alerta'     => $certidoes_alerta,
+            'alertas_agenda'       => $alertas_agenda // 5. Passando para a View
         ];
 
         $this->view('painel', $dados);

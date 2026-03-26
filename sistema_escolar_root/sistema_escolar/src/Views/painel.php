@@ -19,9 +19,34 @@
             </header>
 
             <main>
-                <?php if (!empty($msg_backup)): ?>
-                    <div class="flash-message success">
-                        Backup realizado com sucesso: <?php echo $msg_backup; ?>
+                <?php if (($_SESSION['usuario_tipo'] ?? '') === 'admin'): ?>
+                    <?php if (!empty($msg_backup)): ?>
+                        <div class="flash-message success">
+                            Backup realizado com sucesso: <?php echo $msg_backup; ?>
+                        </div>
+                    <?php endif; ?>
+                <?php endif; ?>
+
+                <?php if (!empty($alertas_agenda)): ?>
+                    <div class="niver-hoje" style="background-color: #e0f2fe; border-color: #bae6fd; color: #0369a1;">
+                        <h2 style="color: #0c4a6e;">📅 Lembretes da Agenda (Próximos dias)</h2>
+                        <?php foreach ($alertas_agenda as $aviso):
+                            $data_br = date('d/m/Y', strtotime($aviso['data_aviso']));
+                            $eh_hoje = ($aviso['data_aviso'] === date('Y-m-d'));
+                        ?>
+                            <div class="niver-card" style="background-color: #f0f9ff; border-color: #bae6fd;">
+                                <span>
+                                    <strong style="color: #0284c7; margin-right: 10px;">
+                                        <?php echo $eh_hoje ? '📍 HOJE' : '📅 ' . $data_br; ?>
+                                    </strong>
+                                    <strong><?php echo htmlspecialchars($aviso['titulo']); ?></strong>
+
+                                    <?php if (!empty($aviso['descricao'])): ?>
+                                        <small style="display: block; color: #475569; margin-top: 5px;"><?php echo htmlspecialchars($aviso['descricao']); ?></small>
+                                    <?php endif; ?>
+                                </span>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
 
@@ -89,9 +114,9 @@
                 <div class="relatorio relatorio-niver">
                     <h3 class="dashboard-section-title">
                         <span>Aniversariantes de <?php
-                            $meses = [1 => 'Janeiro', 2 => 'Fevereiro', 3 => 'Março', 4 => 'Abril', 5 => 'Maio', 6 => 'Junho', 7 => 'Julho', 8 => 'Agosto', 9 => 'Setembro', 10 => 'Outubro', 11 => 'Novembro', 12 => 'Dezembro'];
-                            echo $meses[(int)date('m')];
-                        ?></span>
+                                                    $meses = [1 => 'Janeiro', 2 => 'Fevereiro', 3 => 'Março', 4 => 'Abril', 5 => 'Maio', 6 => 'Junho', 7 => 'Julho', 8 => 'Agosto', 9 => 'Setembro', 10 => 'Outubro', 11 => 'Novembro', 12 => 'Dezembro'];
+                                                    echo $meses[(int)date('m')];
+                                                    ?></span>
                     </h3>
 
                     <?php if (empty($aniversariantes_mes)): ?>
