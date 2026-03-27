@@ -3,12 +3,11 @@
     color: #fff;
     border-radius: 18px;
     padding: 24px;
+    margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
-    gap: 18px;
     align-items: flex-start;
-    margin: 0 0 24px;
-    width: 100%;
+    gap: 20px;
 }
 
 .relatorio-hero h2 {

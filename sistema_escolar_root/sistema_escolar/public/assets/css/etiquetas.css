@@ -37,11 +37,11 @@ body.pagina-etiqueta .main-content-wrapper.etiqueta-print-wrapper main {
     color: #fff;
     border-radius: 18px;
     padding: 24px;
+    margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
-    gap: 18px;
-    align-items: center;
-    margin-bottom: 24px;
+    align-items: flex-start;
+    gap: 20px;
 }
 
 .etiqueta-hero h2 {

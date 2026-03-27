@@ -784,11 +784,11 @@ input#dias_calculados {
     color: #fff;
     border-radius: 18px;
     padding: 24px;
+    margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
-    gap: 18px;
-    align-items: center;
-    margin-bottom: 24px;
+    align-items: flex-start;
+    gap: 20px;
 }
 
 .cert-overview h2 {
@@ -901,33 +901,6 @@ input#dias_calculados {
     color: #075985;
     font-size: 0.85rem;
     font-weight: 700;
-}
-
-.cert-layout-compact .cert-overview {
-    padding: 18px 20px;
-    margin-bottom: 16px;
-}
-
-.cert-layout-compact .cert-overview h2 {
-    font-size: 1.08rem;
-}
-
-.cert-layout-compact .cert-overview p {
-    font-size: 0.92rem;
-    line-height: 1.45;
-}
-
-.cert-layout-compact .cert-overview-stats {
-    gap: 8px;
-}
-
-.cert-layout-compact .cert-stat {
-    min-width: 106px;
-    padding: 10px 12px;
-}
-
-.cert-layout-compact .cert-stat strong {
-    font-size: 1.05rem;
 }
 
 .cert-layout-compact .toolbar-matriz {

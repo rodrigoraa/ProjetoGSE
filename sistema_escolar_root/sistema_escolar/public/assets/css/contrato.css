@@ -491,11 +491,11 @@ input.sistema::placeholder {
 }
 
 .contrato-hero {
-    background: linear-gradient(135deg, #0c3566 0%, #16508f 100%);
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
     color: #fff;
     border-radius: 18px;
     padding: 24px;
-    margin-bottom: 22px;
+    margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;

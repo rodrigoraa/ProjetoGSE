@@ -35,7 +35,7 @@ foreach ($dados_organizados as $grupoFornecedor) {
                 <section class="cert-overview">
                     <div>
                         <h2>Painel central das certidões</h2>
-                        <p>Acompanhe rapidamente os documentos ativos a partir de <?php echo (int)$ano_atual; ?>, filtre por fornecedor e destaque o que precisa de renovação ou atenção imediata.</p>
+                        <p>Certidões registradas, filtre por fornecedor e destaque o que precisa de renovação ou atenção imediata.</p>
                     </div>
                     <div class="cert-overview-stats">
                         <div class="cert-stat">
