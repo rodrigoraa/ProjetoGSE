@@ -23,14 +23,12 @@
 
                 <form action="/certidao/editar/<?php echo (int)$certidao['id']; ?>" method="POST" enctype="multipart/form-data" class="form-certidao">
 
-                    <?php if (!empty($certidao['arquivo_pdf'])): ?>
-                        <div class="box-pdf-existente">
-                            <span><i class="fa-solid fa-paperclip" style="margin-right: 8px;"></i> Existe um arquivo PDF em anexo.</span>
-                            <a href="/uploads/certidoes/<?php echo rawurlencode($certidao['arquivo_pdf']); ?>" target="_blank" class="link-ver-pdf">
-                                <i class="fa-solid fa-eye"></i> Visualizar PDF
-                            </a>
-                        </div>
-                    <?php endif; ?>
+                    <div class="box-pdf-existente">
+                        <span><i class="fa-solid fa-paperclip" style="margin-right: 8px;"></i> Consulte o PDF atual desta certidão.</span>
+                        <a href="/certidao/visualizarPdf/<?php echo (int)$certidao['id']; ?>?origem=editar" class="link-ver-pdf">
+                            <i class="fa-solid fa-eye"></i> Visualizar PDF
+                        </a>
+                    </div>
 
                     <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
 
@@ -75,7 +73,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label><i class="fa-solid fa-file-arrow-up inline-icon"></i> Substituir PDF (Opcional):</label>
+                        <label><i class="fa-solid fa-file-arrow-up inline-icon"></i> Substituir PDF (opcional):</label>
                         <input type="file" name="arquivo_pdf" accept="application/pdf">
                     </div>
 
@@ -85,7 +83,7 @@
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn-novo"><i class="fa-solid fa-floppy-disk"></i> Atualizar Dados</button>
+                        <button type="submit" class="btn-novo"><i class="fa-solid fa-floppy-disk"></i> Atualizar dados</button>
                         <a href="/certidao" class="cancelar"><i class="fa-solid fa-arrow-left"></i> Voltar</a>
                     </div>
                 </form>
@@ -121,7 +119,7 @@
 
         inpEmissao.addEventListener('change', calcularDiferenca);
         inpVencimento.addEventListener('change', calcularDiferenca);
-        window.onload = calcularDiferenca;
+        calcularDiferenca();
     </script>
 </body>
 

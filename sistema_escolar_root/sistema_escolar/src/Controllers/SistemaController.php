@@ -22,7 +22,7 @@ class SistemaController extends Controller
                 definir_flash('sucesso', 'Logs limpos', "Foram removidos {$qtd} registros antigos.");
                 registrar_log(Model::getConexao(), 'Sistema', 'Realizou limpeza de logs (>365 dias).');
             } else {
-                definir_flash('erro', 'Nao foi possivel limpar os logs', 'Tente novamente em alguns instantes.');
+                definir_flash('erro', 'Não foi possível limpar os logs', 'Tente novamente em alguns instantes.');
             }
 
             redirect('/sistema/logs');
@@ -46,7 +46,7 @@ class SistemaController extends Controller
                 definir_flash('sucesso', 'Backup gerado', "Backup criado com sucesso: {$nome}");
                 registrar_log(Model::getConexao(), 'Sistema', 'Criou backup manual via painel.');
             } else {
-                definir_flash('erro', 'Nao foi possivel gerar o backup', 'Verifique as permissoes da pasta e tente novamente.');
+                definir_flash('erro', 'Não foi possível gerar o backup', 'Verifique as permissões da pasta e tente novamente.');
             }
 
             redirect('/sistema/backups');
@@ -77,7 +77,7 @@ class SistemaController extends Controller
         $mais_recente = !empty($lista_atual) ? basename($lista_atual[0]) : null;
 
         if ($arquivo_alvo === $mais_recente) {
-            definir_flash('aviso', 'Acao protegida', 'O backup mais recente nao pode ser excluido.');
+            definir_flash('aviso', 'Ação protegida', 'O backup mais recente não pode ser excluído.');
             redirect('/sistema/backups');
             exit;
         }
@@ -86,10 +86,10 @@ class SistemaController extends Controller
         $caminho = ROOT_PATH . '/' . rtrim($pasta_backups, '/') . '/' . $arquivo_alvo;
 
         if (file_exists($caminho) && unlink($caminho)) {
-            definir_flash('sucesso', 'Backup excluido', "O arquivo {$arquivo_alvo} foi removido.");
+            definir_flash('sucesso', 'Backup excluído', "O arquivo {$arquivo_alvo} foi removido.");
             registrar_log(Model::getConexao(), 'Sistema', "Excluiu arquivo de backup: {$arquivo_alvo}");
         } else {
-            definir_flash('erro', 'Nao foi possivel excluir o backup', 'O arquivo informado nao foi encontrado ou nao pode ser removido.');
+            definir_flash('erro', 'Não foi possível excluir o backup', 'O arquivo informado não foi encontrado ou não pode ser removido.');
         }
 
         redirect('/sistema/backups');
@@ -103,7 +103,7 @@ class SistemaController extends Controller
         $caminho = ROOT_PATH . '/' . rtrim($pasta_backups, '/') . '/' . $arquivo;
 
         if (!file_exists($caminho) || !is_file($caminho)) {
-            definir_flash('erro', 'Arquivo nao encontrado', 'O backup solicitado nao esta mais disponivel.');
+            definir_flash('erro', 'Arquivo não encontrado', 'O backup solicitado não está mais disponível.');
             redirect('/sistema/backups');
             exit;
         }

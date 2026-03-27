@@ -85,7 +85,7 @@ class PassivoController extends Controller
             if ($nome === '' || $caixa === '') {
                 $mensagem = alerta_html(
                     'erro',
-                    'Faltam informaÃ§Ãµes obrigatÃ³rias',
+                    'Faltam informações obrigatórias',
                     'Para salvar o registro, informe pelo menos o nome completo e a caixa de arquivamento.',
                     'Preencha os campos destacados e tente novamente.'
                 );
@@ -112,9 +112,9 @@ class PassivoController extends Controller
 
                 $mensagem = alerta_html(
                     'erro',
-                    'NÃ£o foi possÃ­vel salvar o registro',
+                    'Não foi possível salvar o registro',
                     'O sistema encontrou um problema ao gravar este ex-aluno no arquivo passivo.',
-                    'Tente novamente. Se continuar falhando, confira se jÃ¡ existe um cadastro parecido ou avise o suporte.'
+                    'Tente novamente. Se continuar falhando, confira se já existe um cadastro parecido ou avise o suporte.'
                 );
             }
         }
@@ -158,16 +158,16 @@ class PassivoController extends Controller
                 definir_flash(
                     'sucesso',
                     'Registro atualizado com sucesso',
-                    'As informaÃ§Ãµes do arquivo passivo foram salvas.',
-                    'VocÃª foi levado de volta para a caixa selecionada para continuar a consulta.'
+                    'As informações do arquivo passivo foram salvas.',
+                    'Você foi levado de volta para a caixa selecionada para continuar a consulta.'
                 );
                 redirect('/passivo?filtro_caixa=' . urlencode($caixa));
                 exit;
             } else {
                 $mensagem = alerta_html(
                     'erro',
-                    'NÃ£o foi possÃ­vel atualizar o registro',
-                    'As alteraÃ§Ãµes nÃ£o foram salvas no arquivo passivo.',
+                    'Não foi possível atualizar o registro',
+                    'As alterações não foram salvas no arquivo passivo.',
                     'Revise os campos preenchidos e tente novamente.'
                 );
             }
@@ -195,9 +195,9 @@ class PassivoController extends Controller
         if ($_SESSION['usuario_tipo'] !== 'admin') {
             definir_flash(
                 'erro',
-                'VocÃª nÃ£o tem permissÃ£o para apagar registros',
+                'Você não tem permissão para apagar registros',
                 'Somente administradores podem excluir itens do arquivo passivo.',
-                'Se a exclusÃ£o for realmente necessÃ¡ria, solicite apoio a um administrador.'
+                'Se a exclusão for realmente necessária, solicite apoio a um administrador.'
             );
             redirect('/passivo');
             exit;
@@ -210,7 +210,7 @@ class PassivoController extends Controller
                 'sucesso',
                 'Registro removido com sucesso',
                 'O item selecionado foi apagado do arquivo passivo.',
-                'Se isso foi um engano, serÃ¡ preciso cadastrar o registro novamente.'
+                'Se isso foi um engano, será preciso cadastrar o registro novamente.'
             );
         }
 
@@ -241,13 +241,13 @@ class PassivoController extends Controller
                         'sucesso',
                         'Caixa organizada com sucesso',
                         "$qtd alunos foram numerados na caixa $caixa.",
-                        'Revise a listagem antes de imprimir ou exportar o conteÃºdo.'
+                        'Revise a listagem antes de imprimir ou exportar o conteúdo.'
                     )
                     : alerta_html(
                         'erro',
-                        'NÃ£o foi possÃ­vel numerar a caixa',
-                        "Existem registros na caixa $caixa sem nÃºmero vÃ¡lido ou fora da sequÃªncia esperada.",
-                        'Confira os cadastros dessa caixa, preencha os nÃºmeros faltantes e tente novamente.'
+                        'Não foi possível numerar a caixa',
+                        "Existem registros na caixa $caixa sem número válido ou fora da sequência esperada.",
+                        'Confira os cadastros dessa caixa, preencha os números faltantes e tente novamente.'
                     );
             } elseif ($acao == 'baixar_txt') {
                 $this->gerarArquivoTexto($caixa);
@@ -271,7 +271,7 @@ class PassivoController extends Controller
                 'erro',
                 'Acesso negado',
                 'Somente administradores podem importar um novo arquivo passivo.',
-                'Se vocÃª precisa realizar essa importaÃ§Ã£o, entre com uma conta administradora.'
+                'Se você precisa realizar essa importação, entre com uma conta administradora.'
             );
             redirect('/passivo');
             exit;
@@ -289,8 +289,8 @@ class PassivoController extends Controller
             ) {
                 $mensagem = alerta_html(
                     'erro',
-                    'NÃ£o foi possÃ­vel enviar o arquivo',
-                    'Selecione um arquivo CSV vÃ¡lido antes de iniciar a importaÃ§Ã£o.',
+                    'Não foi possível enviar o arquivo',
+                    'Selecione um arquivo CSV válido antes de iniciar a importação.',
                     'Confira se o arquivo foi escolhido corretamente e tente novamente.'
                 );
             } else {
@@ -302,23 +302,23 @@ class PassivoController extends Controller
                 if ($extensao !== 'csv') {
                     $mensagem = alerta_html(
                         'erro',
-                        'Formato de arquivo invÃ¡lido',
-                        'A importaÃ§Ã£o do arquivo passivo aceita apenas arquivos com extensÃ£o .csv.',
+                        'Formato de arquivo inválido',
+                        'A importação do arquivo passivo aceita apenas arquivos com extensão .csv.',
                         'Exporte ou salve a planilha novamente em CSV e tente outra vez.'
                     );
                 } elseif (empty($tmpPath) || !is_uploaded_file($tmpPath)) {
                     $mensagem = alerta_html(
                         'erro',
-                        'Arquivo temporÃ¡rio indisponÃ­vel',
-                        'O upload nÃ£o ficou disponÃ­vel para leitura no servidor.',
+                        'Arquivo temporário indisponível',
+                        'O upload não ficou disponível para leitura no servidor.',
                         'Envie o arquivo novamente. Se o problema persistir, verifique o tamanho do arquivo.'
                     );
                 } elseif ($this->passivoModel->importarCSV($tmpPath)) {
                     registrar_log(Model::getConexao(), 'Passivo - Importar CSV', "Importou arquivo: {$nomeArquivo}");
                     definir_flash(
                         'sucesso',
-                        'ImportaÃ§Ã£o concluÃ­da com sucesso',
-                        'O arquivo passivo foi substituÃ­do pelos dados do CSV enviado.',
+                        'Importação concluída com sucesso',
+                        'O arquivo passivo foi substituído pelos dados do CSV enviado.',
                         'Revise a listagem das caixas para confirmar se os registros foram importados corretamente.'
                     );
                     redirect('/passivo');
@@ -326,9 +326,9 @@ class PassivoController extends Controller
                 } else {
                     $mensagem = alerta_html(
                         'erro',
-                        'NÃ£o foi possÃ­vel importar o CSV',
+                        'Não foi possível importar o CSV',
                         'O sistema encontrou um problema ao processar o arquivo enviado.',
-                        'Confirme se o arquivo usa ponto e vÃ­rgula, possui as colunas Nome; Data; NÃºmero; Caixa e tente novamente.'
+                        'Confirme se o arquivo usa ponto e vírgula, possui as colunas Nome; Data; Número; Caixa e tente novamente.'
                     );
                 }
             }

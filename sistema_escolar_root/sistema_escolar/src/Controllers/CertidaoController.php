@@ -69,11 +69,11 @@ class CertidaoController extends Controller
                             registrar_log(
                                 Model::getConexao(),
                                 'Certidao - Arquivar',
-                                'Arquivou certidÃ£o renovada ID: ' . (int)$_POST['renovar_id']
+                                'Arquivou certidão renovada ID: ' . (int)$_POST['renovar_id']
                             );
                         }
 
-                        registrar_log(Model::getConexao(), 'Certidao - Cadastrar', "ID Tipo: $tipo | ID Fornec: $fornecedor");
+                        registrar_log(Model::getConexao(), 'Certidao - Cadastrar', "ID Tipo: $tipo | ID Fornecedor: $fornecedor");
                         definir_flash(
                             'sucesso',
                             'Certidão cadastrada com sucesso',
@@ -86,7 +86,7 @@ class CertidaoController extends Controller
 
                     $mensagem = '<p class="error-message">Erro ao salvar no banco de dados.</p>';
                 } else {
-                    $mensagem = '<p class="error-message">Apenas arquivos PDF sao permitidos.</p>';
+                    $mensagem = '<p class="error-message">Apenas arquivos PDF são permitidos.</p>';
                 }
             }
         }
@@ -124,12 +124,12 @@ class CertidaoController extends Controller
             } else {
                 $novoArquivo = $this->processarUploadPdf($certidao['arquivo_pdf']);
                 if ($novoArquivo === false) {
-                    $mensagem = '<p class="error-message">Apenas arquivos PDF sao permitidos.</p>';
+                    $mensagem = '<p class="error-message">Apenas arquivos PDF são permitidos.</p>';
                 } elseif ($this->certidaoModel->atualizar($id, $fornecedor, $tipo, $emissao, $vencimento, $obs, $novoArquivo)) {
                     registrar_log(
                         Model::getConexao(),
                         'Certidao - Editar',
-                        "Atualizou certidÃ£o ID: {$id} | Tipo ID: {$tipo} | Fornecedor ID: {$fornecedor}"
+                        "Atualizou certidão ID: {$id} | Tipo ID: {$tipo} | Fornecedor ID: {$fornecedor}"
                     );
                     definir_flash(
                         'sucesso',
@@ -140,7 +140,7 @@ class CertidaoController extends Controller
                     redirect('/certidao');
                     exit;
                 } else {
-                    $mensagem = '<p class="error-message">Erro ao atualizar a certidao.</p>';
+                    $mensagem = '<p class="error-message">Erro ao atualizar a certidão.</p>';
                 }
             }
 
@@ -155,6 +155,53 @@ class CertidaoController extends Controller
         ]);
     }
 
+    public function visualizarPdf($id)
+    {
+        $id = (int)$id;
+        $certidao = $this->certidaoModel->buscarPorId($id);
+
+        if (!$certidao) {
+            definir_flash(
+                'erro',
+                'Certidão não encontrada',
+                'O registro solicitado não foi localizado no sistema.',
+                'Atualize a lista e tente novamente.'
+            );
+            redirect('/certidao');
+            exit;
+        }
+
+        if (empty($certidao['arquivo_pdf'])) {
+            definir_flash(
+                'aviso',
+                'Esta certidão ainda não possui PDF enviado',
+                'O cadastro existe, mas nenhum arquivo foi anexado para visualização.',
+                'Se necessário, abra a edição da certidão para enviar o documento.'
+            );
+            $this->redirecionarRetornoPdf($id);
+        }
+
+        $nomeArquivo = basename((string)$certidao['arquivo_pdf']);
+        $caminhoFisico = ROOT_PATH . '/public/uploads/certidoes/' . $nomeArquivo;
+
+        if (!is_file($caminhoFisico)) {
+            definir_flash(
+                'erro',
+                'Arquivo PDF não encontrado',
+                'O cadastro foi localizado, mas o arquivo não está disponível no servidor.',
+                'Envie o PDF novamente na edição da certidão.'
+            );
+            $this->redirecionarRetornoPdf($id);
+        }
+
+        header('Content-Type: application/pdf');
+        header('Content-Length: ' . filesize($caminhoFisico));
+        header('Content-Disposition: inline; filename="' . rawurlencode($nomeArquivo) . '"');
+        header('X-Content-Type-Options: nosniff');
+        readfile($caminhoFisico);
+        exit;
+    }
+
     public function arquivar($id)
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -164,7 +211,7 @@ class CertidaoController extends Controller
 
         verificar_csrf_token($_POST['csrf_token'] ?? '');
         if ($this->certidaoModel->alternarArquivo((int)$id, 1)) {
-            registrar_log(Model::getConexao(), 'Certidao - Arquivar', "Arquivou certidÃ£o ID: {$id}");
+            registrar_log(Model::getConexao(), 'Certidao - Arquivar', "Arquivou certidão ID: {$id}");
             definir_flash(
                 'sucesso',
                 'Certidão arquivada',
@@ -192,7 +239,7 @@ class CertidaoController extends Controller
 
         verificar_csrf_token($_POST['csrf_token'] ?? '');
         if ($this->certidaoModel->alternarArquivo((int)$id, 0)) {
-            registrar_log(Model::getConexao(), 'Certidao - Desarquivar', "Desarquivou certidÃ£o ID: {$id}");
+            registrar_log(Model::getConexao(), 'Certidao - Desarquivar', "Desarquivou certidão ID: {$id}");
             definir_flash(
                 'sucesso',
                 'Certidão desarquivada',
@@ -316,7 +363,7 @@ class CertidaoController extends Controller
                 definir_flash('erro', 'Tipo de configuração inválido', 'O sistema recebeu uma lista que não é permitida para edição.', 'Atualize a página e tente novamente.');
             } elseif ($id > 0 && $novoNome !== '') {
                 if ($this->certidaoModel->atualizarOpcaoLista($tipoLista, $id, $novoNome)) {
-                    registrar_log(Model::getConexao(), 'Certidao - Editar Opcao', "Atualizou opÃ§Ã£o ID {$id} em {$tipoLista} para '{$novoNome}'");
+                    registrar_log(Model::getConexao(), 'Certidao - Editar Opcao', "Atualizou opção ID {$id} em {$tipoLista} para '{$novoNome}'");
                     definir_flash('sucesso', ucfirst($tipoLabel) . ' atualizado com sucesso', "A opção foi renomeada para '{$novoNome}'.", 'Os formulários já passarão a exibir o novo texto.');
                 } else {
                     definir_flash('erro', 'Não foi possível atualizar a opção', "O sistema não conseguiu renomear esse {$tipoLabel}.", 'Tente novamente.');
@@ -341,7 +388,7 @@ class CertidaoController extends Controller
                 definir_flash('erro', 'Tipo de configuração inválido', 'O sistema recebeu uma lista que não é permitida para edição.', 'Atualize a página e tente novamente.');
             } elseif ($id > 0) {
                 if ($this->certidaoModel->excluirOpcaoLista($tipoLista, $id)) {
-                    registrar_log(Model::getConexao(), 'Certidao - Excluir Opcao', "Excluiu opÃ§Ã£o ID {$id} de {$tipoLista}");
+                    registrar_log(Model::getConexao(), 'Certidao - Excluir Opcao', "Excluiu opção ID {$id} de {$tipoLista}");
                     definir_flash('sucesso', ucfirst($tipoLabel) . ' excluído com sucesso', 'A opção foi removida da configuração do sistema.', 'Verifique se ela não está sendo usada em novos cadastros.');
                 } else {
                     definir_flash('erro', 'Não foi possível excluir a opção', "O sistema não conseguiu remover esse {$tipoLabel}.", 'Ele pode estar vinculado a registros existentes.');
@@ -377,6 +424,25 @@ class CertidaoController extends Controller
     private function getTipoConfiguracaoLabel($tipoLista)
     {
         return self::TIPOS_CONFIG[$tipoLista] ?? null;
+    }
+
+    private function redirecionarRetornoPdf($id)
+    {
+        $origem = $_GET['origem'] ?? 'lista';
+
+        if ($origem === 'arquivo') {
+            $ano = $_GET['ano'] ?? date('Y');
+            redirect('/certidao/arquivadas?ano=' . urlencode($ano));
+            exit;
+        }
+
+        if ($origem === 'editar') {
+            redirect('/certidao/editar/' . (int)$id);
+            exit;
+        }
+
+        redirect('/certidao');
+        exit;
     }
 
     private function processarUploadPdf($arquivoAtual = null)

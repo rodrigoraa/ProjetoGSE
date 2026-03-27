@@ -99,11 +99,7 @@
                                         <td><span class="data-badge"><?php echo date('d/m/Y', strtotime($reg['data_emissao'])); ?></span></td>
                                         <td><span class="data-badge"><?php echo date('d/m/Y', strtotime($reg['data_vencimento'])); ?></span></td>
                                         <td style="text-align:center;">
-                                            <?php if (!empty($reg['arquivo_pdf'])): ?>
-                                                <a href="/uploads/certidoes/<?php echo rawurlencode($reg['arquivo_pdf']); ?>" target="_blank" class="pdf-btn" title="Baixar/Ver PDF"><i class="fa-solid fa-file-pdf"></i> Ver PDF</a>
-                                            <?php else: ?>
-                                                <span class="pdf-btn disabled" title="Sem anexo"><i class="fa-solid fa-file-pdf"></i> S/ Anexo</span>
-                                            <?php endif; ?>
+                                            <a href="/certidao/visualizarPdf/<?php echo (int)$reg['id']; ?>?origem=arquivo&ano=<?php echo urlencode((string)$ano_filtro); ?>" class="pdf-btn" title="Baixar/Ver PDF"><i class="fa-solid fa-file-pdf"></i> Ver PDF</a>
                                         </td>
                                         <td style="text-align: right;">
                                             <div class="cert-actions" style="border: none; padding: 0; margin: 0; justify-content: flex-end; gap: 8px;">

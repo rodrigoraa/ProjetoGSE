@@ -85,6 +85,25 @@
     cursor: pointer;
 }
 
+.filtro-box-busca {
+    min-width: 240px;
+    gap: 8px;
+}
+
+.filtro-box-busca input {
+    border: none;
+    background: transparent;
+    font-weight: 600;
+    color: var(--text-main);
+    outline: none;
+    width: 100%;
+}
+
+.filtro-box-busca input::placeholder {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
 .compact-toggle {
     display: inline-flex;
     align-items: center;
@@ -139,6 +158,60 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
+.fullscreen-status-bar {
+    display: none;
+}
+
+.fullscreen-status-btn {
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(14, 35, 59, 0.72);
+    color: #fff;
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.fullscreen-status-btn:hover {
+    background: rgba(22, 80, 143, 0.9);
+    border-color: rgba(255, 255, 255, 0.46);
+    transform: translateY(-1px);
+}
+
+.fullscreen-status-btn.is-active {
+    background: #ffffff;
+    color: var(--primary-dark);
+    border-color: #ffffff;
+    box-shadow: 0 6px 18px rgba(12, 53, 102, 0.2);
+}
+
+.fullscreen-exit-btn {
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(207, 69, 60, 0.88);
+    color: #fff;
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.fullscreen-exit-btn:hover {
+    background: #b93830;
+    border-color: rgba(255, 255, 255, 0.46);
+    transform: translateY(-1px);
+}
+
 .tabela-matriz {
     width: 100%;
     border-collapse: collapse;
@@ -161,7 +234,11 @@
     border-bottom: 2px solid var(--border-color);
     z-index: 20;
     left: 0;
-    min-width: 200px;
+    min-width: 150px;
+    max-width: 150px;
+    width: 150px;
+    font-size: 0.82rem;
+    line-height: 1.15;
 }
 
 .tabela-matriz th.th-fornecedor {
@@ -200,6 +277,15 @@
     border-right: 1px solid #f0f0f0;
     vertical-align: top;
     min-width: 200px;
+}
+
+.tabela-matriz .row-focus td,
+.tabela-matriz .row-focus .nome-tipo {
+    background: #f8fbff;
+}
+
+.tabela-matriz .col-focus {
+    background: #f8fbff !important;
 }
 
 .cell-empty {
@@ -857,6 +943,34 @@ input#dias_calculados {
     border-radius: 999px;
     font-size: 0.78rem;
     font-weight: 700;
+    border: 1px solid transparent;
+}
+
+.status-pill-filter {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.status-pill-filter:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+}
+
+.status-pill-filter:focus-visible {
+    outline: 2px solid rgba(44, 126, 214, 0.35);
+    outline-offset: 2px;
+}
+
+.status-pill-filter.is-active {
+    border-color: rgba(12, 53, 102, 0.22);
+    box-shadow: 0 8px 16px rgba(12, 53, 102, 0.12);
+}
+
+.status-pill-filter[data-status-value="todos"] {
+    color: var(--primary-dark);
+    background: #e8f1fb;
 }
 
 .status-pill.success {
@@ -903,75 +1017,135 @@ input#dias_calculados {
     font-weight: 700;
 }
 
-.cert-layout-compact .toolbar-matriz {
-    padding: 12px 16px;
-    gap: 12px;
-    margin-bottom: 16px;
+body.cert-fullscreen .sidebar {
+    display: none !important;
 }
 
-.cert-layout-compact .toolbar-stack p,
-.cert-layout-compact .matriz-meta p {
+body.cert-fullscreen .main-content-wrapper {
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding: 18px 20px 24px !important;
+}
+
+body.cert-fullscreen .cert-page-header {
+    display: none !important;
+}
+
+body.cert-fullscreen .cert-overview {
+    display: none !important;
+}
+
+body.cert-fullscreen .toolbar-matriz {
+    display: none !important;
+}
+
+body.cert-fullscreen .toolbar-stack p,
+body.cert-fullscreen .matriz-meta p {
     font-size: 0.84rem;
 }
 
-.cert-layout-compact .matriz-meta {
-    margin-bottom: 8px;
+body.cert-fullscreen .matriz-meta {
+    display: none !important;
 }
 
-.cert-layout-compact .tabela-matriz {
-    font-size: 0.8rem;
-    min-width: 860px;
+body.cert-fullscreen .fullscreen-status-bar {
+    display: flex;
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    z-index: 1200;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: calc(100vw - 32px);
 }
 
-.cert-layout-compact .tabela-matriz th {
-    padding: 10px 12px;
+body.cert-fullscreen .matriz-container {
+    max-height: calc(100vh - 52px);
+    overflow: auto;
+    margin: 0;
+    border-radius: 0;
 }
 
-.cert-layout-compact .tabela-matriz td {
-    padding: 6px;
-    min-width: 160px;
+body.cert-fullscreen .tabela-matriz {
+    font-size: 0.72rem;
+    min-width: 600px;
 }
 
-.cert-layout-compact .tabela-matriz th.th-tipo {
-    min-width: 150px;
+body.cert-fullscreen .tabela-matriz th {
+    padding: 6px 5px;
 }
 
-.cert-layout-compact .tabela-matriz td.nome-tipo {
-    font-size: 0.82rem;
-    padding: 10px 12px;
+body.cert-fullscreen .tabela-matriz td {
+    padding: 3px;
+    min-width: 92px;
 }
 
-.cert-layout-compact .cert-card {
-    padding: 8px;
-    margin-bottom: 6px;
-    gap: 8px;
-    border-radius: 7px;
+body.cert-fullscreen .tabela-matriz th.th-tipo {
+    min-width: 82px;
+    max-width: 82px;
+    padding: 6px 4px;
+    font-size: 0.6rem;
 }
 
-.cert-layout-compact .cert-card:hover {
+body.cert-fullscreen .tabela-matriz td.nome-tipo {
+    font-size: 0.62rem;
+    line-height: 1.15;
+    padding: 6px 4px;
+    min-width: 82px;
+    max-width: 82px;
+    word-break: break-word;
+}
+
+body.cert-fullscreen .tabela-matriz th.th-fornecedor {
+    min-width: 92px;
+    max-width: 92px;
+    padding: 6px 4px;
+}
+
+body.cert-fullscreen .tabela-matriz th.th-fornecedor span {
+    display: block;
+    font-size: 0.62rem;
+    line-height: 1.05;
+    white-space: normal;
+    word-break: break-word;
+}
+
+body.cert-fullscreen .cert-card {
+    padding: 4px;
+    margin-bottom: 3px;
+    gap: 4px;
+    border-radius: 5px;
+}
+
+body.cert-fullscreen .cert-card:hover {
     transform: translateY(-1px);
 }
 
-.cert-layout-compact .cert-badge {
-    font-size: 0.62rem;
-    padding: 3px 8px;
+body.cert-fullscreen .cert-badge {
+    font-size: 0.5rem;
+    padding: 2px 4px;
 }
 
-.cert-layout-compact .date-lbl {
+body.cert-fullscreen .date-lbl {
+    font-size: 0.46rem;
+}
+
+body.cert-fullscreen .date-val {
     font-size: 0.58rem;
 }
 
-.cert-layout-compact .date-val {
-    font-size: 0.76rem;
+body.cert-fullscreen .cert-actions {
+    padding-top: 4px;
 }
 
-.cert-layout-compact .cert-actions {
-    padding-top: 8px;
+body.cert-fullscreen .action-btn {
+    font-size: 0.7rem;
+    padding: 3px 2px;
 }
 
-.cert-layout-compact .action-btn {
-    font-size: 0.88rem;
-    padding: 5px 6px;
+body.cert-fullscreen .filtro-box-busca {
+    min-width: 190px;
 }
 
 .arquivo-shell {
@@ -1003,6 +1177,32 @@ input#dias_calculados {
     .toolbar-arquivo, .toolbar-matriz {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    body.cert-fullscreen .fullscreen-status-bar {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        justify-content: flex-start;
+    }
+
+    .fullscreen-status-btn {
+        font-size: 0.68rem;
+        padding: 5px 9px;
+    }
+
+    .fullscreen-exit-btn {
+        font-size: 0.68rem;
+        padding: 5px 9px;
+    }
+
+    .toolbar-filters {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .filtro-box-busca {
+        min-width: 100%;
     }
 
     .config-form,

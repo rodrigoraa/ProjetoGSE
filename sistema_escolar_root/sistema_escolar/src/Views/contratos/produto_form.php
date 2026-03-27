@@ -14,7 +14,7 @@
         <?php include VIEW_PATH . '/partials/menu.php'; ?>
         <div class="main-content-wrapper">
             <header>
-                <h1><?php echo $acao === 'editar' ? 'Editar Produto' : 'Adicionar Novo Produto'; ?></h1>
+                <h1><?php echo $acao === 'editar' ? 'Editar produto' : 'Adicionar novo produto'; ?></h1>
             </header>
             <main>
                 <div class="toolbar-alunos">
@@ -24,7 +24,7 @@
 
                 <?php if (!empty($erro)): ?>
                     <div class="alert-box alert-erro" style="max-width: 600px; margin-bottom: 20px;">
-                        <div class="alert-title">Nao foi possivel salvar</div>
+                        <div class="alert-title">Não foi possível salvar</div>
                         <div class="alert-text"><?php echo e($erro); ?></div>
                     </div>
                 <?php endif; ?>
@@ -36,7 +36,7 @@
                     <?php endif; ?>
 
                     <div class="form-group">
-                        <label>Nome do Produto</label>
+                        <label>Nome do produto</label>
                         <input type="text" name="nome_produto" class="sistema" required value="<?php echo $acao === 'editar' ? e($produto['nome_produto']) : ''; ?>" placeholder="Ex: Papel A4">
                     </div>
 
@@ -63,13 +63,13 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Valor Unitário (R$)</label>
+                            <label>Valor unitário (R$)</label>
                             <input type="number" name="valor_unitario" class="sistema" step="0.01" required value="<?php echo $acao === 'editar' ? e($produto['valor_unitario']) : ''; ?>">
                         </div>
                     </div>
 
                     <div class="form-actions" style="margin-top: 20px;">
-                        <button type="submit" class="btn-primary" style="width: 100%;">Salvar Informações do Produto</button>
+                        <button type="submit" class="btn-primary" style="width: 100%;">Salvar informações do produto</button>
                     </div>
                 </form>
             </main>
