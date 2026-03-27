@@ -18,6 +18,9 @@
             </header>
 
             <main>
+                <?php $flash = consumir_flash(); ?>
+                <?php if (!empty($flash)) echo $flash; ?>
+
                 <?php if (!empty($mensagem))
                     echo $mensagem; ?>
 

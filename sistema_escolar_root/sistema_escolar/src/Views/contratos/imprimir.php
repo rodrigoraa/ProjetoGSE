@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Imprimir Pedido #<?php echo (int)$contrato['id']; ?></title>
+    <title><?php echo !empty($folhaSelecionada) ? 'Imprimir Nota ' . (int)$folhaSelecionada : 'Imprimir Pedido'; ?> #<?php echo (int)$contrato['id']; ?></title>
     <link rel="stylesheet" href="/assets/css/imprimir.css">
 </head>
 
@@ -12,7 +12,7 @@
         <button class="btn-print" onclick="window.print()">🖨️ Imprimir</button>
 
         <div class="header">
-            <h1>Pedido: <?php echo htmlspecialchars($contrato['titulo']); ?></h1>
+            <h1><?php echo !empty($folhaSelecionada) ? 'Nota ' . (int)$folhaSelecionada . ' do Pedido' : 'Pedido'; ?>: <?php echo htmlspecialchars($contrato['titulo']); ?></h1>
             <p>ID do Pedido: #<?php echo (int)$contrato['id']; ?> | Data: <?php echo date('d/m/Y', strtotime($contrato['criado_em'])); ?></p>
         </div>
 
@@ -37,6 +37,13 @@
                     <span>Nota <?php echo $f['numero_folha']; ?></span>
                     <span>Total da nota: R$ <?php echo number_format($f['valor_folha'], 2, ',', '.'); ?></span>
                 </div>
+
+                <?php if (!empty($f['observacao'])): ?>
+                    <div style="margin: 12px 0 16px; padding: 10px 12px; border: 1px solid #d8e1ea; border-radius: 8px; background: #f8fbff;">
+                        <strong>Observações:</strong><br>
+                        <?php echo nl2br(htmlspecialchars($f['observacao'])); ?>
+                    </div>
+                <?php endif; ?>
 
                 <?php if (count($produtos_folha) > 0): ?>
                     <table>

@@ -23,7 +23,33 @@
                     <?php echo $flash; ?>
                 <?php endif; ?>
 
+                <section class="aluno-hero">
+                    <div>
+                        <h2>Central de cadastro e acompanhamento dos alunos</h2>
+                        <p>Pesquise rapidamente por nome, revise a turma atual, abra o perfil completo e mantenha os dados de contato e DVA sempre atualizados.</p>
+                    </div>
+                    <div class="aluno-stats">
+                        <div class="aluno-stat">
+                            <strong><?php echo (int)$total_registros; ?></strong>
+                            <span>Total de alunos</span>
+                        </div>
+                        <div class="aluno-stat">
+                            <strong><?php echo (int)$pagina_atual; ?></strong>
+                            <span>página atual</span>
+                        </div>
+                        <div class="aluno-stat">
+                            <strong><?php echo (int)$total_paginas; ?></strong>
+                            <span>total de páginas</span>
+                        </div>
+                    </div>
+                </section>
+
                 <div class="toolbar-alunos">
+                    <div class="toolbar-copy">
+                        <h3>Ações rápidas</h3>
+                        <p>Cadastre novos alunos ou use a busca para localizar um registro específico.</p>
+                    </div>
+
                     <a href="/aluno/cadastrar" class="btn-primary" style="text-decoration:none;">+ Novo Aluno</a>
 
                     <form action="/aluno" method="GET" class="form-busca">
@@ -33,7 +59,13 @@
                 </div>
 
                 <div class="relatorio">
-                    <h3 class="form-section-title">Alunos Cadastrados (<?php echo (int)$total_registros; ?>)</h3>
+                    <div class="section-head">
+                        <div>
+                            <h3>Alunos Cadastrados</h3>
+                            <p>Abra o perfil para detalhes completos ou entre em edição para atualizar dados rapidamente.</p>
+                        </div>
+                        <span class="result-pill"><?php echo (int)$total_registros; ?> registros</span>
+                    </div>
 
                     <table class="tabela-filtrada">
                         <thead>
@@ -47,7 +79,7 @@
                         <tbody>
                             <?php if (empty($lista_alunos)): ?>
                                 <tr>
-                                    <td colspan="4" style="text-align:center; padding:20px; color:#777;">Nenhum aluno encontrado.</td>
+                                    <td colspan="4" class="table-empty">Nenhum aluno encontrado.</td>
                                 </tr>
                             <?php endif; ?>
 
@@ -56,17 +88,16 @@
                                     <td class="nome-aluno">
                                         <a href="/aluno/perfil/<?php echo (int)$aluno['id']; ?>"><?php echo e($aluno['nome_completo']); ?></a>
                                     </td>
-                                    <td><?php echo e($aluno['nome_turma'] ?? 'Sem turma'); ?></td>
+                                    <td><span class="turma-badge"><?php echo e($aluno['nome_turma'] ?? 'Sem turma'); ?></span></td>
                                     <td><?php echo date('d/m/Y', strtotime($aluno['data_nascimento'])); ?></td>
-
                                     <td class="col-acoes">
-                                        <a href="/aluno/perfil/<?php echo (int)$aluno['id']; ?>" class="editar">👤 Perfil</a>
-                                        <a href="/aluno/editar/<?php echo (int)$aluno['id']; ?>" class="editar">✏️ Editar</a>
+                                        <a href="/aluno/perfil/<?php echo (int)$aluno['id']; ?>" class="link-acao">👤 Perfil</a>
+                                        <a href="/aluno/editar/<?php echo (int)$aluno['id']; ?>" class="link-acao">✏️ Editar</a>
 
                                         <?php if ($_SESSION['usuario_tipo'] === 'admin'): ?>
                                             <form action="/aluno/excluir/<?php echo (int)$aluno['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Tem certeza absoluta? Isso apagara o aluno e a DVA dele.');">
                                                 <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
-                                                <button type="submit" class="btn-danger" style="text-decoration:none; border:0; cursor:pointer;">🗑️ Apagar</button>
+                                                <button type="submit" class="btn-inline-danger">🗑️ Apagar</button>
                                             </form>
                                         <?php endif; ?>
                                     </td>

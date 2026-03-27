@@ -1,3 +1,19 @@
+<?php
+$totalAvisos = count($avisos ?? []);
+$autoresAgenda = [];
+$proximoAviso = null;
+
+foreach (($avisos ?? []) as $avisoResumo) {
+    $autorNome = trim((string)($avisoResumo['autor_nome'] ?? ''));
+    if ($autorNome !== '') {
+        $autoresAgenda[$autorNome] = true;
+    }
+
+    if ($proximoAviso === null) {
+        $proximoAviso = $avisoResumo['data_aviso'] ?? null;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -5,8 +21,6 @@
     <meta charset="UTF-8">
     <title>Agenda de Avisos</title>
     <link rel="stylesheet" href="/assets/css/painel.css">
-    <link rel="stylesheet" href="/assets/css/alunos.css">
-    <link rel="stylesheet" href="/assets/css/contrato.css">
     <link rel="stylesheet" href="/assets/css/agenda.css">
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
@@ -24,10 +38,31 @@
             </header>
 
             <main>
+                <section class="agenda-hero">
+                    <div>
+                        <h2>Painel central dos avisos da equipe</h2>
+                        <p>Concentre lembretes, eventos e comunicações internas em uma agenda visual com consulta rápida e registro por autor.</p>
+                    </div>
+                    <div class="agenda-hero-stats">
+                        <div class="agenda-stat">
+                            <strong><?php echo (int)$totalAvisos; ?></strong>
+                            <span>Avisos</span>
+                        </div>
+                        <div class="agenda-stat">
+                            <strong><?php echo count($autoresAgenda); ?></strong>
+                            <span>Autores</span>
+                        </div>
+                        <div class="agenda-stat">
+                            <strong><?php echo $proximoAviso ? date('d/m', strtotime($proximoAviso)) : '--'; ?></strong>
+                            <span>Próximo aviso</span>
+                        </div>
+                    </div>
+                </section>
+
                 <div class="agenda-grid">
                     <div class="relatorio agenda-card agenda-card-form">
                         <h3 class="form-section-title">Novo Aviso</h3>
-                        <form action="/agenda/cadastrar" method="POST" class="formulario-sistema">
+                        <form action="/agenda/cadastrar" method="POST" class="sistema">
                             <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
 
                             <div class="grid-form-inline agenda-form-grid">
@@ -109,7 +144,7 @@
                                                 ?>
                                                     <form action="/agenda/excluir/<?php echo (int)$aviso['id']; ?>" method="POST" onsubmit="return confirm('Tem certeza que deseja apagar este aviso?');">
                                                         <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
-                                                        <button type="submit" class="btn-danger btn-sm" title="Apagar aviso">Apagar</button>
+                                                        <button type="submit" class="btn-danger btn-sm" title="Apagar aviso">🗑️ Apagar</button>
                                                     </form>
                                                 <?php endif; ?>
                                             </div>

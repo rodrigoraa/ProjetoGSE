@@ -12,42 +12,6 @@ $renovar_id = $_GET['renovar_id'] ?? '';
     <link rel="stylesheet" href="/assets/css/painel.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="/assets/css/certidoes.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .grid-3-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 25px;
-            margin-bottom: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .grid-3-col {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-        }
-
-        input[type="file"]::file-selector-button {
-            background-color: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            padding: 8px 12px;
-            border-radius: 4px;
-            color: #475569;
-            font-weight: 600;
-            cursor: pointer;
-            margin-right: 15px;
-            transition: 0.2s;
-        }
-
-        input[type="file"]::file-selector-button:hover {
-            background-color: #e2e8f0;
-        }
-    </style>
 </head>
 
 <body>
@@ -56,17 +20,14 @@ $renovar_id = $_GET['renovar_id'] ?? '';
         <?php include VIEW_PATH . '/partials/menu.php'; ?>
 
         <div class="main-content-wrapper">
-            <header style="margin-bottom: 25px;">
-                <h1 style="color: #1e293b; font-size: 1.8rem;">
-                    <i class="fa-solid fa-file-circle-plus" style="color: #64748b; margin-right: 10px;"></i> Cadastrar Certidão
-                </h1>
+            <header class="cert-page-header">
+                <h1><i class="fa-solid fa-file-circle-plus"></i> Cadastrar Certidão</h1>
             </header>
 
             <main>
                 <?php if (!empty($mensagem)) echo $mensagem; ?>
 
                 <form action="/certidao/cadastrar" method="POST" enctype="multipart/form-data" class="form-certidao">
-
                     <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                     <input type="hidden" name="renovar_id" value="<?php echo htmlspecialchars($renovar_id); ?>">
 
@@ -76,8 +37,8 @@ $renovar_id = $_GET['renovar_id'] ?? '';
                             <select name="fornecedor" required>
                                 <option value="">Selecione...</option>
                                 <?php foreach ($fornecedores as $f): ?>
-                                    <option value="<?= $f['id'] ?>" <?= ($f['id'] == $f_get) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($f['nome']) ?>
+                                    <option value="<?php echo (int)$f['id']; ?>" <?php echo ($f['id'] == $f_get) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($f['nome']); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -87,8 +48,8 @@ $renovar_id = $_GET['renovar_id'] ?? '';
                             <select name="tipo_certidao" required>
                                 <option value="">Selecione...</option>
                                 <?php foreach ($tipos as $t): ?>
-                                    <option value="<?= $t['id'] ?>" <?= ($t['id'] == $t_get) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($t['nome']) ?>
+                                    <option value="<?php echo (int)$t['id']; ?>" <?php echo ($t['id'] == $t_get) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($t['nome']); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -96,26 +57,26 @@ $renovar_id = $_GET['renovar_id'] ?? '';
                     </div>
 
                     <div class="grid-3-col">
-                        <div class="form-group" style="margin-bottom: 0;">
+                        <div class="form-group compact">
                             <label>Emissão:</label>
                             <input type="date" name="data_emissao" id="emissao" required>
                         </div>
-                        <div class="form-group" style="margin-bottom: 0;">
+                        <div class="form-group compact">
                             <label>Vencimento:</label>
                             <input type="date" name="data_vencimento" id="vencimento" required>
                         </div>
-                        <div class="form-group" style="margin-bottom: 0;">
+                        <div class="form-group compact">
                             <label>Validade (Dias):</label>
                             <input type="text" id="dias_calculados" readonly placeholder="...">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label><i class="fa-solid fa-paperclip" style="color: #94a3b8; margin-right: 5px;"></i> Anexar PDF (Opcional):</label>
+                        <label><i class="fa-solid fa-paperclip inline-icon"></i> Anexar PDF (Opcional):</label>
                         <input type="file" name="arquivo_pdf" accept="application/pdf">
                     </div>
 
-                    <div class="form-group" style="margin-bottom: 0;">
+                    <div class="form-group compact">
                         <label>Observação:</label>
                         <textarea name="observacao" rows="3" placeholder="Adicione notas adicionais aqui..."></textarea>
                     </div>
@@ -139,25 +100,24 @@ $renovar_id = $_GET['renovar_id'] ?? '';
                 const dt1 = new Date(inpEmissao.value);
                 const dt2 = new Date(inpVencimento.value);
                 const diffTime = dt2 - dt1;
-                let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
                 if (!isNaN(diffDays)) {
                     if (diffDays <= 0) {
-                        inpDias.value = "Inválido (Já vencida)";
-                        inpDias.style.color = "var(--danger-color)";
+                        inpDias.value = 'Inválido (já vencida)';
+                        inpDias.style.color = 'var(--danger-color)';
                     } else {
-                        inpDias.value = diffDays + " dias";
-                        inpDias.style.color = "var(--primary-color)";
+                        inpDias.value = diffDays + ' dias';
+                        inpDias.style.color = 'var(--primary-color)';
                     }
                 }
             } else {
-                inpDias.value = "";
+                inpDias.value = '';
             }
         }
 
         inpEmissao.addEventListener('change', calcularDiferenca);
         inpVencimento.addEventListener('change', calcularDiferenca);
-
         window.onload = calcularDiferenca;
     </script>
 </body>

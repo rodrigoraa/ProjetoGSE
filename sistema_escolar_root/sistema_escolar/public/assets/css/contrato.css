@@ -166,6 +166,25 @@ input.sistema::placeholder {
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
 }
 
+.contrato-observacao-card {
+    background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+    border: 1px solid #dbe6f2;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+}
+
+.contrato-observacao-input {
+    resize: vertical;
+    min-height: 92px;
+    margin-bottom: 12px;
+}
+
+.contrato-observacao-actions {
+    justify-content: flex-end;
+}
+
 .grid-form-inline {
     display: grid; 
     /* Ajustado para 6 colunas para incluir Marca */
@@ -469,6 +488,89 @@ input.sistema::placeholder {
 
 .section-heading {
     margin-top: 30px;
+}
+
+.contrato-hero {
+    background: linear-gradient(135deg, #0c3566 0%, #16508f 100%);
+    color: #fff;
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.contrato-hero h2 {
+    color: white;
+    margin: 0 0 8px;
+    font-size: 1.25rem;
+}
+
+.contrato-hero p {
+    margin: 0;
+    color: #fff;
+    font-weight: 700;
+    line-height: 1.55;
+}
+
+.contrato-hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.contrato-stat {
+    min-width: 120px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.contrato-stat strong {
+    display: block;
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+}
+
+.contrato-stat span {
+    font-size: 0.85rem;
+    color: #fff;
+    font-weight: 700;
+}
+
+.contrato-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+}
+
+.contrato-toolbar-copy h3 {
+    margin: 0 0 4px;
+    color: var(--text-dark);
+}
+
+.contrato-toolbar-copy p {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.badge-media {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: #eef4fa;
+    color: var(--primary-blue);
+    border: 1px solid #d5e3f2;
 }
 
 @media (max-width: 960px) {

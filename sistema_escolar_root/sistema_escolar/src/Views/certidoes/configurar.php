@@ -14,19 +14,35 @@
         <?php include VIEW_PATH . '/partials/menu.php'; ?>
 
         <div class="main-content-wrapper">
-            <header style="margin-bottom: 25px;">
-                <h1 style="color: #1e293b; font-size: 1.8rem;"><i class="fa-solid fa-gear" style="color: #64748b; margin-right: 10px;"></i> Configurar Opções do Sistema</h1>
+            <header class="cert-page-header">
+                <h1><i class="fa-solid fa-gear"></i> Configurar Opções do Sistema</h1>
             </header>
 
-            <div class="grid-2-col" style="align-items: start;">
+            <?php $flash = consumir_flash(); ?>
+            <?php if (!empty($flash)): ?>
+                <?php echo $flash; ?>
+            <?php endif; ?>
+
+            <section class="config-intro">
+                <div>
+                    <h2>Organize os catálogos usados nas certidões</h2>
+                    <p>Use esta tela para manter a lista de fornecedores e os tipos de certidão atualizados. As alterações feitas aqui já aparecem nos formulários de cadastro e edição.</p>
+                </div>
+                <div class="config-chip"><i class="fa-solid fa-shield-halved"></i> Alterações com feedback imediato</div>
+            </section>
+
+            <div class="grid-2-col config-layout">
                 <div class="config-card">
-                    <div class="config-header"><i class="fa-solid fa-truck-fast" style="color: #64748b; margin-right: 8px;"></i> Lista de Fornecedores</div>
+                    <div class="config-card-header">
+                        <div class="config-header"><i class="fa-solid fa-truck-fast"></i> Lista de Fornecedores</div>
+                        <p>Cadastre e mantenha os nomes usados para vincular cada certidão ao respectivo fornecedor.</p>
+                    </div>
 
                     <form action="/certidao/adicionarOpcao" method="POST" class="config-form">
                         <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                         <input type="hidden" name="tipo_lista" value="lista_fornecedores">
                         <input type="text" name="nome" placeholder="Adicionar novo (Ex: GRB)" required>
-                        <button type="submit" class="btn-novo" style="padding: 10px 15px;" title="Adicionar Fornecedor"><i class="fa-solid fa-plus"></i></button>
+                        <button type="submit" class="btn-novo" title="Adicionar Fornecedor"><i class="fa-solid fa-plus"></i></button>
                     </form>
 
                     <div class="config-list-container">
@@ -37,9 +53,9 @@
                                 <?php foreach ($fornecedores as $f): ?>
                                     <li class="config-item">
                                         <span class="config-item-name"><?php echo e($f['nome']); ?></span>
-                                        <div style="display: flex; gap: 5px;">
-                                            <button type="button" onclick="renomearOpcao(<?php echo (int)$f['id']; ?>, 'lista_fornecedores', <?php echo json_encode($f['nome']); ?>)" class="action-btn text-primary" title="Renomear" style="background:none; border:none; cursor:pointer;"><i class="fa-solid fa-pen"></i></button>
-                                            <form action="/certidao/excluirOpcao" method="POST" style="display:inline;" onsubmit="return confirm('Deseja excluir o fornecedor <?php echo e($f['nome']); ?> da lista?');">
+                                        <div class="config-item-actions">
+                                            <button type="button" onclick="abrirModalRenomear(<?php echo (int)$f['id']; ?>, 'lista_fornecedores', <?php echo json_encode($f['nome']); ?>, 'fornecedor')" class="action-btn text-primary" title="Renomear" style="background:none; border:none; cursor:pointer;"><i class="fa-solid fa-pen"></i></button>
+                                            <form action="/certidao/excluirOpcao" method="POST" onsubmit="return confirm('Deseja excluir o fornecedor <?php echo e($f['nome']); ?> da lista?');">
                                                 <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                                                 <input type="hidden" name="id" value="<?php echo (int)$f['id']; ?>">
                                                 <input type="hidden" name="tipo" value="lista_fornecedores">
@@ -54,13 +70,16 @@
                 </div>
 
                 <div class="config-card">
-                    <div class="config-header"><i class="fa-solid fa-certificate" style="color: #64748b; margin-right: 8px;"></i> Tipos de Certidão</div>
+                    <div class="config-card-header">
+                        <div class="config-header"><i class="fa-solid fa-certificate"></i> Tipos de Certidão</div>
+                        <p>Mantenha a nomenclatura dos documentos padronizada para evitar cadastros duplicados ou nomes divergentes.</p>
+                    </div>
 
                     <form action="/certidao/adicionarOpcao" method="POST" class="config-form">
                         <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                         <input type="hidden" name="tipo_lista" value="lista_tipos_certidao">
                         <input type="text" name="nome" placeholder="Adicionar novo (Ex: CND FEDERAL)" required>
-                        <button type="submit" class="btn-novo" style="padding: 10px 15px;" title="Adicionar Tipo"><i class="fa-solid fa-plus"></i></button>
+                        <button type="submit" class="btn-novo" title="Adicionar Tipo"><i class="fa-solid fa-plus"></i></button>
                     </form>
 
                     <div class="config-list-container">
@@ -71,9 +90,9 @@
                                 <?php foreach ($tipos as $t): ?>
                                     <li class="config-item">
                                         <span class="config-item-name"><?php echo e($t['nome']); ?></span>
-                                        <div style="display: flex; gap: 5px;">
-                                            <button type="button" onclick="renomearOpcao(<?php echo (int)$t['id']; ?>, 'lista_tipos_certidao', <?php echo json_encode($t['nome']); ?>)" class="action-btn text-primary" title="Renomear" style="background:none; border:none; cursor:pointer;"><i class="fa-solid fa-pen"></i></button>
-                                            <form action="/certidao/excluirOpcao" method="POST" style="display:inline;" onsubmit="return confirm('Deseja excluir o tipo <?php echo e($t['nome']); ?> da lista?');">
+                                        <div class="config-item-actions">
+                                            <button type="button" onclick="abrirModalRenomear(<?php echo (int)$t['id']; ?>, 'lista_tipos_certidao', <?php echo json_encode($t['nome']); ?>, 'tipo de certidão')" class="action-btn text-primary" title="Renomear" style="background:none; border:none; cursor:pointer;"><i class="fa-solid fa-pen"></i></button>
+                                            <form action="/certidao/excluirOpcao" method="POST" onsubmit="return confirm('Deseja excluir o tipo <?php echo e($t['nome']); ?> da lista?');">
                                                 <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                                                 <input type="hidden" name="id" value="<?php echo (int)$t['id']; ?>">
                                                 <input type="hidden" name="tipo" value="lista_tipos_certidao">
@@ -88,39 +107,74 @@
                 </div>
             </div>
 
-            <div style="margin-top: 30px;">
+            <div class="page-footer-link">
                 <a href="/certidao" class="cancelar"><i class="fa-solid fa-arrow-left"></i> Voltar para a Tela Inicial</a>
             </div>
         </div>
     </div>
 
+    <div class="rename-modal" id="renameModal" hidden>
+        <div class="rename-modal-backdrop" onclick="fecharModalRenomear()"></div>
+        <div class="rename-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="renameModalTitle">
+            <div class="rename-modal-header">
+                <h2 id="renameModalTitle">Renomear opção</h2>
+                <p id="renameModalDescription">Atualize o texto desta opção para manter a lista organizada.</p>
+            </div>
+
+            <form action="/certidao/editarOpcao" method="POST" class="rename-modal-body" id="renameForm">
+                <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
+                <input type="hidden" name="id" id="renameId">
+                <input type="hidden" name="tipo" id="renameTipo">
+
+                <label for="renameNome">Novo nome</label>
+                <input type="text" name="novo_nome" id="renameNome" required>
+
+                <div class="rename-modal-actions">
+                    <button type="button" class="btn-modal-secondary" onclick="fecharModalRenomear()">Cancelar</button>
+                    <button type="submit" class="btn-novo">Salvar alteração</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        function renomearOpcao(id, tipoTabela, nomeAntigo) {
-            const novoNome = prompt("Introduza o novo nome para corrigir:", nomeAntigo);
-            if (novoNome !== null && novoNome.trim() !== "" && novoNome.trim().toUpperCase() !== nomeAntigo.toUpperCase()) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/certidao/editarOpcao';
+        const renameModal = document.getElementById('renameModal');
+        const renameId = document.getElementById('renameId');
+        const renameTipo = document.getElementById('renameTipo');
+        const renameNome = document.getElementById('renameNome');
+        const renameModalTitle = document.getElementById('renameModalTitle');
+        const renameModalDescription = document.getElementById('renameModalDescription');
 
-                const campos = {
-                    csrf_token: <?php echo json_encode(gerar_csrf_token()); ?>,
-                    id: id,
-                    tipo: tipoTabela,
-                    novo_nome: novoNome.trim()
-                };
-
-                Object.entries(campos).forEach(([nome, valor]) => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = nome;
-                    input.value = valor;
-                    form.appendChild(input);
-                });
-
-                document.body.appendChild(form);
-                form.submit();
-            }
+        function abrirModalRenomear(id, tipoTabela, nomeAntigo, label) {
+            renameId.value = id;
+            renameTipo.value = tipoTabela;
+            renameNome.value = nomeAntigo;
+            renameModalTitle.textContent = 'Renomear ' + label;
+            renameModalDescription.textContent = 'Atualize o nome desta opção sem precisar sair da tela de configuração.';
+            renameModal.hidden = false;
+            setTimeout(() => renameNome.focus(), 50);
+            renameNome.select();
         }
+
+        function fecharModalRenomear() {
+            renameModal.hidden = true;
+            renameId.value = '';
+            renameTipo.value = '';
+            renameNome.value = '';
+        }
+
+        document.getElementById('renameForm').addEventListener('submit', function(event) {
+            if (renameNome.value.trim() === '') {
+                event.preventDefault();
+                renameNome.focus();
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && !renameModal.hidden) {
+                fecharModalRenomear();
+            }
+        });
     </script>
 </body>
 

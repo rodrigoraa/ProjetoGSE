@@ -15,12 +15,31 @@
 
         <div class="main-content-wrapper">
             <header>
-                <h1>⚠️ Alunos com DVA Pendente</h1>
+                <h1>Alunos com DVA Pendente</h1>
             </header>
 
             <main>
-                <div class="relatorio" style="border-left: 5px solid #f57c00;">
-                    <h3 style="margin-top:0; color:#f57c00;">Lista de Pendências (<?php echo count($lista_alunos); ?>)</h3>
+                <section class="aluno-hero">
+                    <div>
+                        <h2>Regularização de vencimentos e cadastros incompletos</h2>
+                        <p>Esta lista concentra os alunos que ainda não possuem DVA registrada para facilitar a atualização dos perfis e reduzir pendências operacionais.</p>
+                    </div>
+                    <div class="aluno-stats">
+                        <div class="aluno-stat">
+                            <strong><?php echo count($lista_alunos); ?></strong>
+                            <span>pendências atuais</span>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="relatorio pendencia-shell">
+                    <div class="section-head">
+                        <div>
+                            <h3>Lista de Pendências</h3>
+                            <p>Abra o perfil ou entre direto na edição para regularizar a informação faltante.</p>
+                        </div>
+                        <span class="result-pill"><?php echo count($lista_alunos); ?> itens</span>
+                    </div>
 
                     <table class="tabela-filtrada">
                         <thead>
@@ -33,8 +52,8 @@
                         <tbody>
                             <?php if (empty($lista_alunos)): ?>
                                 <tr>
-                                    <td colspan="3" style="padding:20px; text-align:center; color:green;">
-                                        ✅ Parabéns! Todos os alunos possuem DVA.
+                                    <td colspan="3" class="pendencia-ok">
+                                        Parabéns! Todos os alunos possuem DVA.
                                     </td>
                                 </tr>
                             <?php endif; ?>
@@ -42,14 +61,14 @@
                             <?php foreach ($lista_alunos as $aluno): ?>
                                 <tr>
                                     <td class="nome-aluno">
-                                        <a href="/aluno/perfil/<?php echo $aluno['id']; ?>">
+                                        <a href="/aluno/perfil/<?php echo (int)$aluno['id']; ?>">
                                             <?php echo htmlspecialchars($aluno['nome_completo']); ?>
                                         </a>
                                     </td>
-                                    <td><?php echo htmlspecialchars($aluno['nome_turma'] ?? 'Sem turma'); ?></td>
+                                    <td><span class="turma-badge"><?php echo htmlspecialchars($aluno['nome_turma'] ?? 'Sem turma'); ?></span></td>
                                     <td>
-                                        <a href="/aluno/editar/<?php echo $aluno['id']; ?>" class="btn-primary" style="padding:5px 10px; font-size:0.9em;">
-                                            📝 Regularizar
+                                        <a href="/aluno/editar/<?php echo (int)$aluno['id']; ?>" class="btn-primary" style="padding:5px 10px; font-size:0.9em;">
+                                            Regularizar
                                         </a>
                                     </td>
                                 </tr>
@@ -58,7 +77,7 @@
                     </table>
                 </div>
 
-                <div style="margin-top:20px;">
+                <div class="pendencia-actions">
                     <a href="/painel" class="cancelar">Voltar ao Painel</a>
                 </div>
             </main>

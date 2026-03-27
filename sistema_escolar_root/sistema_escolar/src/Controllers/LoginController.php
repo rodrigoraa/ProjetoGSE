@@ -12,8 +12,12 @@ class LoginController extends Controller
 
         $erro = $_SESSION['mensagem_erro'] ?? null;
         unset($_SESSION['mensagem_erro']);
+        $mensagem = trim((string)($_GET['msg'] ?? ''));
+        if ($mensagem === '') {
+            $mensagem = null;
+        }
 
-        $this->view('login', ['erro' => $erro]);
+        $this->view('login', ['erro' => $erro, 'mensagem' => $mensagem]);
     }
 
     public function entrar()
@@ -46,6 +50,7 @@ class LoginController extends Controller
         }
 
         registrar_log(Model::getConexao(), 'Login - Falha', "Tentativa de login inválida para o e-mail: $email");
+        usleep(300000);
         $this->view('login', ['erro' => 'E-mail ou senha incorretos.']);
     }
 

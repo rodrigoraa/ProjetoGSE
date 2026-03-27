@@ -1,3 +1,7 @@
+<?php
+$totalModelosEtiqueta = 2;
+$totalFormatosEtiqueta = 3;
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -28,6 +32,27 @@
             </header>
 
             <main>
+                <section class="etiqueta-hero">
+                    <div>
+                        <h2>Central de modelos para impressão rápida</h2>
+                        <p>Escolha o tipo de etiqueta, preencha os dados e gere impressões padronizadas para alunos, caixas e livros do acervo.</p>
+                    </div>
+                    <div class="etiqueta-hero-stats">
+                        <div class="etiqueta-stat">
+                            <strong><?php echo (int)$totalModelosEtiqueta; ?></strong>
+                            <span>Modelos</span>
+                        </div>
+                        <div class="etiqueta-stat">
+                            <strong>A4</strong>
+                            <span>Formato base</span>
+                        </div>
+                        <div class="etiqueta-stat">
+                            <strong><?php echo (int)$totalFormatosEtiqueta; ?></strong>
+                            <span>Saídas guiadas</span>
+                        </div>
+                    </div>
+                </section>
+
                 <div class="container-selecao">
                     <p style="color: #666; margin-bottom: 30px;">
                         Selecione um dos modelos abaixo para preencher os dados e gerar o arquivo de impressão.

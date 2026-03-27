@@ -18,7 +18,10 @@
             </header>
 
             <main>
-                <?php if (!empty($mensagem)) echo $mensagem; ?>
+                <?php $flash = consumir_flash(); ?>
+                <?php if (!empty($flash)): ?>
+                    <?php echo $flash; ?>
+                <?php endif; ?>
 
                 <div class="info-box">
                     <strong>ℹ️ Informação:</strong> Aqui você vê as últimas 500 ações realizadas no sistema. Use a pesquisa para filtrar.

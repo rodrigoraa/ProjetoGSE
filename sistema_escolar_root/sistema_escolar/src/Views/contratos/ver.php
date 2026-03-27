@@ -20,6 +20,11 @@
             </header>
 
             <main>
+                <?php $flash = consumir_flash(); ?>
+                <?php if (!empty($flash)): ?>
+                    <?php echo $flash; ?>
+                <?php endif; ?>
+
                 <div class="toolbar-alunos">
                     <div class="toolbar-actions">
                         <a href="/contrato" class="btn-secondary">Voltar</a>
@@ -86,6 +91,7 @@
 
                                     <div class="action-group" style="display: flex; gap: 10px; align-items: center;">
                                         <button type="button" onclick="toggleFormProduto(<?php echo (int)$num_folha; ?>)" class="btn-primary">+ Adicionar Produto</button>
+                                        <a href="/contrato/imprimir/<?php echo (int)$contrato['id']; ?>?folha=<?php echo (int)$num_folha; ?>" target="_blank" class="btn-secondary">🖨️ Imprimir nota</a>
 
                                         <form action="/contrato/duplicar_folha/<?php echo (int)$contrato['id']; ?>/<?php echo (int)$num_folha; ?>" method="POST" style="margin: 0;" onsubmit="return confirm('Deseja realmente duplicar esta folha e todos os seus produtos?');">
                                             <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
@@ -167,6 +173,17 @@
                                         <?php endif; ?>
                                     </tbody>
                                 </table>
+
+                                <div class="contrato-observacao-card">
+                                    <h4 class="contrato-summary-title">Observações da nota <?php echo (int)$num_folha; ?></h4>
+                                    <form action="/contrato/salvar_observacao_folha/<?php echo (int)$contrato['id']; ?>/<?php echo (int)$num_folha; ?>" method="POST">
+                                        <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
+                                        <textarea name="observacao" class="sistema contrato-observacao-input" rows="3" placeholder="Escreva aqui informações adicionais desta nota..."><?php echo e($f['observacao'] ?? ''); ?></textarea>
+                                        <div class="inline-form-actions contrato-observacao-actions">
+                                            <button type="submit" class="btn-primary">Salvar observações</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     <?php endforeach; ?>

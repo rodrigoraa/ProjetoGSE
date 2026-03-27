@@ -29,9 +29,11 @@ class RelatorioController extends Controller
     public function gerar()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            redirect('/relatorios');
+            redirect('/relatorio');
             exit;
         }
+
+        verificar_csrf_token($_POST['csrf_token'] ?? '');
 
         $id_turma = $_POST['turma'] ?? '';
         $status   = $_POST['status'] ?? 'todos';

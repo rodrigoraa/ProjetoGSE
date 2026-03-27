@@ -1,3 +1,10 @@
+<?php
+$totalCaixas = count($lista_caixas);
+$totalRegistrosResumo = 0;
+foreach ($resumo_caixas as $item) {
+    $totalRegistrosResumo += (int)$item['total'];
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -24,13 +31,39 @@
                     <?php echo $flash; ?>
                 <?php endif; ?>
 
-                <div class="relatorio" style="padding: 20px; display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center;">
-                    <form action="/passivo" method="GET" style="display: flex; gap: 10px; flex: 1; min-width: 300px; max-width: 800px;">
+                <section class="passivo-hero">
+                    <div>
+                        <h2>Consulta central do acervo físico e histórico</h2>
+                        <p>Use os filtros para localizar rapidamente caixas, pesquisar ex-alunos e importar ou exportar conteúdos.</p>
+                    </div>
+                    <div class="passivo-stats">
+                        <div class="passivo-stat">
+                            <strong><?php echo (int)$totalCaixas; ?></strong>
+                            <span>Caixas</span>
+                        </div>
+                        <div class="passivo-stat">
+                            <strong><?php echo (int)$totalRegistrosResumo; ?></strong>
+                            <span>Registros</span>
+                        </div>
+                        <div class="passivo-stat">
+                            <strong><?php echo $modo_exibicao === 'dashboard' ? 'Visão geral' : count($resultados); ?></strong>
+                            <span><?php echo $modo_exibicao === 'dashboard' ? 'modo atual' : 'resultados visíveis'; ?></span>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="toolbar-passivo">
+                    <div class="toolbar-headline">
+                        <h3>Busca e navegação</h3>
+                        <p>Filtre por caixa, pesquise por nome ou número e acesse ferramentas rápidas do módulo.</p>
+                    </div>
+
+                    <form action="/passivo" method="GET" class="form-busca">
                         <select name="filtro_caixa" class="sistema" style="margin-bottom: 0; width: 150px; cursor: pointer;" onchange="this.form.submit()">
-                            <option value="">📦 Todas as Caixas</option>
+                            <option value="">Todas as Caixas</option>
                             <?php foreach ($lista_caixas as $cx): ?>
                                 <option value="<?php echo e($cx); ?>" <?php echo ($cx == $caixa_atual) ? 'selected' : ''; ?>>
-                                    📦 <?php echo e($cx); ?>
+                                    📦<?php echo e($cx); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -43,7 +76,7 @@
                         <?php endif; ?>
                     </form>
 
-                    <div style="display: flex; gap: 10px;">
+                    <div class="toolbar-actions">
                         <a href="/passivo/cadastrar" class="btn-primary" style="background-color: #28a745;">+ Novo</a>
                         <a href="/passivo/ferramentas" class="btn-secondary">Ferramentas</a>
                         <?php if ($_SESSION['usuario_tipo'] === 'admin'): ?>
@@ -54,12 +87,16 @@
 
                 <div class="relatorio">
                     <?php if ($modo_exibicao == 'dashboard'): ?>
-                        <div style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
-                            <h3 style="margin: 0; color: var(--primary-color);">Visão Geral do Arquivo</h3>
+                        <div class="section-head">
+                            <div>
+                                <h3>Visão Geral do Arquivo</h3>
+                                <p>Clique em uma caixa para abrir seu conteúdo e continuar a navegação por sequência.</p>
+                            </div>
+                            <span class="result-count"><?php echo (int)$totalCaixas; ?> caixas</span>
                         </div>
 
                         <?php if (empty($resumo_caixas)): ?>
-                            <div style="text-align: center; padding: 40px; color: #666;">
+                            <div class="passivo-empty">
                                 <p>Nenhuma caixa encontrada. Importe um CSV ou cadastre manualmente.</p>
                             </div>
                         <?php else: ?>
@@ -73,21 +110,22 @@
                             </div>
                         <?php endif; ?>
                     <?php else: ?>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                            <h3 style="margin: 0; color: var(--primary-color);">
-                                <?php if (!empty($caixa_atual)): ?>
-                                    Conteúdo da Caixa: <strong><?php echo e($caixa_atual); ?></strong>
-                                <?php else: ?>
-                                    Resultados da Busca
-                                <?php endif; ?>
-                            </h3>
-                            <span style="background: #e9ecef; padding: 2px 10px; border-radius: 12px; font-size: 0.85em; color: #555; font-weight:bold;">
-                                <?php echo count($resultados); ?> registros
-                            </span>
+                        <div class="section-head">
+                            <div>
+                                <h3>
+                                    <?php if (!empty($caixa_atual)): ?>
+                                        Conteúdo da Caixa: <strong><?php echo e($caixa_atual); ?></strong>
+                                    <?php else: ?>
+                                        Resultados da Busca
+                                    <?php endif; ?>
+                                </h3>
+                                <p><?php echo !empty($caixa_atual) ? 'Use a navegação abaixo para avançar entre caixas vizinhas.' : 'Resultados limitados à pesquisa atual.'; ?></p>
+                            </div>
+                            <span class="result-count"><?php echo count($resultados); ?> registros</span>
                         </div>
 
                         <?php if (empty($resultados)): ?>
-                            <div style="padding: 40px; text-align: center; color: #dc3545;">
+                            <div class="passivo-empty danger">
                                 <h3>Nenhum aluno encontrado.</h3>
                             </div>
                         <?php else: ?>
@@ -117,46 +155,46 @@
                                 </div>
                             <?php endif; ?>
 
-                            <table class="tabela-filtrada">
-                                <thead>
-                                    <tr>
-                                        <th>Nome Completo</th>
-                                        <th>Data Nasc.</th>
-                                        <th>Número</th>
-                                        <th>Caixa</th>
-                                        <th style="text-align: right;">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($resultados as $reg): ?>
+                            <div class="tabela-filtrada-wrap">
+                                <table class="tabela-filtrada">
+                                    <thead>
                                         <tr>
-                                            <td style="font-weight: 600; color: #333;"><?php echo e($reg['nome_completo']); ?></td>
-                                            <td>
-                                                <?php if (!empty($reg['data_nascimento'])): ?>
-                                                    <?php echo date('d/m/Y', strtotime($reg['data_nascimento'])); ?>
-                                                <?php else: ?>
-                                                    <span style="color: #999; font-style: italic;">N/A</span>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td><?php echo e($reg['numero']); ?></td>
-                                            <td>
-                                                <span style="background: #e3f2fd; color: #004a91; padding: 4px 10px; border-radius: 15px; font-weight: 700; font-size: 0.85em;">
-                                                    <?php echo e($reg['caixa']); ?>
-                                                </span>
-                                            </td>
-                                            <td class="col-acoes" style="text-align: right;">
-                                                <a href="/passivo/editar/<?php echo (int)$reg['id']; ?>" style="color: #007bff; margin-right: 10px;">✏️ Editar</a>
-                                                <?php if ($_SESSION['usuario_tipo'] === 'admin'): ?>
-                                                    <form action="/passivo/excluir/<?php echo (int)$reg['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Apagar?');">
-                                                        <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
-                                                        <button type="submit" style="color: #dc3545; border:0; background:none; cursor:pointer;">🗑️ Apagar</button>
-                                                    </form>
-                                                <?php endif; ?>
-                                            </td>
+                                            <th>Nome Completo</th>
+                                            <th>Data Nasc.</th>
+                                            <th>Número</th>
+                                            <th>Caixa</th>
+                                            <th style="text-align: right;">Ações</th>
                                         </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($resultados as $reg): ?>
+                                            <tr>
+                                                <td style="font-weight: 600; color: #333;"><?php echo e($reg['nome_completo']); ?></td>
+                                                <td>
+                                                    <?php if (!empty($reg['data_nascimento'])): ?>
+                                                        <?php echo date('d/m/Y', strtotime($reg['data_nascimento'])); ?>
+                                                    <?php else: ?>
+                                                        <span style="color: #999; font-style: italic;">N/A</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td><?php echo e($reg['numero']); ?></td>
+                                                <td>
+                                                    <span class="badge-caixa"><?php echo e($reg['caixa']); ?></span>
+                                                </td>
+                                                <td class="passivo-actions">
+                                                    <a href="/passivo/editar/<?php echo (int)$reg['id']; ?>" class="link-editar">✏️ Editar</a>
+                                                    <?php if ($_SESSION['usuario_tipo'] === 'admin'): ?>
+                                                        <form action="/passivo/excluir/<?php echo (int)$reg['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Apagar?');">
+                                                            <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
+                                                            <button type="submit" class="link-excluir">🗑️ Apagar</button>
+                                                        </form>
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         <?php endif; ?>
                     <?php endif; ?>
                 </div>

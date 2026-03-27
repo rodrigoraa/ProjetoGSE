@@ -22,7 +22,7 @@
                 <?php if (($_SESSION['usuario_tipo'] ?? '') === 'admin'): ?>
                     <?php if (!empty($msg_backup)): ?>
                         <div class="flash-message success">
-                            Backup realizado com sucesso: <?php echo $msg_backup; ?>
+                            Status do backup: <?php echo e($msg_backup); ?>
                         </div>
                     <?php endif; ?>
                 <?php endif; ?>

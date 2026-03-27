@@ -1,42 +1,117 @@
-/* --- RESET E PÁGINA --- */
 * {
     box-sizing: border-box;
     -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
     margin: 0;
     padding: 0;
 }
 
 body.pagina-etiqueta {
-    background-color: #525659;
+    background: #525659;
     font-family: Arial, sans-serif;
+}
+
+body.pagina-etiqueta .layout-container {
+    display: block;
+}
+
+body.pagina-etiqueta .main-content-wrapper.etiqueta-print-wrapper {
+    width: calc(100vw - var(--sidebar-width));
+    max-width: calc(100vw - var(--sidebar-width));
+    margin-left: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+body.pagina-etiqueta .main-content-wrapper.etiqueta-print-wrapper main {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.etiqueta-hero {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+    color: #fff;
+    border-radius: 18px;
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.etiqueta-hero h2 {
+    color: white;
+    margin: 0 0 8px;
+    font-size: 1.25rem;
+}
+
+.etiqueta-hero p {
+    margin: 0;
+    color: #fff;
+    font-weight: 700;
+    line-height: 1.55;
+}
+
+.etiqueta-hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.etiqueta-stat {
+    min-width: 120px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.etiqueta-stat strong {
+    display: block;
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+}
+
+.etiqueta-stat span {
+    font-size: 0.85rem;
+    color: #fff;
+    font-weight: 700;
 }
 
 .no-print-bar {
     background: #333;
     padding: 15px;
     text-align: center;
-    color: white;
+    color: #fff;
+}
+
+.btn-imprimir,
+.btn-limpar,
+.btn-voltar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 700;
+    text-decoration: none;
 }
 
 .btn-imprimir {
-    padding: 10px 20px;
     background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
+    color: #fff;
 }
 
 .btn-limpar {
-    padding: 10px 20px;
     background: #dc3545;
-    /* Vermelho */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
+    color: #fff;
     margin-left: 10px;
 }
 
@@ -44,18 +119,31 @@ body.pagina-etiqueta {
     background: #c82333;
 }
 
-/* --- ESTRUTURA A4 --- */
-.folha-ambiente {
+.btn-voltar {
+    color: #fff;
+    background: #666;
+}
+
+.folha-ambiente,
+.folha-ambiente-passivo {
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: flex-start;
+}
+
+.folha-ambiente {
     padding: 20px 0;
+}
+
+.folha-ambiente-passivo {
+    padding: 1cm 0;
 }
 
 .folha-a4 {
     width: 21cm;
     height: 29.7cm;
-    background: white;
+    background: #fff;
     display: flex;
     flex-direction: column;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
@@ -65,7 +153,6 @@ body.pagina-etiqueta {
 
 .etiqueta-ficha {
     flex: 1;
-    /* Divide a folha 50/50 */
     width: 100%;
     padding: 0.6cm;
     display: flex;
@@ -78,7 +165,6 @@ body.pagina-etiqueta {
     border-bottom: none;
 }
 
-/* --- CABEÇALHO --- */
 .cabecalho-escola {
     text-align: center;
     margin-bottom: 5px;
@@ -91,10 +177,9 @@ body.pagina-etiqueta {
 
 .nome-escola {
     font-size: 18pt;
-    font-weight: bold;
+    font-weight: 700;
 }
 
-/* --- TABELAS TRAVADAS --- */
 .tabela-principal {
     width: 100%;
     border-collapse: collapse;
@@ -108,7 +193,6 @@ body.pagina-etiqueta {
     table-layout: fixed;
 }
 
-/* Altura fixa rigorosa para as células */
 .tabela-principal td,
 .tabela-interna td {
     height: 33px;
@@ -118,10 +202,8 @@ body.pagina-etiqueta {
     border: none;
     vertical-align: middle;
     overflow: hidden;
-    /* Corta qualquer tentativa de aumentar */
 }
 
-/* Container Mágico: Mantém label na esquerda e input no resto */
 .celula-travada {
     display: flex;
     align-items: center;
@@ -132,12 +214,11 @@ body.pagina-etiqueta {
 }
 
 .label-ficha {
-    font-weight: bold;
+    font-weight: 700;
     font-size: 9pt;
     white-space: nowrap;
     margin-right: 5px;
     flex-shrink: 0;
-    /* Impede a label de sumir */
 }
 
 .input-ficha {
@@ -145,18 +226,17 @@ body.pagina-etiqueta {
     outline: none;
     text-transform: uppercase;
     white-space: nowrap;
-    /* Impede quebra de linha */
     overflow: hidden;
     cursor: text;
     min-width: 0;
 }
 
-[contenteditable="true"] br {
-    display: none;
-}
-
 [contenteditable="true"] {
     -webkit-user-modify: read-write-plaintext-only;
+}
+
+[contenteditable="true"] br {
+    display: none;
 }
 
 .borda-baixo {
@@ -173,52 +253,22 @@ body.pagina-etiqueta {
 }
 
 .header-grade td {
-    font-weight: bold;
+    font-weight: 700;
     font-size: 8pt;
     text-align: center;
     background: #f2f2f2;
 }
 
-.linha-grade td {
-    text-align: center;
-}
-
+.linha-grade td,
 .linha-grade .input-ficha {
     text-align: center;
-    width: 100%;
 }
 
-@media print {
-    @page {
-        size: A4;
-        margin: 0;
-    }
-
-    body.pagina-etiqueta {
-        background: white;
-    }
-
-    .no-print-bar {
-        display: none !important;
-    }
-
-    .folha-ambiente {
-        padding: 0;
-    }
-
-    .folha-a4 {
-        box-shadow: none;
-    }
-}
-
-/* --- TELA DE SELEÇÃO DE MODELOS (DESIGN MODERNO) --- */
-
-/* Container Principal */
 .container-selecao {
     padding: 50px 20px;
     max-width: 1000px;
     margin: 0 auto;
-    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
 }
 
 .container-selecao h2 {
@@ -235,7 +285,6 @@ body.pagina-etiqueta {
     margin-bottom: 40px;
 }
 
-/* Botão Voltar Superior */
 .btn-voltar-home {
     display: inline-flex;
     align-items: center;
@@ -245,7 +294,7 @@ body.pagina-etiqueta {
     margin-bottom: 30px;
     font-size: 14px;
     padding: 10px 18px;
-    background: white;
+    background: #fff;
     border-radius: 8px;
     border: 1px solid #ddd;
     transition: all 0.3s ease;
@@ -259,16 +308,14 @@ body.pagina-etiqueta {
     transform: translateX(-5px);
 }
 
-/* Grid de Cards */
 .grid-etiquetas {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 30px;
 }
 
-/* Card Individual */
 .card-etiqueta {
-    background: white;
+    background: #fff;
     border-radius: 16px;
     padding: 40px 30px;
     text-align: center;
@@ -303,7 +350,7 @@ body.pagina-etiqueta {
 
 .card-etiqueta:hover .icon-wrapper {
     background: #007bff;
-    color: white;
+    color: #fff;
 }
 
 .card-etiqueta h3 {
@@ -319,11 +366,10 @@ body.pagina-etiqueta {
     line-height: 1.5;
 }
 
-/* Botão de Ação do Card */
 .btn-abrir {
     width: 100%;
     background: #007bff;
-    color: white !important;
+    color: #fff;
     padding: 12px;
     border-radius: 10px;
     text-decoration: none;
@@ -338,40 +384,18 @@ body.pagina-etiqueta {
     box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
 
-
-/* --- RESET E PÁGINA --- */
-* {
-    box-sizing: border-box;
-    -webkit-print-color-adjust: exact;
-    margin: 0;
-    padding: 0;
-}
-
-body.pagina-etiqueta {
-    background-color: #525659;
-    font-family: Arial, sans-serif;
-}
-
-/* --- CONTAINER PARA EXIBIR AMBOS OS MODELOS NA TELA --- */
-.folha-ambiente-passivo {
-    display: flex;
-    justify-content: center;
-    padding: 1cm 0;
-}
-
-.container-duplo-passivo {
+body.pagina-etiqueta-passivo .container-duplo-passivo {
     display: flex;
     flex-direction: column;
     gap: 2cm;
     align-items: center;
 }
 
-/* --- ESTRUTURA BASE DAS ETIQUETAS --- */
-.etiqueta-passivo-container,
-.etiqueta-livro-container {
+body.pagina-etiqueta-passivo .etiqueta-passivo-container,
+body.pagina-etiqueta-passivo .etiqueta-livro-container {
     width: 17cm;
     min-height: 25cm;
-    background: white;
+    background: #fff;
     padding: 1.5cm;
     font-family: "Times New Roman", Times, serif;
     color: #000;
@@ -381,170 +405,52 @@ body.pagina-etiqueta {
     margin: 0 auto;
 }
 
-/* Caixa com borda, Livro sem borda */
-.etiqueta-passivo-container {
-    border: 2px solid #000 !important;
+body.pagina-etiqueta-passivo .etiqueta-passivo-container {
+    border: 2px solid #000;
 }
 
-.etiqueta-livro-container {
-    border: none !important;
+body.pagina-etiqueta-passivo .etiqueta-livro-container {
+    border: none;
 }
 
-/* --- CONTEÚDO INTERNO --- */
-.bloco-conteudo-central {
+body.pagina-etiqueta-passivo .bloco-conteudo-central {
     display: block;
     text-align: left;
     padding-left: 0.5cm;
     width: 100%;
 }
 
-.header-passivo {
+body.pagina-etiqueta-passivo .header-passivo {
     margin-bottom: 20px;
 }
 
-.escola-titulo {
+body.pagina-etiqueta-passivo .escola-titulo {
     font-size: 12pt;
     text-transform: uppercase;
     display: block;
     margin-bottom: 5px;
 }
 
-.caixa-numero {
+body.pagina-etiqueta-passivo .caixa-numero {
     font-size: 24pt;
-    font-weight: bold;
+    font-weight: 700;
     display: block;
     margin-bottom: 20px;
 }
 
-.corpo-passivo {
+body.pagina-etiqueta-passivo .corpo-passivo {
     font-size: 14pt;
     line-height: 1.5;
     outline: none;
     margin-top: 10px;
 }
 
-.corpo-passivo div {
+body.pagina-etiqueta-passivo .corpo-passivo div {
     white-space: nowrap;
 }
 
-/* --- CONFIGURAÇÃO DE IMPRESSÃO --- */
-@media print {
-    @page {
-        size: A4;
-        margin: 0;
-        /* Essencial para não gerar página extra */
-    }
-
-    body.pagina-etiqueta {
-        background: white !important;
-    }
-
-    .no-print-bar,
-    .no-print {
-        display: none !important;
-    }
-
-    .folha-ambiente-passivo,
-    .container-duplo-passivo {
-        display: block !important;
-        /* Facilita a quebra de página */
-        padding: 0 !important;
-        background: white !important;
-    }
-
-    .etiqueta-passivo-container {
-        border: 2px solid #000 !important;
-        margin: 1cm auto !important;
-        page-break-after: always !important;
-        /* Força o Livro a ir para a pág 2 */
-    }
-
-    .etiqueta-livro-container {
-        border: none !important;
-        margin: 1cm auto !important;
-        page-break-after: avoid !important;
-        /* Impede pág 3 em branco */
-    }
-}
-
-/* Estrutura para alinhar a sidebar com o conteúdo */
-body.pagina-com-sidebar {
-    display: flex;
-    margin: 0;
-}
-
-.main-content {
-    flex: 1;
-    margin-left: 260px;
-    /* Ajuste para a largura exata da sua sidebar */
-    min-height: 100vh;
-}
-
-/* Na hora de imprimir, some tudo menos as etiquetas */
-@media print {
-
-    .sidebar,
-    .no-print-bar,
-    .no-print {
-        display: none !important;
-    }
-
-    .main-content {
-        margin-left: 0 !important;
-        width: 100% !important;
-    }
-}
-
-.sidebar {
-    width: 260px;
-    height: 100vh;
-    position: fixed;
-    /* Fixa na esquerda */
-    left: 0;
-    top: 0;
-    z-index: 1000;
-    background-color: #2c3e50;
-    /* Cor da sua sidebar */
-    overflow-y: auto;
-    /* Caso o menu seja grande, permite rolar */
-}
-
-/* Garanta que o link ativo apareça corretamente */
-.sidebar-link.active {
-    background: rgba(255, 255, 255, 0.1);
-    border-left: 4px solid #3498db;
-    color: #fff;
-}
-
-/* --- FICHA DO ALUNO: AJUSTE FINO DE IMPRESSAO --- */
-.etiqueta-print-wrapper {
+body.pagina-etiqueta .etiqueta-print-wrapper {
     overflow: visible;
-}
-
-body.pagina-etiqueta .layout-container {
-    display: block;
-}
-
-body.pagina-etiqueta .main-content-wrapper.etiqueta-print-wrapper {
-    width: calc(100vw - var(--sidebar-width)) !important;
-    max-width: calc(100vw - var(--sidebar-width)) !important;
-    margin-left: var(--sidebar-width) !important;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-left: 24px !important;
-    padding-right: 24px !important;
-}
-
-body.pagina-etiqueta .main-content-wrapper.etiqueta-print-wrapper main {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
-
-body.pagina-etiqueta .folha-ambiente {
-    width: 100%;
-    justify-content: center !important;
 }
 
 @media print {
@@ -562,16 +468,29 @@ body.pagina-etiqueta .folha-ambiente {
         padding: 0 !important;
     }
 
+    body.pagina-etiqueta .sidebar,
+    body.pagina-etiqueta .no-print-bar,
+    body.pagina-etiqueta .no-print {
+        display: none !important;
+    }
+
     body.pagina-etiqueta .layout-container,
     body.pagina-etiqueta .main-content-wrapper,
     body.pagina-etiqueta .etiqueta-print-wrapper,
     body.pagina-etiqueta main,
-    body.pagina-etiqueta .folha-ambiente {
+    body.pagina-etiqueta .folha-ambiente,
+    body.pagina-etiqueta .folha-ambiente-passivo,
+    body.pagina-etiqueta .container-duplo-passivo {
         display: block !important;
         width: 100% !important;
+        max-width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
         overflow: visible !important;
+    }
+
+    body.pagina-etiqueta .main-content-wrapper.etiqueta-print-wrapper {
+        margin-left: 0 !important;
     }
 
     body.pagina-etiqueta .folha-a4 {
@@ -634,5 +553,37 @@ body.pagina-etiqueta .folha-ambiente {
     body.pagina-etiqueta .tabela-principal,
     body.pagina-etiqueta .tabela-interna {
         width: 100% !important;
+    }
+
+    body.pagina-etiqueta-passivo .etiqueta-passivo-container,
+    body.pagina-etiqueta-passivo .etiqueta-livro-container {
+        width: 170mm !important;
+        min-height: 250mm !important;
+        margin: 10mm auto !important;
+        padding: 15mm !important;
+        box-shadow: none !important;
+        break-inside: avoid-page;
+        page-break-inside: avoid;
+    }
+
+    body.pagina-etiqueta-passivo .etiqueta-passivo-container {
+        border: 2px solid #000 !important;
+        page-break-after: always !important;
+    }
+
+    body.pagina-etiqueta-passivo .etiqueta-livro-container {
+        border: none !important;
+        page-break-after: avoid !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .etiqueta-hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .etiqueta-hero-stats {
+        justify-content: flex-start;
     }
 }

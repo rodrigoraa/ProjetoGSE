@@ -5,6 +5,7 @@ require_once ROOT_PATH . '/src/Models/Usuario.php';
 class RecuperarController extends Controller
 {
     private $usuarioModel;
+    private const MSG_ENVIO = 'Se o e-mail informado estiver cadastrado, você receberá o link em instantes.';
 
     public function __construct()
     {
@@ -30,7 +31,7 @@ class RecuperarController extends Controller
         verificar_csrf_token($_POST['csrf_token'] ?? '');
 
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-        $msg = "";
+        $msg = self::MSG_ENVIO;
         $user = $this->usuarioModel->buscarPorEmail($email);
 
         if ($user) {
@@ -44,7 +45,8 @@ class RecuperarController extends Controller
             $sql = "INSERT INTO recuperacao_senha (email, token, expira_em) VALUES (?, ?, ?)";
             $pdo->prepare($sql)->execute([$email, $tokenHash, $expira]);
 
-            $link = "https://eesjv.com.br/recuperar/senha?token=" . $token;
+            $baseUrl = defined('BASE_URL') ? rtrim(BASE_URL, '/') : '';
+            $link = $baseUrl . "/recuperar/senha?token=" . $token;
             $html = "
                 <div style='font-family: Arial, sans-serif; color: #333;'>
                     <h2>Recuperação de Senha</h2>
@@ -58,13 +60,9 @@ class RecuperarController extends Controller
                 </div>";
 
             $mail = new EmailService();
-            if ($mail->enviar($email, 'Redefinir sua Senha', $html)) {
-                $msg = "Instruções enviadas para o seu e-mail.";
-            } else {
-                $msg = "Erro ao enviar e-mail. Tente novamente mais tarde.";
+            if (!$mail->enviar($email, 'Redefinir sua Senha', $html)) {
+                error_log("Falha ao enviar e-mail de recuperacao para {$email}.");
             }
-        } else {
-            $msg = "Se o e-mail informado estiver cadastrado, você receberá o link em instantes.";
         }
 
         $this->view('recuperar/esqueci', ['mensagem' => $msg]);
@@ -81,9 +79,9 @@ class RecuperarController extends Controller
         $reg = $stmt->fetch();
 
         if ($reg) {
-            $this->view('recuperar/nova_senha', ['token' => $token, 'email' => $reg['email']]);
+            $this->view('recuperar/nova_senha', ['token' => $token, 'email' => $reg['email'], 'mensagem' => '']);
         } else {
-            $this->view('recuperar/esqueci', ['mensagem' => "Link inválido ou expirado."]);
+            $this->view('recuperar/esqueci', ['mensagem' => "Link inválido ou expirado. Solicite uma nova recuperação."]);
         }
     }
 
@@ -99,19 +97,29 @@ class RecuperarController extends Controller
         $tokenHash = hash('sha256', $token);
         $senha = $_POST['senha'] ?? '';
         $confirmar = $_POST['confirmar_senha'] ?? '';
-
-        if (strlen($senha) < 6) {
-            die("A senha deve ter no mínimo 6 caracteres.");
-        }
-
-        if ($senha !== $confirmar) {
-            die("As senhas não coincidem.");
-        }
-
         $pdo = Model::getConexao();
         $stmt = $pdo->prepare("SELECT email FROM recuperacao_senha WHERE token = ? AND expira_em > datetime('now', 'localtime')");
         $stmt->execute([$tokenHash]);
         $reg = $stmt->fetch();
+        $email = $reg['email'] ?? '';
+
+        if (strlen($senha) < 6) {
+            $this->view('recuperar/nova_senha', [
+                'token' => $token,
+                'email' => $email,
+                'mensagem' => 'A senha deve ter no mínimo 6 caracteres.'
+            ]);
+            return;
+        }
+
+        if ($senha !== $confirmar) {
+            $this->view('recuperar/nova_senha', [
+                'token' => $token,
+                'email' => $email,
+                'mensagem' => 'As senhas não coincidem.'
+            ]);
+            return;
+        }
 
         if ($reg) {
             $hash = password_hash($senha, PASSWORD_DEFAULT);
@@ -119,8 +127,9 @@ class RecuperarController extends Controller
             $pdo->prepare("DELETE FROM recuperacao_senha WHERE email = ?")->execute([$reg['email']]);
             registrar_log($pdo, "Seguranca", "Senha alterada via recuperacao para o e-mail: {$reg['email']}");
             redirect('/login?msg=Senha alterada com sucesso!');
+            exit;
         } else {
-            die("Sessão de recuperação expirada.");
+            $this->view('recuperar/esqueci', ['mensagem' => 'Sessão de recuperação expirada. Solicite um novo link.']);
         }
     }
 }

@@ -9,6 +9,9 @@
 <body class="login-container">
     <form action="/recuperar/salvar" method="POST" class="login">
         <h2>Criar Nova Senha</h2>
+        <?php if (!empty($mensagem)): ?>
+            <p style="margin-bottom:15px"><?php echo e($mensagem); ?></p>
+        <?php endif; ?>
         <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
         <input type="hidden" name="token" value="<?php echo e($token); ?>">
 

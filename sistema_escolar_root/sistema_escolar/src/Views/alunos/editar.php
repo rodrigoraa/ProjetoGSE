@@ -15,17 +15,23 @@
 
         <div class="main-content-wrapper">
             <header>
-                <h1>✏️ Editar Aluno</h1>
+                <h1>Editar Aluno</h1>
             </header>
 
             <main>
                 <?php echo $mensagem; ?>
 
+                <section class="page-intro">
+                    <h2>Atualize dados pessoais, contatos e vencimento da DVA</h2>
+                    <p>Revise os campos abaixo com atenção. Essa tela foi organizada para facilitar a manutenção do cadastro sem perder o contexto acadêmico e documental do aluno.</p>
+                </section>
+
                 <div class="form-container">
-                    <form action="/aluno/editar/<?php echo $aluno['id']; ?>" method="POST" class="sistema">
+                    <form action="/aluno/editar/<?php echo (int)$aluno['id']; ?>" method="POST" class="sistema">
                         <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
 
-                        <h3 class="form-section-title" style="margin-bottom: 15px; color: #666; font-size: 1.1em; border-bottom: 1px solid #eee; padding-bottom: 5px;">Dados Pessoais</h3>
+                        <h3 class="form-section-title">Dados Pessoais</h3>
+                        <p class="section-subtitle">Campos principais do cadastro escolar e da vinculação com a turma.</p>
 
                         <div style="margin-bottom: 20px;">
                             <label>Nome Completo:</label>
@@ -35,7 +41,7 @@
                         <div class="grid-3-col">
                             <div>
                                 <label>Data de Nascimento:</label>
-                                <input type="date" name="data_nascimento" value="<?php echo $aluno['data_nascimento']; ?>" required>
+                                <input type="date" name="data_nascimento" value="<?php echo e($aluno['data_nascimento']); ?>" required>
                             </div>
 
                             <div>
@@ -43,7 +49,7 @@
                                 <select name="id_turma">
                                     <option value="">Sem turma</option>
                                     <?php foreach ($turmas as $t): ?>
-                                        <option value="<?php echo $t['id']; ?>" <?php echo selected($aluno['id_turma'], $t['id']); ?>>
+                                        <option value="<?php echo (int)$t['id']; ?>" <?php echo selected($aluno['id_turma'], $t['id']); ?>>
                                             <?php echo htmlspecialchars($t['nome_turma']); ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -56,19 +62,21 @@
                             </div>
                         </div>
 
-                        <h3 class="form-section-title" style="margin-top: 30px; margin-bottom: 15px; color: #666; font-size: 1.1em; border-bottom: 1px solid #eee; padding-bottom: 5px;">Contatos</h3>
+                        <h3 class="form-section-title">Contatos</h3>
+                        <p class="section-subtitle">Informações úteis para comunicação rápida com o aluno e responsável.</p>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="grid-2-col">
                             <div>
-                                <label>📱 WhatsApp / Celular do Aluno:</label>
+                                <label>WhatsApp / Celular do Aluno:</label>
                                 <input type="text" name="telefone_aluno" value="<?php echo htmlspecialchars($aluno['telefone_aluno'] ?? ''); ?>" placeholder="(00) 00000-0000">
                             </div>
 
                             <div>
-                                <label>👨‍👩‍👦 Telefone do Responsável:</label>
+                                <label>Telefone do Responsável:</label>
                                 <input type="text" name="telefone_responsavel" value="<?php echo htmlspecialchars($aluno['telefone_responsavel'] ?? ''); ?>" placeholder="(00) 00000-0000">
                             </div>
                         </div>
+
                         <div class="form-actions">
                             <button type="submit" class="btn-primary">Salvar Alterações</button>
                             <a href="/aluno" class="cancelar">Cancelar</a>

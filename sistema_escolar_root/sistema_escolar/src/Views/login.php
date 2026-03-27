@@ -1,5 +1,6 @@
 <?php
 $erro = $erro ?? null;
+$mensagem = $mensagem ?? null;
 ?>
 
 <!DOCTYPE html>
@@ -20,6 +21,12 @@ $erro = $erro ?? null;
         <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
 
         <h2>Login</h2>
+
+        <?php if ($mensagem): ?>
+            <p style="margin-bottom: 15px; color: #0f5132; background: #d1e7dd; border: 1px solid #badbcc; padding: 10px 12px; border-radius: 8px;">
+                <?php echo e($mensagem); ?>
+            </p>
+        <?php endif; ?>
 
         <?php if ($erro): ?>
             <p class="error-message"><?php echo htmlspecialchars($erro); ?></p>

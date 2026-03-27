@@ -22,6 +22,13 @@
                     <a href="/contrato/ver/<?php echo (int)$link_voltar; ?>" class="btn-secondary" style="text-decoration:none;">Voltar</a>
                 </div>
 
+                <?php if (!empty($erro)): ?>
+                    <div class="alert-box alert-erro" style="max-width: 600px; margin-bottom: 20px;">
+                        <div class="alert-title">Nao foi possivel salvar</div>
+                        <div class="alert-text"><?php echo e($erro); ?></div>
+                    </div>
+                <?php endif; ?>
+
                 <form method="POST" class="form-aluno" style="max-width: 600px;">
                     <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                     <?php if (isset($_GET['folha'])): ?>

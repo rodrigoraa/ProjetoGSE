@@ -1,3 +1,6 @@
+<?php
+$totalTurmas = count($turmas ?? []);
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -16,9 +19,31 @@
             </header>
             
             <main>
+                <section class="relatorio-hero">
+                    <div>
+                        <h2>Gerador central de relatórios da secretaria</h2>
+                        <p>Monte exportações por turma e situação da DVA em poucos cliques, com saída pronta para PDF ou Excel.</p>
+                    </div>
+                    <div class="relatorio-hero-stats">
+                        <div class="relatorio-stat">
+                            <strong><?php echo (int)$totalTurmas; ?></strong>
+                            <span>Turmas</span>
+                        </div>
+                        <div class="relatorio-stat">
+                            <strong>4</strong>
+                            <span>Status de DVA</span>
+                        </div>
+                        <div class="relatorio-stat">
+                            <strong>2</strong>
+                            <span>Formatos</span>
+                        </div>
+                    </div>
+                </section>
+
                 <div class="box-relatorio">
                     
                     <form action="/relatorio/gerar" method="POST" target="_blank" class="sistema">
+                        <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                         
                         <div style="margin-bottom: 25px;">
                             <label class="label-destaque">1. Filtrar por Turma (Opcional):</label>

@@ -24,8 +24,7 @@ class Contrato extends Model
             $stmt->execute([$titulo, $valor_total, $qtd_folhas]);
             $id_contrato = self::$pdo->lastInsertId();
 
-            // As folhas nascem agora com o valor 0.00
-            $sqlFolha = "INSERT INTO contrato_folhas (id_contrato, numero_folha, valor_folha) VALUES (?, ?, 0)";
+            $sqlFolha = "INSERT INTO contrato_folhas (id_contrato, numero_folha, valor_folha, observacao) VALUES (?, ?, 0, '')";
             $stmtFolha = self::$pdo->prepare($sqlFolha);
             for ($i = 1; $i <= $qtd_folhas; $i++) {
                 $stmtFolha->execute([$id_contrato, $i]);
@@ -52,7 +51,9 @@ class Contrato extends Model
             $this->recalcularValorFolha($id_contrato, 1);
             return true;
         } catch (Throwable $e) {
-            if (self::$pdo->inTransaction()) self::$pdo->rollBack();
+            if (self::$pdo->inTransaction()) {
+                self::$pdo->rollBack();
+            }
             return false;
         }
     }
@@ -68,7 +69,7 @@ class Contrato extends Model
             self::$pdo->prepare("DELETE FROM contrato_folhas WHERE id_contrato = ?")->execute([$id]);
             self::$pdo->prepare("DELETE FROM contrato_produtos WHERE id_contrato = ?")->execute([$id]);
 
-            $sqlFolha = "INSERT INTO contrato_folhas (id_contrato, numero_folha, valor_folha) VALUES (?, ?, 0)";
+            $sqlFolha = "INSERT INTO contrato_folhas (id_contrato, numero_folha, valor_folha, observacao) VALUES (?, ?, 0, '')";
             $stmtFolha = self::$pdo->prepare($sqlFolha);
             for ($i = 1; $i <= $qtd_folhas; $i++) {
                 $stmtFolha->execute([$id, $i]);
@@ -95,7 +96,9 @@ class Contrato extends Model
             $this->recalcularValorFolha($id, 1);
             return true;
         } catch (Exception $e) {
-            if (self::$pdo->inTransaction()) self::$pdo->rollBack();
+            if (self::$pdo->inTransaction()) {
+                self::$pdo->rollBack();
+            }
             return false;
         }
     }
@@ -136,6 +139,33 @@ class Contrato extends Model
         return $stmt->fetchAll();
     }
 
+    public function buscarFolha($id_contrato, $numero_folha)
+    {
+        $stmt = self::$pdo->prepare("SELECT * FROM contrato_folhas WHERE id_contrato = ? AND numero_folha = ?");
+        $stmt->execute([$id_contrato, $numero_folha]);
+        return $stmt->fetch();
+    }
+
+    public function folhaExiste($id_contrato, $numero_folha)
+    {
+        $stmt = self::$pdo->prepare("SELECT 1 FROM contrato_folhas WHERE id_contrato = ? AND numero_folha = ?");
+        $stmt->execute([$id_contrato, $numero_folha]);
+        return (bool)$stmt->fetchColumn();
+    }
+
+    public function contarFolhas($id_contrato)
+    {
+        $stmt = self::$pdo->prepare("SELECT COUNT(*) FROM contrato_folhas WHERE id_contrato = ?");
+        $stmt->execute([$id_contrato]);
+        return (int)$stmt->fetchColumn();
+    }
+
+    public function atualizarObservacaoFolha($id_contrato, $numero_folha, $observacao)
+    {
+        $stmt = self::$pdo->prepare("UPDATE contrato_folhas SET observacao = ? WHERE id_contrato = ? AND numero_folha = ?");
+        return $stmt->execute([$observacao, $id_contrato, $numero_folha]);
+    }
+
     public function excluir($id)
     {
         try {
@@ -146,7 +176,9 @@ class Contrato extends Model
             self::$pdo->commit();
             return true;
         } catch (Exception $e) {
-            if (self::$pdo->inTransaction()) self::$pdo->rollBack();
+            if (self::$pdo->inTransaction()) {
+                self::$pdo->rollBack();
+            }
             return false;
         }
     }
@@ -157,7 +189,9 @@ class Contrato extends Model
         $sql = "INSERT INTO contrato_produtos (id_contrato, numero_folha, nome_produto, marca, unidade, quantidade, valor_unitario, valor_total) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $resultado = self::$pdo->prepare($sql)->execute([$id_contrato, $numero_folha, $nome, $marca, $unidade, $quantidade, $valor_unitario, $valor_total]);
 
-        if ($resultado) $this->recalcularValorFolha($id_contrato, $numero_folha);
+        if ($resultado) {
+            $this->recalcularValorFolha($id_contrato, $numero_folha);
+        }
         return $resultado;
     }
 
@@ -178,30 +212,42 @@ class Contrato extends Model
     public function atualizarProduto($id_produto, $nome, $marca, $unidade, $quantidade, $valor_unitario)
     {
         $produto = $this->buscarProdutoPorId($id_produto);
-        if (!$produto) return false;
+        if (!$produto) {
+            return false;
+        }
 
         $valor_total = $quantidade * $valor_unitario;
         $sql = "UPDATE contrato_produtos SET nome_produto = ?, marca = ?, unidade = ?, quantidade = ?, valor_unitario = ?, valor_total = ? WHERE id = ?";
         $resultado = self::$pdo->prepare($sql)->execute([$nome, $marca, $unidade, $quantidade, $valor_unitario, $valor_total, $id_produto]);
 
-        if ($resultado) $this->recalcularValorFolha($produto['id_contrato'], $produto['numero_folha']);
+        if ($resultado) {
+            $this->recalcularValorFolha($produto['id_contrato'], $produto['numero_folha']);
+        }
         return $resultado;
     }
 
     public function excluirProduto($id_produto)
     {
         $produto = $this->buscarProdutoPorId($id_produto);
-        if (!$produto) return false;
+        if (!$produto) {
+            return false;
+        }
 
         $resultado = self::$pdo->prepare("DELETE FROM contrato_produtos WHERE id = ?")->execute([$id_produto]);
 
-        if ($resultado) $this->recalcularValorFolha($produto['id_contrato'], $produto['numero_folha']); // Subtrai ao apagar
+        if ($resultado) {
+            $this->recalcularValorFolha($produto['id_contrato'], $produto['numero_folha']);
+        }
         return $resultado;
     }
 
     public function excluirFolha($id_contrato, $numero_folha)
     {
         try {
+            if ($this->contarFolhas($id_contrato) <= 1) {
+                return false;
+            }
+
             self::$pdo->beginTransaction();
             self::$pdo->prepare("DELETE FROM contrato_produtos WHERE id_contrato = ? AND numero_folha = ?")->execute([$id_contrato, $numero_folha]);
             self::$pdo->prepare("DELETE FROM contrato_folhas WHERE id_contrato = ? AND numero_folha = ?")->execute([$id_contrato, $numero_folha]);
@@ -213,7 +259,9 @@ class Contrato extends Model
             self::$pdo->commit();
             return true;
         } catch (Exception $e) {
-            if (self::$pdo->inTransaction()) self::$pdo->rollBack();
+            if (self::$pdo->inTransaction()) {
+                self::$pdo->rollBack();
+            }
             return false;
         }
     }
@@ -226,13 +274,15 @@ class Contrato extends Model
             $stmtMax->execute([$id_contrato]);
             $nova_folha = ($stmtMax->fetch()['max_folha'] ?? 0) + 1;
 
-            self::$pdo->prepare("INSERT INTO contrato_folhas (id_contrato, numero_folha, valor_folha) VALUES (?, ?, 0)")->execute([$id_contrato, $nova_folha]);
+            self::$pdo->prepare("INSERT INTO contrato_folhas (id_contrato, numero_folha, valor_folha, observacao) VALUES (?, ?, 0, '')")->execute([$id_contrato, $nova_folha]);
             self::$pdo->prepare("UPDATE contratos SET qtd_folhas = qtd_folhas + 1 WHERE id = ?")->execute([$id_contrato]);
 
             self::$pdo->commit();
             return true;
         } catch (Exception $e) {
-            if (self::$pdo->inTransaction()) self::$pdo->rollBack();
+            if (self::$pdo->inTransaction()) {
+                self::$pdo->rollBack();
+            }
             return false;
         }
     }
@@ -246,7 +296,10 @@ class Contrato extends Model
             $stmtMax->execute([$id_contrato]);
             $nova_folha = ($stmtMax->fetch()['max_folha'] ?? 0) + 1;
 
-            self::$pdo->prepare("INSERT INTO contrato_folhas (id_contrato, numero_folha, valor_folha) VALUES (?, ?, 0)")->execute([$id_contrato, $nova_folha]);
+            $folhaOrigem = $this->buscarFolha($id_contrato, $numero_folha_origem);
+            $observacaoFolha = trim((string)($folhaOrigem['observacao'] ?? ''));
+
+            self::$pdo->prepare("INSERT INTO contrato_folhas (id_contrato, numero_folha, valor_folha, observacao) VALUES (?, ?, 0, ?)")->execute([$id_contrato, $nova_folha, $observacaoFolha]);
 
             $stmtProd = self::$pdo->prepare("SELECT * FROM contrato_produtos WHERE id_contrato = ? AND numero_folha = ?");
             $stmtProd->execute([$id_contrato, $numero_folha_origem]);
@@ -274,7 +327,9 @@ class Contrato extends Model
             $this->recalcularValorFolha($id_contrato, $nova_folha);
             return $nova_folha;
         } catch (Exception $e) {
-            if (self::$pdo->inTransaction()) self::$pdo->rollBack();
+            if (self::$pdo->inTransaction()) {
+                self::$pdo->rollBack();
+            }
             return false;
         }
     }

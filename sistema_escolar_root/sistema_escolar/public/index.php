@@ -18,13 +18,19 @@ session_start();
 
 define('ROOT_PATH', dirname(__DIR__));
 define('VIEW_PATH', ROOT_PATH . '/src/Views');
-define('BASE_URL', (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST']);
 
 require_once ROOT_PATH . '/src/Core/Helpers.php';
 
 if (file_exists(ROOT_PATH . '/.env')) {
     carregar_env(ROOT_PATH . '/.env');
 }
+
+$appUrl = trim($_ENV['APP_URL'] ?? '');
+$hostHeader = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$hostSeguro = preg_match('/^[a-z0-9\.\-]+(?::[0-9]+)?$/i', $hostHeader) ? $hostHeader : 'localhost';
+$scheme = $isHttps ? 'https' : 'http';
+
+define('BASE_URL', $appUrl !== '' ? rtrim($appUrl, '/') : ($scheme . '://' . $hostSeguro));
 
 $ambiente = $_ENV['APP_ENV'] ?? 'production';
 

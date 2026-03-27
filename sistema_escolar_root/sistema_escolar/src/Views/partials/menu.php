@@ -48,11 +48,11 @@
             <span class="sidebar-icon">📦</span>
             <span>Arquivo Passivo</span>
         </a>
-        <a href="/relatorio" class="sidebar-link">
+        <a href="/relatorio" class="sidebar-link <?php echo is_active($uri, '/relatorio'); ?>">
             <span class="sidebar-icon">📊</span>
             <span>Relatórios</span>
         </a>
-        <a href="/etiqueta" class="sidebar-link">
+        <a href="/etiqueta" class="sidebar-link <?php echo is_active($uri, '/etiqueta'); ?>">
             <span class="sidebar-icon">🏷️</span>
             <span>Etiquetas</span>
         </a>
@@ -60,7 +60,7 @@
             <span class="sidebar-icon">🌦️</span>
             <span>Estação Meteorológica</span>
         </a>
-        <a href="/agenda" class="sidebar-link">
+        <a href="/agenda" class="sidebar-link <?php echo is_active($uri, '/agenda'); ?>">
             <span class="sidebar-icon">📅</span>
             <span>Agenda de Avisos</span>
         </a>

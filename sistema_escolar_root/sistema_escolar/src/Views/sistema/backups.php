@@ -17,10 +17,13 @@
                 <h1>Gestão de Backups</h1>
             </header>
             <main>
+                <?php $flash = consumir_flash(); ?>
+                <?php if (!empty($flash)): ?>
+                    <?php echo $flash; ?>
+                <?php endif; ?>
+
                 <div class="backup-controls">
                     <h2 class="backup-title">Criar Novo Backup</h2>
-
-                    <?php if (!empty($mensagem)) echo $mensagem; ?>
 
                     <form method="POST">
                         <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">

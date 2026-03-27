@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/assets/css/etiquetas.css">
 </head>
 
-<body>
+<body class="pagina-etiqueta pagina-com-sidebar pagina-etiqueta-passivo">
     <div class="layout-container">
         <?php
         $caminhoMenu = dirname(__DIR__) . '/partials/menu.php';
@@ -18,7 +18,7 @@
         include $caminhoMenu;
         ?>
 
-        <div class="main-content-wrapper">
+        <div class="main-content-wrapper etiqueta-print-wrapper etiqueta-passivo-print-wrapper">
             <div class="no-print-bar" style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px; background: #333;">
                 <button onclick="window.print()" class="btn-imprimir">🖨️ IMPRIMIR TUDO</button>
                 <button onclick="document.getElementById('inputArquivo').click()" class="btn-limpar" style="background: #007bff;">📂 IMPORTAR XML / TXT</button>

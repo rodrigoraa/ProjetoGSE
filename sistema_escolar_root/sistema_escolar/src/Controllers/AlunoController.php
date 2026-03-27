@@ -217,9 +217,9 @@ class AlunoController extends Controller
         $status_dva = 'sem_dva';
         $dias_restantes = 0;
 
-        if (!empty($aluno['data_vencimento'])) {
+        if (!empty($aluno['data_dva'])) {
             $hoje = new DateTime('today');
-            $venc = new DateTime($aluno['data_vencimento']);
+            $venc = new DateTime($aluno['data_dva']);
             $diff = $hoje->diff($venc);
             $dias = (int)$diff->format("%r%a");
 
