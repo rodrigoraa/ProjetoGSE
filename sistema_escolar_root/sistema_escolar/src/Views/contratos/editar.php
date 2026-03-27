@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>✏️ Editar Dados Gerais do Pedido</title>
+    <title>Editar Dados Gerais do Pedido</title>
     <link rel="stylesheet" href="/assets/css/painel.css">
     <link rel="stylesheet" href="/assets/css/alunos.css">
     <link rel="stylesheet" href="/assets/css/contrato.css">
@@ -24,6 +24,13 @@
                         <a href="/contrato/ver/<?php echo $contrato['id']; ?>" class="btn-secondary page-back-link">Voltar</a>
                     </div>
                 </div>
+
+                <?php if (!empty($erro)): ?>
+                    <div class="alert-box alert-erro" style="max-width: 600px; margin-bottom: 20px;">
+                        <div class="alert-title">Nao foi possivel salvar</div>
+                        <div class="alert-text"><?php echo e($erro); ?></div>
+                    </div>
+                <?php endif; ?>
 
                 <form action="/contrato/editar/<?php echo $contrato['id']; ?>" method="POST" class="form-aluno" style="max-width: 600px;">
                     <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">

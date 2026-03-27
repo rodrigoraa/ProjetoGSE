@@ -1,36 +1,93 @@
-/* Container Principal */
+.agenda-subtitle {
+    color: #64748b;
+    margin-top: 5px;
+}
+
+.agenda-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.agenda-card {
+    height: 100%;
+}
+
+.agenda-card-form,
+.agenda-card-tips,
+.agenda-calendar-wrap {
+    margin-bottom: 30px;
+}
+
+.agenda-form-grid {
+    grid-template-columns: 1fr 3fr;
+}
+
+.agenda-form-actions {
+    margin-top: 15px;
+}
+
+.agenda-tip-list {
+    display: grid;
+    gap: 12px;
+}
+
+.agenda-tip-list p {
+    margin: 0;
+    padding: 14px 16px;
+    border: 1px solid #dbe7f3;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #f8fbff 0%, #eef5fb 100%);
+    color: #334155;
+}
+
+.agenda-empty-state {
+    text-align: center;
+    padding: 30px;
+    color: #666;
+}
+
+.agenda-description-cell {
+    max-width: 360px;
+    color: #475569;
+}
+
+.agenda-muted {
+    color: #94a3b8;
+    font-style: italic;
+}
+
 #calendar {
     max-width: 100%;
     margin: 20px auto;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: Georgia, "Times New Roman", serif;
     font-size: 14px;
-    background: #ffffff;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
     padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+    border: 1px solid #d9e5f1;
 }
 
-/* Título do Mês/Ano */
 .fc-toolbar-title {
     font-size: 1.4rem !important;
     font-weight: 700 !important;
-    color: #1e293b;
+    color: #16324f;
     text-transform: capitalize;
 }
 
-/* Botões Modernos */
 .fc-button-primary {
-    background-color: #0f172a !important;
-    border-color: #0f172a !important;
-    font-weight: 500 !important;
+    background-color: #16324f !important;
+    border-color: #16324f !important;
+    font-weight: 600 !important;
     text-transform: capitalize !important;
     transition: all 0.2s ease !important;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
 }
 
 .fc-button-primary:hover {
-    background-color: #334155 !important;
+    background-color: #244d75 !important;
     transform: translateY(-1px);
 }
 
@@ -39,56 +96,164 @@
     border-color: #94a3b8 !important;
 }
 
-/* Estilização dos Eventos (Avisos) */
 .fc-event {
     border: none !important;
-    padding: 3px 6px !important;
-    border-radius: 4px !important;
-    font-weight: 500 !important;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
-    transition: filter 0.2s;
+    padding: 4px 7px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+    transition: filter 0.2s, transform 0.2s;
+    cursor: pointer;
 }
 
 .fc-event:hover {
-    filter: brightness(0.9);
+    filter: brightness(0.95);
+    transform: translateY(-1px);
 }
 
-/* Ajuste nos dias do calendário */
 .fc-daygrid-day-number {
     color: #64748b;
-    font-weight: 500;
+    font-weight: 600;
     padding: 8px !important;
     text-decoration: none !important;
 }
 
 .fc-col-header-cell-cushion {
     color: #475569;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     font-size: 0.75rem;
     padding: 10px 0 !important;
     text-decoration: none !important;
+    letter-spacing: 0.04em;
 }
 
-/* Destaque para o dia atual */
 .fc-day-today {
-    background-color: #f8fafc !important;
+    background-color: #f3f8fd !important;
 }
 
 .fc-day-today .fc-daygrid-day-number {
-    background-color: #0f172a;
-    color: white !important;
+    background-color: #16324f;
+    color: #fff !important;
     border-radius: 50%;
     display: inline-block;
-    width: 24px;
-    height: 24px;
-    line-height: 24px;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
     text-align: center;
     margin: 4px;
     padding: 0 !important;
 }
 
-/* Bordas da grade mais suaves */
-.fc-theme-standard td, .fc-theme-standard th {
-    border: 1px solid #f1f5f9 !important;
+.fc-theme-standard td,
+.fc-theme-standard th {
+    border: 1px solid #edf2f7 !important;
+}
+
+.agenda-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    z-index: 999;
+}
+
+.agenda-modal.is-open {
+    display: block;
+}
+
+.agenda-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(2px);
+}
+
+.agenda-modal-dialog {
+    position: relative;
+    width: min(560px, calc(100vw - 32px));
+    margin: 10vh auto 0;
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+}
+
+.agenda-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 22px 24px 14px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.agenda-modal-kicker {
+    margin: 0 0 4px;
+    color: #64748b;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.agenda-modal-header h3 {
+    margin: 0;
+    color: #0f172a;
+}
+
+.agenda-modal-close {
+    border: none;
+    background: #eef4fa;
+    color: #16324f;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.agenda-modal-body {
+    padding: 20px 24px 24px;
+}
+
+.agenda-modal-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.agenda-modal-meta span {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    padding: 6px 12px;
+    color: #475569;
+    font-size: 0.92rem;
+}
+
+.agenda-modal-description {
+    margin: 0;
+    color: #334155;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+@media (max-width: 900px) {
+    .agenda-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .agenda-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #calendar {
+        padding: 12px;
+    }
+
+    .agenda-description-cell {
+        max-width: none;
+    }
 }

@@ -40,7 +40,7 @@ class ContratoController extends Controller
                 $produtos = $this->processarProdutosPost();
 
                 if ($this->contratoModel->salvarContratoCompleto($titulo, $valor_total, $qtd_folhas, $produtos)) {
-                    registrar_log(Model::getConexao(), 'CADASTRO_CONTRATO', "Novo contrato '$titulo' cadastrado.");
+                    registrar_log(Model::getConexao(), 'Contrato - Cadastrar', "Novo contrato '{$titulo}' cadastrado.");
                     redirect('/contrato');
                     exit;
                 }
@@ -55,6 +55,7 @@ class ContratoController extends Controller
     {
         $id = (int)$id;
         $contrato = $this->contratoModel->buscarPorId($id);
+        $erro = '';
 
         if (!$contrato) {
             $this->mostrarErro404("Contrato não encontrado.");
@@ -69,22 +70,25 @@ class ContratoController extends Controller
             }
 
             $valor_total = (float)($_POST['valor_total'] ?? 0);
-            $qtd_folhas = (int)($_POST['qtd_folhas'] ?? 1);
 
-            if ($valor_total > 0 && $qtd_folhas > 0) {
-                $produtos = $this->processarProdutosPost();
-
-                if ($this->contratoModel->atualizarContratoCompleto($id, $titulo, $valor_total, $qtd_folhas, $produtos)) {
-                    registrar_log(Model::getConexao(), 'EDITAR_CONTRATO', "Contrato #{$id} atualizado.");
+            if ($valor_total > 0) {
+                if ($this->contratoModel->atualizarDadosGerais($id, $titulo, $valor_total)) {
+                    registrar_log(Model::getConexao(), 'Contrato - Editar', "Contrato #{$id} atualizado para '{$titulo}'.");
                     redirect("/contrato/ver/{$id}");
                     exit;
                 }
+
+                $erro = 'Nao foi possivel salvar os dados gerais do pedido.';
+            } else {
+                $erro = 'O valor total do pedido deve ser maior que zero.';
             }
+
+            $contrato = $this->contratoModel->buscarPorId($id);
         }
 
         $this->view('contratos/editar', [
             'contrato' => $contrato,
-            'produtos' => $this->contratoModel->buscarProdutos($id)
+            'erro' => $erro
         ]);
     }
 
@@ -103,7 +107,11 @@ class ContratoController extends Controller
         }
 
         $id = (int)$id;
-        $this->contratoModel->excluir($id);
+        $contrato = $this->contratoModel->buscarPorId($id);
+        if ($this->contratoModel->excluir($id)) {
+            $titulo = $contrato['titulo'] ?? 'Sem título';
+            registrar_log(Model::getConexao(), 'Contrato - Excluir', "Contrato #{$id} ('{$titulo}') excluído.");
+        }
         redirect('/contrato');
         exit;
     }
@@ -138,7 +146,9 @@ class ContratoController extends Controller
 
         verificar_csrf_token($_POST['csrf_token'] ?? '');
         $id_contrato = (int)$id_contrato;
-        $this->contratoModel->adicionarFolha($id_contrato);
+        if ($this->contratoModel->adicionarFolha($id_contrato)) {
+            registrar_log(Model::getConexao(), 'Contrato - Cadastrar Folha', "Adicionou nova folha ao contrato #{$id_contrato}.");
+        }
         redirect("/contrato/ver/{$id_contrato}");
         exit;
     }
@@ -153,7 +163,13 @@ class ContratoController extends Controller
         verificar_csrf_token($_POST['csrf_token'] ?? '');
         $id_contrato = (int)$id_contrato;
         $numero_folha = (int)$numero_folha;
-        $this->contratoModel->excluirFolha($id_contrato, $numero_folha);
+        if ($this->contratoModel->excluirFolha($id_contrato, $numero_folha)) {
+            registrar_log(
+                Model::getConexao(),
+                'Contrato - Excluir Folha',
+                "Excluiu a folha {$numero_folha} do contrato #{$id_contrato}."
+            );
+        }
         redirect("/contrato/ver/{$id_contrato}");
         exit;
     }
@@ -167,16 +183,23 @@ class ContratoController extends Controller
             $numero_folha = (int)$_POST['numero_folha'];
             $qtd = (int)$_POST['quantidade'];
             $valor_unit = (float)$_POST['valor_unitario'];
+            $nome_produto = trim($_POST['nome_produto']);
 
-            $this->contratoModel->adicionarProdutoUnico(
+            if ($this->contratoModel->adicionarProdutoUnico(
                 $id_contrato,
                 $numero_folha,
-                trim($_POST['nome_produto']),
+                $nome_produto,
                 trim($_POST['marca']),
                 $_POST['unidade'] ?? 'UN',
                 $qtd,
                 $valor_unit
-            );
+            )) {
+                registrar_log(
+                    Model::getConexao(),
+                    'Contrato - Cadastrar Produto',
+                    "Adicionou produto '{$nome_produto}' na folha {$numero_folha} do contrato #{$id_contrato}."
+                );
+            }
 
             redirect("/contrato/ver/{$id_contrato}?folha={$numero_folha}");
             exit;
@@ -199,14 +222,20 @@ class ContratoController extends Controller
             $valor_unitario = (float)($_POST['valor_unitario'] ?? 0);
 
             if ($quantidade > 0 && $valor_unitario >= 0) {
-                $this->contratoModel->atualizarProduto(
+                if ($this->contratoModel->atualizarProduto(
                     $id_produto,
                     trim($_POST['nome_produto'] ?? ''),
                     trim($_POST['marca'] ?? ''),
                     $_POST['unidade'] ?? 'UN',
                     $quantidade,
                     $valor_unitario
-                );
+                )) {
+                    registrar_log(
+                        Model::getConexao(),
+                        'Contrato - Editar Produto',
+                        "Atualizou produto ID {$id_produto} no contrato #{$produto['id_contrato']}."
+                    );
+                }
 
                 $folha = (int)($produto['numero_folha'] ?? 1);
                 redirect("/contrato/ver/{$produto['id_contrato']}?folha={$folha}");
@@ -233,7 +262,13 @@ class ContratoController extends Controller
         $produto = $this->contratoModel->buscarProdutoPorId($id_produto);
 
         if ($produto) {
-            $this->contratoModel->excluirProduto($id_produto);
+            if ($this->contratoModel->excluirProduto($id_produto)) {
+                registrar_log(
+                    Model::getConexao(),
+                    'Contrato - Excluir Produto',
+                    "Excluiu produto '{$produto['nome_produto']}' (ID {$id_produto}) do contrato #{$produto['id_contrato']}."
+                );
+            }
             $folha = (int)($produto['numero_folha'] ?? 1);
             redirect("/contrato/ver/{$produto['id_contrato']}?folha={$folha}");
             exit;
@@ -256,6 +291,13 @@ class ContratoController extends Controller
         $numero_folha = (int)$numero_folha;
 
         $nova_folha = $this->contratoModel->duplicarFolha($id_contrato, $numero_folha);
+        if ($nova_folha) {
+            registrar_log(
+                Model::getConexao(),
+                'Contrato - Cadastrar Folha',
+                "Duplicou a folha {$numero_folha} para a folha {$nova_folha} no contrato #{$id_contrato}."
+            );
+        }
 
         $aba = $nova_folha ? $nova_folha : $numero_folha;
         redirect("/contrato/ver/{$id_contrato}?folha={$aba}");

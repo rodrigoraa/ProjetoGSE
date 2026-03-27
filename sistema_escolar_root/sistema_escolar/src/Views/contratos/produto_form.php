@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title><?php echo $acao === 'editar' ? '✏️ Editar Produto' : 'Novo Produto'; ?></title>
+    <title><?php echo $acao === 'editar' ? 'Editar Produto' : 'Novo Produto'; ?></title>
     <link rel="stylesheet" href="/assets/css/painel.css">
     <link rel="stylesheet" href="/assets/css/alunos.css">
     <link rel="stylesheet" href="/assets/css/contrato.css">
@@ -14,7 +14,7 @@
         <?php include VIEW_PATH . '/partials/menu.php'; ?>
         <div class="main-content-wrapper">
             <header>
-                <h1><?php echo $acao === 'editar' ? '✏️ Editar Produto' : 'Adicionar Novo Produto'; ?></h1>
+                <h1><?php echo $acao === 'editar' ? 'Editar Produto' : 'Adicionar Novo Produto'; ?></h1>
             </header>
             <main>
                 <div class="toolbar-alunos">

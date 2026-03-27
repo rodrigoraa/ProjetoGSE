@@ -59,6 +59,11 @@ class CertidaoController extends Controller
                 if ($this->certidaoModel->cadastrar($fornecedor, $tipo, $emissao, $vencimento, $obs, $nome_arquivo_final)) {
                     if (!empty($_POST['renovar_id'])) {
                         $this->certidaoModel->alternarArquivo((int)$_POST['renovar_id'], 1);
+                        registrar_log(
+                            Model::getConexao(),
+                            'Certidao - Arquivar',
+                            'Arquivou certidão renovada ID: ' . (int)$_POST['renovar_id']
+                        );
                     }
 
                     registrar_log(Model::getConexao(), "Certidao - Cadastrar", "ID Tipo: $tipo | ID Fornec: $fornecedor");
@@ -104,6 +109,11 @@ class CertidaoController extends Controller
             if ($novoArquivo === false) {
                 $mensagem = '<p class="error-message">Apenas arquivos PDF sao permitidos.</p>';
             } elseif ($this->certidaoModel->atualizar($id, $fornecedor, $tipo, $emissao, $vencimento, $obs, $novoArquivo)) {
+                registrar_log(
+                    Model::getConexao(),
+                    'Certidao - Editar',
+                    "Atualizou certidão ID: {$id} | Tipo ID: {$tipo} | Fornecedor ID: {$fornecedor}"
+                );
                 redirect('/certidao');
                 exit;
             } else {
@@ -129,7 +139,9 @@ class CertidaoController extends Controller
         }
 
         verificar_csrf_token($_POST['csrf_token'] ?? '');
-        $this->certidaoModel->alternarArquivo((int)$id, 1);
+        if ($this->certidaoModel->alternarArquivo((int)$id, 1)) {
+            registrar_log(Model::getConexao(), 'Certidao - Arquivar', "Arquivou certidão ID: {$id}");
+        }
         redirect('/certidao');
         exit;
     }
@@ -142,7 +154,9 @@ class CertidaoController extends Controller
         }
 
         verificar_csrf_token($_POST['csrf_token'] ?? '');
-        $this->certidaoModel->alternarArquivo((int)$id, 0);
+        if ($this->certidaoModel->alternarArquivo((int)$id, 0)) {
+            registrar_log(Model::getConexao(), 'Certidao - Desarquivar', "Desarquivou certidão ID: {$id}");
+        }
         redirect('/certidao/arquivadas');
         exit;
     }
@@ -209,7 +223,13 @@ class CertidaoController extends Controller
             $nome = trim($_POST['nome'] ?? '');
 
             if ($nome !== '') {
-                $this->certidaoModel->adicionarOpcaoLista($tipoLista, $nome);
+                if ($this->certidaoModel->adicionarOpcaoLista($tipoLista, $nome)) {
+                    registrar_log(
+                        Model::getConexao(),
+                        'Certidao - Cadastrar Opcao',
+                        "Adicionou '{$nome}' em {$tipoLista}"
+                    );
+                }
             }
         }
 
@@ -225,7 +245,13 @@ class CertidaoController extends Controller
             $novoNome = trim($_POST['novo_nome'] ?? '');
 
             if ($id > 0 && $novoNome !== '') {
-                $this->certidaoModel->atualizarOpcaoLista($tipoLista, $id, $novoNome);
+                if ($this->certidaoModel->atualizarOpcaoLista($tipoLista, $id, $novoNome)) {
+                    registrar_log(
+                        Model::getConexao(),
+                        'Certidao - Editar Opcao',
+                        "Atualizou opção ID {$id} em {$tipoLista} para '{$novoNome}'"
+                    );
+                }
             }
         }
 
@@ -240,7 +266,13 @@ class CertidaoController extends Controller
             $tipoLista = $_POST['tipo'] ?? '';
 
             if ($id > 0) {
-                $this->certidaoModel->excluirOpcaoLista($tipoLista, $id);
+                if ($this->certidaoModel->excluirOpcaoLista($tipoLista, $id)) {
+                    registrar_log(
+                        Model::getConexao(),
+                        'Certidao - Excluir Opcao',
+                        "Excluiu opção ID {$id} de {$tipoLista}"
+                    );
+                }
             }
         }
 

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>✏️ Editar Usuário</title>
+    <title>Editar Usuário</title>
     <link rel="stylesheet" href="/assets/css/painel.css">
     <link rel="stylesheet" href="/assets/css/usuarios.css">
 </head>

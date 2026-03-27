@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>✏️ Editar Passivo</title>
+    <title>Editar Passivo</title>
     <link rel="stylesheet" href="/assets/css/painel.css">
     <link rel="stylesheet" href="/assets/css/passivo.css">
 </head>

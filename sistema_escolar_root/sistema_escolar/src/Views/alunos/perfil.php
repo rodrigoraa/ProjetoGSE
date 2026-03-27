@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>👤 Perfil do Aluno</title>
+    <title>Perfil do Aluno</title>
     <link rel="stylesheet" href="/assets/css/painel.css">
     <link rel="stylesheet" href="/assets/css/alunos.css">
 </head>

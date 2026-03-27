@@ -31,7 +31,13 @@ class AgendaController extends Controller
             $usuario_id = $_SESSION['usuario_id'];
 
             if (!empty($titulo) && !empty($data_aviso)) {
-                $this->agendaModel->adicionar($usuario_id, $data_aviso, $titulo, $descricao);
+                if ($this->agendaModel->adicionar($usuario_id, $data_aviso, $titulo, $descricao)) {
+                    registrar_log(
+                        Model::getConexao(),
+                        'Agenda - Cadastrar',
+                        "Criou aviso '{$titulo}' para {$data_aviso}"
+                    );
+                }
             }
 
             redirect('/agenda');
@@ -46,10 +52,16 @@ class AgendaController extends Controller
 
             $id_aviso = (int)$id_aviso;
             $usuario_id = $_SESSION['usuario_id'];
-
+            $aviso = $this->agendaModel->buscarPorId($id_aviso);
             $usuario_tipo = $_SESSION['usuario_tipo'] ?? 'comum';
 
-            $this->agendaModel->excluir($id_aviso, $usuario_id, $usuario_tipo);
+            if ($this->agendaModel->excluir($id_aviso, $usuario_id, $usuario_tipo) && $aviso) {
+                registrar_log(
+                    Model::getConexao(),
+                    'Agenda - Excluir',
+                    "Excluiu aviso '{$aviso['titulo']}' (ID: {$id_aviso})"
+                );
+            }
 
             redirect('/agenda');
             exit;

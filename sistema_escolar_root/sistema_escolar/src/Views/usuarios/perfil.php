@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>👤 Meu Perfil</title>
+    <title>Meu Perfil</title>
     <link rel="stylesheet" href="/assets/css/painel.css">
     <link rel="stylesheet" href="/assets/css/usuarios.css">
 </head>

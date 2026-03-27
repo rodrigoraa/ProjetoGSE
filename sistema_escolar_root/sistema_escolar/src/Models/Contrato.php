@@ -100,6 +100,16 @@ class Contrato extends Model
         }
     }
 
+    public function atualizarDadosGerais($id, $titulo, $valor_total)
+    {
+        try {
+            $sql = "UPDATE contratos SET titulo = ?, valor_total = ? WHERE id = ?";
+            return self::$pdo->prepare($sql)->execute([$titulo, $valor_total, $id]);
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
     public function listarTodos()
     {
         return self::$pdo->query("SELECT * FROM contratos ORDER BY id DESC")->fetchAll();
