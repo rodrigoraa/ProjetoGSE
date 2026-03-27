@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Editar Certidão</title>
     <link rel="stylesheet" href="/assets/css/painel.css">
-    <link rel="stylesheet" href="/assets/css/certidoes.css">
+    <link rel="stylesheet" href="/assets/css/certidoes.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/certidoes.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 

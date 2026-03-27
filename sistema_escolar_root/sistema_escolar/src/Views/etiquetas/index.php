@@ -10,7 +10,7 @@ $totalFormatosEtiqueta = 3;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modelos de Etiquetas</title>
     <link rel="stylesheet" href="/assets/css/painel.css">
-    <link rel="stylesheet" href="/assets/css/etiquetas.css">
+    <link rel="stylesheet" href="/assets/css/etiquetas.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/etiquetas.css'); ?>">
 </head>
 
 <body>

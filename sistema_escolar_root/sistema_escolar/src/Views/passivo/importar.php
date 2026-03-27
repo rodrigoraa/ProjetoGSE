@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Importar CSV</title>
     <link rel="stylesheet" href="/assets/css/painel.css">
-    <link rel="stylesheet" href="/assets/css/passivo.css">
+    <link rel="stylesheet" href="/assets/css/passivo.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/passivo.css'); ?>">
 </head>
 
 <body>

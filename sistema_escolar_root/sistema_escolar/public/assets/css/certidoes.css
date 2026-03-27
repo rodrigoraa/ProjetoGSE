@@ -783,12 +783,12 @@ input#dias_calculados {
     background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
     color: #fff;
     border-radius: 18px;
-    padding: 22px 24px;
-    margin-bottom: 22px;
+    padding: 24px;
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    gap: 20px;
+    gap: 18px;
+    align-items: center;
+    margin-bottom: 24px;
 }
 
 .cert-overview h2 {

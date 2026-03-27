@@ -21,7 +21,7 @@ foreach (($avisos ?? []) as $avisoResumo) {
     <meta charset="UTF-8">
     <title>Agenda de Avisos</title>
     <link rel="stylesheet" href="/assets/css/painel.css">
-    <link rel="stylesheet" href="/assets/css/agenda.css">
+    <link rel="stylesheet" href="/assets/css/agenda.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/agenda.css'); ?>">
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales/pt-br.global.min.js"></script>

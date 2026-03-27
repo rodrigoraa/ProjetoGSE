@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <title>Detalhes do Pedido #<?php echo (int)$contrato['id']; ?></title>
     <link rel="stylesheet" href="/assets/css/painel.css">
-    <link rel="stylesheet" href="/assets/css/alunos.css">
-    <link rel="stylesheet" href="/assets/css/contrato.css">
+    <link rel="stylesheet" href="/assets/css/alunos.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/alunos.css'); ?>">
+    <link rel="stylesheet" href="/assets/css/contrato.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/contrato.css'); ?>">
 </head>
 
 <body>
