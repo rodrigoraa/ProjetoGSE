@@ -89,6 +89,17 @@
                                         </div>
                                     </div>
 
+                                    <div class="contrato-faturamento-card">
+                                        <form action="/contrato/salvar_data_faturamento_folha/<?php echo (int)$contrato['id']; ?>/<?php echo (int)$num_folha; ?>" method="POST" class="contrato-faturamento-form">
+                                            <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
+                                            <label for="data_faturamento_<?php echo (int)$num_folha; ?>" class="form-grid-label contrato-faturamento-label">Data de faturamento</label>
+                                            <div class="contrato-faturamento-controls">
+                                                <input type="date" id="data_faturamento_<?php echo (int)$num_folha; ?>" name="data_faturamento" class="sistema contrato-faturamento-input" value="<?php echo e($f['data_faturamento'] ?? ''); ?>">
+                                                <button type="submit" class="btn-secondary">Salvar data</button>
+                                            </div>
+                                        </form>
+                                    </div>
+
                                     <div class="action-group" style="display: flex; gap: 10px; align-items: center;">
                                         <button type="button" onclick="toggleFormProduto(<?php echo (int)$num_folha; ?>)" class="btn-primary">+ Adicionar Produto</button>
                                         <a href="/contrato/imprimir/<?php echo (int)$contrato['id']; ?>?folha=<?php echo (int)$num_folha; ?>" target="_blank" class="btn-secondary">🖨️ Imprimir nota</a>

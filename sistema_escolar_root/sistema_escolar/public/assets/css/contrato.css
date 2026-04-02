@@ -175,6 +175,36 @@ input.sistema::placeholder {
     box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
 }
 
+.contrato-faturamento-card {
+    min-width: 260px;
+    max-width: 320px;
+    padding: 14px 16px;
+    background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+    border: 1px solid #dbe6f2;
+    border-radius: 14px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+}
+
+.contrato-faturamento-form {
+    margin: 0;
+}
+
+.contrato-faturamento-label {
+    margin-bottom: 8px;
+}
+
+.contrato-faturamento-controls {
+    display: flex;
+    align-items: end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.contrato-faturamento-input {
+    min-width: 160px;
+    margin: 0;
+}
+
 .contrato-observacao-input {
     resize: vertical;
     min-height: 92px;

@@ -45,3 +45,5 @@ temp/
 # --- CONFIGURAÇÕES LOCAIS ---
 # Se você criar um arquivo .env no futuro com senhas
 .env
+
+atualizar_banco.php

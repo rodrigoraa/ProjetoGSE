@@ -219,6 +219,52 @@ class ContratoController extends Controller
         exit;
     }
 
+    public function salvar_data_faturamento_folha($id_contrato, $numero_folha)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('/contrato/ver/' . (int)$id_contrato);
+            exit;
+        }
+
+        verificar_csrf_token($_POST['csrf_token'] ?? '');
+
+        $id_contrato = (int)$id_contrato;
+        $numero_folha = (int)$numero_folha;
+        $data_faturamento = trim((string)($_POST['data_faturamento'] ?? ''));
+
+        if (!$this->contratoModel->folhaExiste($id_contrato, $numero_folha)) {
+            definir_flash('erro', 'Folha nao encontrada', 'A nota informada nao existe neste pedido.');
+            redirect("/contrato/ver/{$id_contrato}");
+            exit;
+        }
+
+        if ($data_faturamento !== '' && !$this->validarDataIso($data_faturamento)) {
+            definir_flash('erro', 'Data invalida', 'Informe uma data de faturamento valida.');
+            redirect("/contrato/ver/{$id_contrato}?folha={$numero_folha}");
+            exit;
+        }
+
+        $valorSalvar = $data_faturamento !== '' ? $data_faturamento : null;
+
+        if ($this->contratoModel->atualizarDataFaturamentoFolha($id_contrato, $numero_folha, $valorSalvar)) {
+            $mensagem = $valorSalvar
+                ? "A data de faturamento da nota {$numero_folha} foi atualizada."
+                : "A data de faturamento da nota {$numero_folha} foi removida.";
+
+            definir_flash('sucesso', 'Data de faturamento salva', $mensagem);
+            registrar_log(
+                Model::getConexao(),
+                'Contrato - Editar Folha',
+                "Atualizou data de faturamento da folha {$numero_folha} do contrato #{$id_contrato}."
+            );
+        } else {
+            definir_flash('erro', 'Nao foi possivel salvar', 'A data de faturamento da nota nao pode ser atualizada agora.');
+        }
+
+        redirect("/contrato/ver/{$id_contrato}?folha={$numero_folha}");
+        exit;
+    }
+
     public function excluir_folha($id_contrato, $numero_folha)
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -488,5 +534,11 @@ class ContratoController extends Controller
         definir_flash('erro', 'Registro nao encontrado', $msg);
         redirect('/contrato');
         exit;
+    }
+
+    private function validarDataIso($data)
+    {
+        $dateTime = DateTime::createFromFormat('Y-m-d', $data);
+        return $dateTime && $dateTime->format('Y-m-d') === $data;
     }
 }
