@@ -16,8 +16,25 @@ class AgendaController extends Controller
     public function index()
     {
         $avisos = $this->agendaModel->listarProximosAvisos();
+        
+        $anoAtual = date('Y');
+        
+        if (!isset($_SESSION["feriados_$anoAtual"])) {
+            $jsonFeriados = @file_get_contents("https://brasilapi.com.br/api/feriados/v1/{$anoAtual}");
+            
+            if ($jsonFeriados) {
+                $_SESSION["feriados_$anoAtual"] = json_decode($jsonFeriados, true);
+            } else {
+                $_SESSION["feriados_$anoAtual"] = []; 
+            }
+        }
 
-        $this->view('agenda/index', ['avisos' => $avisos]);
+        $feriados = $_SESSION["feriados_$anoAtual"];
+
+        $this->view('agenda/index', [
+            'avisos' => $avisos,
+            'feriados' => $feriados
+        ]);
     }
 
     public function cadastrar()

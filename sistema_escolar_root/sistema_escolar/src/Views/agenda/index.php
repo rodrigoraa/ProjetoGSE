@@ -173,6 +173,19 @@ foreach (($avisos ?? []) as $avisoResumo) {
             ];
         }
     }
+    if (!empty($feriados)) {
+        foreach ($feriados as $indice => $feriado) {
+            $eventos_calendario[] = [
+                'id' => 'feriado_' . $indice,
+                'title' => '🌟 ' . $feriado['name'],
+                'start' => $feriado['date'],
+                'description' => 'Feriado Nacional Oficial',
+                'author' => 'Calendário',
+                'color' => '#28a745', // Verde (Destaque para os feriados)
+                // 'display' => 'background' // Descomente esta linha se preferir que o dia todo fique pintado em vez de aparecer um bloco de texto.
+            ];
+        }
+    }
     ?>
 
     <div id="agendaModal" class="agenda-modal" aria-hidden="true">
