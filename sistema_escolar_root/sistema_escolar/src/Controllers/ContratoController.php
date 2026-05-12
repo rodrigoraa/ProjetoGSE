@@ -34,15 +34,18 @@ class ContratoController extends Controller
             $valor_total = (float)($_POST['valor_total'] ?? 0);
             $qtd_folhas = (int)($_POST['qtd_folhas'] ?? 1);
             $faturado = isset($_POST['faturado']) ? 1 : 0;
+            $data_faturamento = trim((string)($_POST['data_faturamento'] ?? ''));
 
             if ($valor_total <= 0 || $qtd_folhas <= 0) {
                 $erro = 'O valor total e a quantidade de folhas devem ser maiores que zero.';
+            } elseif ($faturado && ($data_faturamento === '' || !$this->validarDataIso($data_faturamento))) {
+                $erro = 'Informe uma data de faturamento valida para marcar o pedido como faturado.';
             } else {
                 $produtos = $this->processarProdutosPost();
 
                 if (empty($produtos)) {
                     $erro = 'Informe pelo menos um produto valido para salvar o pedido.';
-                } elseif ($this->contratoModel->salvarContratoCompleto($titulo, $valor_total, $qtd_folhas, $produtos, $faturado)) {
+                } elseif ($this->contratoModel->salvarContratoCompleto($titulo, $valor_total, $qtd_folhas, $produtos, $faturado, $data_faturamento)) {
                     definir_flash('sucesso', 'Pedido cadastrado', 'O novo pedido foi salvo com sucesso.');
                     registrar_log(Model::getConexao(), 'Contrato - Cadastrar', "Novo contrato '{$titulo}' cadastrado.");
                     redirect('/contrato');
@@ -76,9 +79,14 @@ class ContratoController extends Controller
 
             $valor_total = (float)($_POST['valor_total'] ?? 0);
             $faturado = isset($_POST['faturado']) ? 1 : 0;
+            $data_faturamento = trim((string)($_POST['data_faturamento'] ?? ''));
 
-            if ($valor_total > 0) {
-                if ($this->contratoModel->atualizarDadosGerais($id, $titulo, $valor_total, $faturado)) {
+            if ($valor_total <= 0) {
+                $erro = 'O valor total do pedido deve ser maior que zero.';
+            } elseif ($faturado && ($data_faturamento === '' || !$this->validarDataIso($data_faturamento))) {
+                $erro = 'Informe uma data de faturamento valida para marcar o pedido como faturado.';
+            } else {
+                if ($this->contratoModel->atualizarDadosGerais($id, $titulo, $valor_total, $faturado, $data_faturamento)) {
                     definir_flash('sucesso', 'Dados gerais atualizados', 'As informacoes principais do pedido foram salvas.');
                     registrar_log(Model::getConexao(), 'Contrato - Editar', "Contrato #{$id} atualizado para '{$titulo}'.");
                     redirect("/contrato/ver/{$id}");
@@ -86,8 +94,6 @@ class ContratoController extends Controller
                 }
 
                 $erro = 'Nao foi possivel salvar os dados gerais do pedido.';
-            } else {
-                $erro = 'O valor total do pedido deve ser maior que zero.';
             }
 
             $contrato = $this->contratoModel->buscarPorId($id);
@@ -116,11 +122,18 @@ class ContratoController extends Controller
         }
 
         $faturado = isset($_POST['faturado']) ? 1 : 0;
+        $data_faturamento = trim((string)($_POST['data_faturamento'] ?? ''));
 
-        if ($this->contratoModel->atualizarFaturado($id, $faturado)) {
+        if ($faturado && ($data_faturamento === '' || !$this->validarDataIso($data_faturamento))) {
+            definir_flash('erro', 'Data de faturamento obrigatoria', 'Informe uma data valida para marcar o pedido como faturado.');
+            redirect("/contrato/ver/{$id}");
+            exit;
+        }
+
+        if ($this->contratoModel->atualizarFaturado($id, $faturado, $data_faturamento)) {
             $tituloFlash = $faturado ? 'Pedido marcado como faturado' : 'Pedido marcado como nao faturado';
             $textoFlash = $faturado
-                ? 'O pedido agora aparecera destacado na lista de contratos.'
+                ? 'O pedido agora aparecera destacado na lista de contratos com a data de faturamento.'
                 : 'O destaque de faturamento foi removido deste pedido.';
 
             definir_flash('sucesso', $tituloFlash, $textoFlash);

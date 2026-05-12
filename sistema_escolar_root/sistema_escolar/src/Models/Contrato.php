@@ -6,19 +6,23 @@ class Contrato extends Model
     public function __construct()
     {
         parent::__construct();
-        $this->garantirColunaFaturado();
+        $this->garantirColunasFaturamento();
     }
 
-    private function garantirColunaFaturado()
+    private function garantirColunasFaturamento()
     {
         $colunas = self::$pdo->query("PRAGMA table_info(contratos)")->fetchAll();
-        foreach ($colunas as $coluna) {
-            if (($coluna['name'] ?? '') === 'faturado') {
-                return;
-            }
+        $colunasExistentes = array_map(static function ($coluna) {
+            return $coluna['name'] ?? '';
+        }, $colunas);
+
+        if (!in_array('faturado', $colunasExistentes, true)) {
+            self::$pdo->exec("ALTER TABLE contratos ADD COLUMN faturado INTEGER NOT NULL DEFAULT 0");
         }
 
-        self::$pdo->exec("ALTER TABLE contratos ADD COLUMN faturado INTEGER NOT NULL DEFAULT 0");
+        if (!in_array('data_faturamento', $colunasExistentes, true)) {
+            self::$pdo->exec("ALTER TABLE contratos ADD COLUMN data_faturamento TEXT DEFAULT NULL");
+        }
     }
 
     public function recalcularValorFolha($id_contrato, $numero_folha)
@@ -32,14 +36,14 @@ class Contrato extends Model
         self::$pdo->prepare($sqlUpd)->execute([$total, $id_contrato, $numero_folha]);
     }
 
-    public function salvarContratoCompleto($titulo, $valor_total, $qtd_folhas, $produtos, $faturado = 0)
+    public function salvarContratoCompleto($titulo, $valor_total, $qtd_folhas, $produtos, $faturado = 0, $data_faturamento = null)
     {
         try {
             self::$pdo->beginTransaction();
 
-            $sqlContrato = "INSERT INTO contratos (titulo, valor_total, qtd_folhas, faturado) VALUES (?, ?, ?, ?)";
+            $sqlContrato = "INSERT INTO contratos (titulo, valor_total, qtd_folhas, faturado, data_faturamento) VALUES (?, ?, ?, ?, ?)";
             $stmt = self::$pdo->prepare($sqlContrato);
-            $stmt->execute([$titulo, $valor_total, $qtd_folhas, $faturado ? 1 : 0]);
+            $stmt->execute([$titulo, $valor_total, $qtd_folhas, $faturado ? 1 : 0, $faturado ? $data_faturamento : null]);
             $id_contrato = self::$pdo->lastInsertId();
 
             $sqlFolha = "INSERT INTO contrato_folhas (id_contrato, numero_folha, valor_folha, observacao, data_faturamento) VALUES (?, ?, 0, '', NULL)";
@@ -121,20 +125,20 @@ class Contrato extends Model
         }
     }
 
-    public function atualizarDadosGerais($id, $titulo, $valor_total, $faturado)
+    public function atualizarDadosGerais($id, $titulo, $valor_total, $faturado, $data_faturamento)
     {
         try {
-            $sql = "UPDATE contratos SET titulo = ?, valor_total = ?, faturado = ? WHERE id = ?";
-            return self::$pdo->prepare($sql)->execute([$titulo, $valor_total, $faturado ? 1 : 0, $id]);
+            $sql = "UPDATE contratos SET titulo = ?, valor_total = ?, faturado = ?, data_faturamento = ? WHERE id = ?";
+            return self::$pdo->prepare($sql)->execute([$titulo, $valor_total, $faturado ? 1 : 0, $faturado ? $data_faturamento : null, $id]);
         } catch (Exception $e) {
             return false;
         }
     }
 
-    public function atualizarFaturado($id, $faturado)
+    public function atualizarFaturado($id, $faturado, $data_faturamento)
     {
-        $stmt = self::$pdo->prepare("UPDATE contratos SET faturado = ? WHERE id = ?");
-        return $stmt->execute([$faturado ? 1 : 0, $id]);
+        $stmt = self::$pdo->prepare("UPDATE contratos SET faturado = ?, data_faturamento = ? WHERE id = ?");
+        return $stmt->execute([$faturado ? 1 : 0, $faturado ? $data_faturamento : null, $id]);
     }
 
     public function listarTodos()

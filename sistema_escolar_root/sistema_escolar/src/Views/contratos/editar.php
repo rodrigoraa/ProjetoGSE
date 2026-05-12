@@ -49,12 +49,17 @@
                     </div>
 
                     <label class="contrato-check-option">
-                        <input type="checkbox" name="faturado" value="1" <?php echo !empty($contrato['faturado']) ? 'checked' : ''; ?>>
+                        <input type="checkbox" id="pedido_faturado" name="faturado" value="1" <?php echo !empty($contrato['faturado']) ? 'checked' : ''; ?> onchange="atualizarObrigatoriedadeFaturamento()">
                         <span>
                             <strong>Pedido ja faturado</strong>
-                            <small>Quando marcado, o pedido fica destacado na lista de contratos.</small>
+                            <small>Quando marcado, informe tambem a data do faturamento.</small>
                         </span>
                     </label>
+
+                    <div class="form-group contrato-data-faturamento-geral" id="grupo_data_faturamento">
+                        <label for="data_faturamento">Data do faturamento</label>
+                        <input type="date" name="data_faturamento" id="data_faturamento" class="sistema" value="<?php echo e($contrato['data_faturamento'] ?? ''); ?>">
+                    </div>
 
                     <div class="form-actions" style="margin-top: 20px;">
                         <button type="submit" class="btn-primary full-width-submit">Salvar Alterações</button>
@@ -63,6 +68,23 @@
             </main>
         </div>
     </div>
+    <script>
+        function atualizarObrigatoriedadeFaturamento() {
+            const checkbox = document.getElementById('pedido_faturado');
+            const dataInput = document.getElementById('data_faturamento');
+            const grupoData = document.getElementById('grupo_data_faturamento');
+
+            dataInput.required = checkbox.checked;
+            dataInput.disabled = !checkbox.checked;
+            grupoData.classList.toggle('is-disabled', !checkbox.checked);
+
+            if (!checkbox.checked) {
+                dataInput.value = '';
+            }
+        }
+
+        atualizarObrigatoriedadeFaturamento();
+    </script>
 </body>
 
 </html>

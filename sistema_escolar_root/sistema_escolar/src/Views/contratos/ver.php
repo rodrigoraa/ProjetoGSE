@@ -45,13 +45,20 @@
                             <span class="<?php echo !empty($contrato['faturado']) ? 'badge-faturado' : 'badge-nao-faturado'; ?>">
                                 <?php echo !empty($contrato['faturado']) ? 'Faturado' : 'Nao faturado'; ?>
                             </span>
+                            <?php if (!empty($contrato['faturado']) && !empty($contrato['data_faturamento'])): ?>
+                                <small class="contrato-data-faturamento-info">Faturado em <?php echo date('d/m/Y', strtotime($contrato['data_faturamento'])); ?></small>
+                            <?php endif; ?>
                         </div>
 
                         <form action="/contrato/salvar_faturamento/<?php echo (int)$contrato['id']; ?>" method="POST" class="contrato-status-form">
                             <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                             <label class="contrato-check-inline">
-                                <input type="checkbox" name="faturado" value="1" <?php echo !empty($contrato['faturado']) ? 'checked' : ''; ?>>
+                                <input type="checkbox" id="pedido_faturado_status" name="faturado" value="1" <?php echo !empty($contrato['faturado']) ? 'checked' : ''; ?> onchange="atualizarObrigatoriedadeFaturamentoStatus()">
                                 <span>Pedido faturado</span>
+                            </label>
+                            <label class="contrato-status-date">
+                                <span>Data do faturamento</span>
+                                <input type="date" id="data_faturamento_status" name="data_faturamento" class="sistema contrato-status-date-input" value="<?php echo e($contrato['data_faturamento'] ?? ''); ?>">
                             </label>
                             <button type="submit" class="btn-secondary btn-sm">Salvar status</button>
                         </form>
@@ -231,6 +238,20 @@
             const form = document.getElementById('form-produto-' + numeroFolha);
             form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
         }
+
+        function atualizarObrigatoriedadeFaturamentoStatus() {
+            const checkbox = document.getElementById('pedido_faturado_status');
+            const dataInput = document.getElementById('data_faturamento_status');
+
+            dataInput.required = checkbox.checked;
+            dataInput.disabled = !checkbox.checked;
+
+            if (!checkbox.checked) {
+                dataInput.value = '';
+            }
+        }
+
+        atualizarObrigatoriedadeFaturamentoStatus();
     </script>
 </body>
 

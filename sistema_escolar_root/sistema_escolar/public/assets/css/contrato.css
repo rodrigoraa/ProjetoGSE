@@ -102,6 +102,35 @@ input.sistema::placeholder {
     justify-content: flex-end;
 }
 
+.contrato-status-date {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.contrato-status-date-input {
+    min-width: 150px;
+    margin: 0;
+}
+
+.contrato-data-faturamento-geral {
+    transition: opacity 0.2s ease;
+}
+
+.contrato-data-faturamento-geral.is-disabled {
+    opacity: 0.55;
+}
+
+.contrato-data-faturamento-info {
+    display: block;
+    margin-top: 6px;
+    color: var(--success-green-dark);
+    font-weight: 700;
+}
+
 .contrato-check-option,
 .contrato-check-inline {
     display: flex;

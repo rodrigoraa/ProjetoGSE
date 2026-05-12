@@ -113,6 +113,9 @@ foreach ($contratos as $contratoResumo) {
                                             <span class="<?php echo $faturado ? 'badge-faturado' : 'badge-nao-faturado'; ?>">
                                                 <?php echo $faturado ? 'Faturado' : 'Nao faturado'; ?>
                                             </span>
+                                            <?php if ($faturado && !empty($c['data_faturamento'])): ?>
+                                                <small class="contrato-meta">Em <?php echo date('d/m/Y', strtotime($c['data_faturamento'])); ?></small>
+                                            <?php endif; ?>
                                         </td>
                                         <td><span class="badge-media">R$ <?php echo number_format($mediaPorFolha, 2, ',', '.'); ?></span></td>
                                         <td class="table-date">
