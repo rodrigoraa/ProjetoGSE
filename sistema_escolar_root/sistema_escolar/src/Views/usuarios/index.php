@@ -12,6 +12,9 @@
         .btn-excluir { color: #dc3545; background: #ffeef0; border: 0; cursor: pointer; }
         .btn-excluir:hover { background: #ffdce0; }
         .inline-form { display: inline-block; margin: 0; }
+        .badge-email { display: inline-flex; padding: 4px 10px; border-radius: 999px; font-size: 0.78em; font-weight: 700; border: 1px solid transparent; }
+        .badge-email-on { background: #e8f6ee; color: #1f7f35; border-color: #b9e3c5; }
+        .badge-email-off { background: #f3f4f6; color: #6b7280; border-color: #d1d5db; }
     </style>
 </head>
 
@@ -41,6 +44,7 @@
                                 <th>Nome</th>
                                 <th>E-mail</th>
                                 <th>Tipo</th>
+                                <th>Avisos por e-mail</th>
                                 <th style="text-align: center;">Ações</th>
                             </tr>
                         </thead>
@@ -49,7 +53,7 @@
 
                             <?php if (empty($dados)): ?>
                                 <tr>
-                                    <td colspan="4" style="text-align:center; padding:20px;">Nenhum usuário encontrado.</td>
+                                    <td colspan="5" style="text-align:center; padding:20px;">Nenhum usuário encontrado.</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($dados as $u): ?>
@@ -59,6 +63,12 @@
                                         <td>
                                             <span style="padding:2px 8px; border-radius:10px; font-size:0.75em; font-weight:bold; background:<?php echo $u['tipo'] == 'admin' ? '#004a91' : '#28a745'; ?>; color:white;">
                                                 <?php echo e(strtoupper($u['tipo'])); ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <?php $recebeAvisos = !empty($u['recebe_avisos_email']); ?>
+                                            <span class="badge-email <?php echo $recebeAvisos ? 'badge-email-on' : 'badge-email-off'; ?>">
+                                                <?php echo $recebeAvisos ? 'Recebe' : 'Nao recebe'; ?>
                                             </span>
                                         </td>
                                         <td class="col-acoes" style="text-align: center;">

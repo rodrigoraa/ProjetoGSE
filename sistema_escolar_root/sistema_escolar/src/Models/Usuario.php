@@ -6,6 +6,19 @@ class Usuario extends Model
     public function __construct()
     {
         parent::__construct();
+        $this->garantirColunaRecebeAvisosEmail();
+    }
+
+    private function garantirColunaRecebeAvisosEmail()
+    {
+        $colunas = self::$pdo->query("PRAGMA table_info(usuarios)")->fetchAll();
+        foreach ($colunas as $coluna) {
+            if (($coluna['name'] ?? '') === 'recebe_avisos_email') {
+                return;
+            }
+        }
+
+        self::$pdo->exec("ALTER TABLE usuarios ADD COLUMN recebe_avisos_email INTEGER NOT NULL DEFAULT 1");
     }
 
     public function buscarPorEmail($email)
@@ -42,24 +55,24 @@ class Usuario extends Model
         }
     }
 
-    public function cadastrar($nome, $email, $senha, $tipo)
+    public function cadastrar($nome, $email, $senha, $tipo, $recebeAvisosEmail = 1)
     {
         try {
             $hash = password_hash($senha, PASSWORD_DEFAULT);
-            $sql = "INSERT INTO usuarios (nome, email, senha, tipo) VALUES (?, ?, ?, ?)";
+            $sql = "INSERT INTO usuarios (nome, email, senha, tipo, recebe_avisos_email) VALUES (?, ?, ?, ?, ?)";
             $stmt = self::$pdo->prepare($sql);
-            return $stmt->execute([$nome, $email, $hash, $tipo]);
+            return $stmt->execute([$nome, $email, $hash, $tipo, $recebeAvisosEmail ? 1 : 0]);
         } catch (Exception $e) {
             error_log("Erro ao cadastrar usuário: " . $e->getMessage());
             return false;
         }
     }
 
-    public function atualizar($id, $nome, $email, $tipo, $novaSenha = null)
+    public function atualizar($id, $nome, $email, $tipo, $recebeAvisosEmail, $novaSenha = null)
     {
         try {
-            $sql = "UPDATE usuarios SET nome=?, email=?, tipo=?";
-            $params = [$nome, $email, $tipo];
+            $sql = "UPDATE usuarios SET nome=?, email=?, tipo=?, recebe_avisos_email=?";
+            $params = [$nome, $email, $tipo, $recebeAvisosEmail ? 1 : 0];
 
             if (!empty($novaSenha)) {
                 $sql .= ", senha=?";

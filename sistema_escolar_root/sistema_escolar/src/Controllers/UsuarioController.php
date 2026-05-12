@@ -24,7 +24,9 @@ class UsuarioController extends Controller
             verificar_csrf_token($_POST['csrf_token'] ?? '');
 
             $usuarioModel = new Usuario();
-            if ($usuarioModel->cadastrar($_POST['nome'], $_POST['email'], $_POST['senha'], $_POST['tipo'])) {
+            $recebeAvisosEmail = isset($_POST['recebe_avisos_email']) ? 1 : 0;
+
+            if ($usuarioModel->cadastrar($_POST['nome'], $_POST['email'], $_POST['senha'], $_POST['tipo'], $recebeAvisosEmail)) {
                 registrar_log(Model::getConexao(), "Usuario - Criar", "Criou: " . $_POST['nome']);
 
                 definir_flash(
@@ -63,8 +65,9 @@ class UsuarioController extends Controller
             verificar_csrf_token($_POST['csrf_token'] ?? '');
 
             $novaSenha = !empty($_POST['senha']) ? $_POST['senha'] : null;
+            $recebeAvisosEmail = isset($_POST['recebe_avisos_email']) ? 1 : 0;
 
-            if ($usuarioModel->atualizar($id, $_POST['nome'], $_POST['email'], $_POST['tipo'], $novaSenha)) {
+            if ($usuarioModel->atualizar($id, $_POST['nome'], $_POST['email'], $_POST['tipo'], $recebeAvisosEmail, $novaSenha)) {
                 registrar_log(Model::getConexao(), "Usuario - Editar", "Editou ID: $id");
 
                 definir_flash(

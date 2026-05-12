@@ -22,7 +22,7 @@
                     <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
 
                     <div><label>Nome:</label><input type="text" name="nome" required></div>
-                    <div><label>E-mail:</label><input type=\"email\" name="email" required></div>
+                    <div><label>E-mail:</label><input type="email" name="email" required></div>
                     <div><label>Senha:</label><input type="password" name="senha" required minlength="6"></div>
 
                     <div><label>Tipo:</label>
@@ -31,6 +31,14 @@
                             <option value="admin">Administrador</option>
                         </select>
                     </div>
+
+                    <label class="usuario-check-option">
+                        <input type="checkbox" name="recebe_avisos_email" value="1" checked>
+                        <span>
+                            <strong>Receber avisos por e-mail</strong>
+                            <small>Inclui alertas automáticos de vencimento de DVA e certidões.</small>
+                        </span>
+                    </label>
 
                     <div style="margin-top:20px;">
                         <button type="submit">Salvar</button> <a href="/usuario" class="cancelar">Cancelar</a>

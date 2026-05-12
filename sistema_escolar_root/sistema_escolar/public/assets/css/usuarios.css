@@ -85,3 +85,34 @@
 .main-content-wrapper div[style*="display:grid"] {
     gap: 20px !important;
 }
+
+.main-content-wrapper .usuario-check-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border: 1px solid #dbe6f2;
+    border-radius: 10px;
+    background: #f8fbff;
+    margin: 4px 0 20px;
+    cursor: pointer;
+}
+
+.main-content-wrapper .usuario-check-option input {
+    width: 18px;
+    height: 18px;
+    accent-color: #28a745;
+    cursor: pointer;
+    margin: 0;
+}
+
+.main-content-wrapper .usuario-check-option strong,
+.main-content-wrapper .usuario-check-option small {
+    display: block;
+}
+
+.main-content-wrapper .usuario-check-option small {
+    margin-top: 3px;
+    color: #6b7280;
+    font-weight: 400;
+}

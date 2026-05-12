@@ -15,12 +15,25 @@ if (file_exists(ROOT_PATH . '/.env')) {
 require_once ROOT_PATH . '/src/Core/Database.php';
 require_once ROOT_PATH . '/src/Core/EmailService.php';
 
+function garantirColunaRecebeAvisosEmail(PDO $pdo)
+{
+    $colunas = $pdo->query("PRAGMA table_info(usuarios)")->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($colunas as $coluna) {
+        if (($coluna['name'] ?? '') === 'recebe_avisos_email') {
+            return;
+        }
+    }
+
+    $pdo->exec("ALTER TABLE usuarios ADD COLUMN recebe_avisos_email INTEGER NOT NULL DEFAULT 1");
+}
+
 function buscarDestinatariosAviso(PDO $pdo)
 {
     $sql = "SELECT DISTINCT nome, email
             FROM usuarios
             WHERE email IS NOT NULL
               AND TRIM(email) <> ''
+              AND recebe_avisos_email = 1
             ORDER BY nome";
 
     $stmt = $pdo->query($sql);
@@ -33,6 +46,7 @@ function buscarDestinatariosAviso(PDO $pdo)
 
 try {
     $pdo = \src\Core\Database::getConnection();
+    garantirColunaRecebeAvisosEmail($pdo);
     $diasAntecedencia = (int) ($_ENV['ALERTA_DVA_DIAS'] ?? 15);
 
     if ($diasAntecedencia <= 0) {
@@ -68,8 +82,8 @@ try {
         $destinatarios = buscarDestinatariosAviso($pdo);
 
         if (count($destinatarios) === 0) {
-            error_log('CRON (DVA): Nenhum usuário com e-mail válido foi encontrado para receber os avisos.');
-            echo "ERRO DE CONFIGURAÇÃO: não há usuários com e-mail válido cadastrados no sistema.\n";
+            error_log('CRON (DVA): Nenhum usuário habilitado com e-mail válido foi encontrado para receber os avisos.');
+            echo "ERRO DE CONFIGURAÇÃO: não há usuários habilitados com e-mail válido para receber os avisos.\n";
             exit(1);
         }
 

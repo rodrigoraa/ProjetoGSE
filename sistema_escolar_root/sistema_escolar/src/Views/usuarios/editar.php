@@ -63,6 +63,14 @@
                             </div>
                         </div>
 
+                        <label class="usuario-check-option">
+                            <input type="checkbox" name="recebe_avisos_email" value="1" <?php echo !empty($user['recebe_avisos_email']) ? 'checked' : ''; ?>>
+                            <span>
+                                <strong>Receber avisos por e-mail</strong>
+                                <small>Inclui alertas automáticos de vencimento de DVA e certidões.</small>
+                            </span>
+                        </label>
+
                         <div
                             style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; display: flex; align-items: center;">
                             <button type="submit" class="btn-primary">Salvar Alterações</button>
