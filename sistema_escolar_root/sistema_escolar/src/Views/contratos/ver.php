@@ -38,8 +38,24 @@
                 $saldo_geral = $contrato['valor_total'] - $total_produtos_geral;
                 ?>
 
-                <div class="contrato-header">
-                    <h2 class="contrato-summary-title"><?php echo e($contrato['titulo']); ?></h2>
+                <div class="contrato-header <?php echo !empty($contrato['faturado']) ? 'contrato-header-faturado' : ''; ?>">
+                    <div class="contrato-title-row">
+                        <div>
+                            <h2 class="contrato-summary-title"><?php echo e($contrato['titulo']); ?></h2>
+                            <span class="<?php echo !empty($contrato['faturado']) ? 'badge-faturado' : 'badge-nao-faturado'; ?>">
+                                <?php echo !empty($contrato['faturado']) ? 'Faturado' : 'Nao faturado'; ?>
+                            </span>
+                        </div>
+
+                        <form action="/contrato/salvar_faturamento/<?php echo (int)$contrato['id']; ?>" method="POST" class="contrato-status-form">
+                            <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
+                            <label class="contrato-check-inline">
+                                <input type="checkbox" name="faturado" value="1" <?php echo !empty($contrato['faturado']) ? 'checked' : ''; ?>>
+                                <span>Pedido faturado</span>
+                            </label>
+                            <button type="submit" class="btn-secondary btn-sm">Salvar status</button>
+                        </form>
+                    </div>
                     <div class="resumo-financeiro">
                         <div>
                             <p class="resumo-label">Teto do Pedido</p>

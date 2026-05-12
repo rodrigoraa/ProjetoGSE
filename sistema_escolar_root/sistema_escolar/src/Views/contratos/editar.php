@@ -48,6 +48,14 @@
                         </small>
                     </div>
 
+                    <label class="contrato-check-option">
+                        <input type="checkbox" name="faturado" value="1" <?php echo !empty($contrato['faturado']) ? 'checked' : ''; ?>>
+                        <span>
+                            <strong>Pedido ja faturado</strong>
+                            <small>Quando marcado, o pedido fica destacado na lista de contratos.</small>
+                        </span>
+                    </label>
+
                     <div class="form-actions" style="margin-top: 20px;">
                         <button type="submit" class="btn-primary full-width-submit">Salvar Alterações</button>
                     </div>

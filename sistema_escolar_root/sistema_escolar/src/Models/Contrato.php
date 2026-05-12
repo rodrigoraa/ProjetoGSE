@@ -3,6 +3,24 @@ require_once ROOT_PATH . '/src/Core/Model.php';
 
 class Contrato extends Model
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->garantirColunaFaturado();
+    }
+
+    private function garantirColunaFaturado()
+    {
+        $colunas = self::$pdo->query("PRAGMA table_info(contratos)")->fetchAll();
+        foreach ($colunas as $coluna) {
+            if (($coluna['name'] ?? '') === 'faturado') {
+                return;
+            }
+        }
+
+        self::$pdo->exec("ALTER TABLE contratos ADD COLUMN faturado INTEGER NOT NULL DEFAULT 0");
+    }
+
     public function recalcularValorFolha($id_contrato, $numero_folha)
     {
         $sql = "SELECT SUM(valor_total) as total FROM contrato_produtos WHERE id_contrato = ? AND numero_folha = ?";
@@ -14,14 +32,14 @@ class Contrato extends Model
         self::$pdo->prepare($sqlUpd)->execute([$total, $id_contrato, $numero_folha]);
     }
 
-    public function salvarContratoCompleto($titulo, $valor_total, $qtd_folhas, $produtos)
+    public function salvarContratoCompleto($titulo, $valor_total, $qtd_folhas, $produtos, $faturado = 0)
     {
         try {
             self::$pdo->beginTransaction();
 
-            $sqlContrato = "INSERT INTO contratos (titulo, valor_total, qtd_folhas) VALUES (?, ?, ?)";
+            $sqlContrato = "INSERT INTO contratos (titulo, valor_total, qtd_folhas, faturado) VALUES (?, ?, ?, ?)";
             $stmt = self::$pdo->prepare($sqlContrato);
-            $stmt->execute([$titulo, $valor_total, $qtd_folhas]);
+            $stmt->execute([$titulo, $valor_total, $qtd_folhas, $faturado ? 1 : 0]);
             $id_contrato = self::$pdo->lastInsertId();
 
             $sqlFolha = "INSERT INTO contrato_folhas (id_contrato, numero_folha, valor_folha, observacao, data_faturamento) VALUES (?, ?, 0, '', NULL)";
@@ -103,14 +121,20 @@ class Contrato extends Model
         }
     }
 
-    public function atualizarDadosGerais($id, $titulo, $valor_total)
+    public function atualizarDadosGerais($id, $titulo, $valor_total, $faturado)
     {
         try {
-            $sql = "UPDATE contratos SET titulo = ?, valor_total = ? WHERE id = ?";
-            return self::$pdo->prepare($sql)->execute([$titulo, $valor_total, $id]);
+            $sql = "UPDATE contratos SET titulo = ?, valor_total = ?, faturado = ? WHERE id = ?";
+            return self::$pdo->prepare($sql)->execute([$titulo, $valor_total, $faturado ? 1 : 0, $id]);
         } catch (Exception $e) {
             return false;
         }
+    }
+
+    public function atualizarFaturado($id, $faturado)
+    {
+        $stmt = self::$pdo->prepare("UPDATE contratos SET faturado = ? WHERE id = ?");
+        return $stmt->execute([$faturado ? 1 : 0, $id]);
     }
 
     public function listarTodos()

@@ -33,6 +33,7 @@ class ContratoController extends Controller
 
             $valor_total = (float)($_POST['valor_total'] ?? 0);
             $qtd_folhas = (int)($_POST['qtd_folhas'] ?? 1);
+            $faturado = isset($_POST['faturado']) ? 1 : 0;
 
             if ($valor_total <= 0 || $qtd_folhas <= 0) {
                 $erro = 'O valor total e a quantidade de folhas devem ser maiores que zero.';
@@ -41,7 +42,7 @@ class ContratoController extends Controller
 
                 if (empty($produtos)) {
                     $erro = 'Informe pelo menos um produto valido para salvar o pedido.';
-                } elseif ($this->contratoModel->salvarContratoCompleto($titulo, $valor_total, $qtd_folhas, $produtos)) {
+                } elseif ($this->contratoModel->salvarContratoCompleto($titulo, $valor_total, $qtd_folhas, $produtos, $faturado)) {
                     definir_flash('sucesso', 'Pedido cadastrado', 'O novo pedido foi salvo com sucesso.');
                     registrar_log(Model::getConexao(), 'Contrato - Cadastrar', "Novo contrato '{$titulo}' cadastrado.");
                     redirect('/contrato');
@@ -74,9 +75,10 @@ class ContratoController extends Controller
             }
 
             $valor_total = (float)($_POST['valor_total'] ?? 0);
+            $faturado = isset($_POST['faturado']) ? 1 : 0;
 
             if ($valor_total > 0) {
-                if ($this->contratoModel->atualizarDadosGerais($id, $titulo, $valor_total)) {
+                if ($this->contratoModel->atualizarDadosGerais($id, $titulo, $valor_total, $faturado)) {
                     definir_flash('sucesso', 'Dados gerais atualizados', 'As informacoes principais do pedido foram salvas.');
                     registrar_log(Model::getConexao(), 'Contrato - Editar', "Contrato #{$id} atualizado para '{$titulo}'.");
                     redirect("/contrato/ver/{$id}");
@@ -95,6 +97,40 @@ class ContratoController extends Controller
             'contrato' => $contrato,
             'erro' => $erro
         ]);
+    }
+
+    public function salvar_faturamento($id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('/contrato/ver/' . (int)$id);
+            exit;
+        }
+
+        verificar_csrf_token($_POST['csrf_token'] ?? '');
+
+        $id = (int)$id;
+        $contrato = $this->contratoModel->buscarPorId($id);
+
+        if (!$contrato) {
+            $this->mostrarErro404('Contrato nao encontrado.');
+        }
+
+        $faturado = isset($_POST['faturado']) ? 1 : 0;
+
+        if ($this->contratoModel->atualizarFaturado($id, $faturado)) {
+            $tituloFlash = $faturado ? 'Pedido marcado como faturado' : 'Pedido marcado como nao faturado';
+            $textoFlash = $faturado
+                ? 'O pedido agora aparecera destacado na lista de contratos.'
+                : 'O destaque de faturamento foi removido deste pedido.';
+
+            definir_flash('sucesso', $tituloFlash, $textoFlash);
+            registrar_log(Model::getConexao(), 'Contrato - Faturamento', "Contrato #{$id} teve status de faturamento alterado para {$faturado}.");
+        } else {
+            definir_flash('erro', 'Nao foi possivel salvar', 'O status de faturamento nao pode ser atualizado agora.');
+        }
+
+        redirect("/contrato/ver/{$id}");
+        exit;
     }
 
     public function excluir($id)

@@ -19,6 +19,13 @@
             </header>
 
             <main>
+                <?php if (!empty($erro)): ?>
+                    <div class="alert-box alert-erro" style="max-width: 760px; margin-bottom: 20px;">
+                        <div class="alert-title">Nao foi possivel salvar</div>
+                        <div class="alert-text"><?php echo e($erro); ?></div>
+                    </div>
+                <?php endif; ?>
+
                 <form action="/contrato/cadastrar" method="POST" class="formulario-sistema">
                     <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
 
@@ -36,6 +43,14 @@
                         <label>Em quantas notas este pedido será dividido?</label>
                         <input type="number" name="qtd_folhas" id="qtd_folhas" class="sistema" value="1" min="1" required oninput="calcularTotais()">
                     </div>
+
+                    <label class="contrato-check-option">
+                        <input type="checkbox" name="faturado" value="1">
+                        <span>
+                            <strong>Pedido ja faturado</strong>
+                            <small>Quando marcado, o pedido aparecera destacado na lista de contratos.</small>
+                        </span>
+                    </label>
 
                     <h3 class="form-section-title" style="margin-top: 30px;">Produtos do Pedido</h3>
 

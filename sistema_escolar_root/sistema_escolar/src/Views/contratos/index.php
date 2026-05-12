@@ -2,10 +2,12 @@
 $totalContratos = count($contratos);
 $valorAcumulado = 0.0;
 $totalFolhas = 0;
+$totalFaturados = 0;
 
 foreach ($contratos as $contratoResumo) {
     $valorAcumulado += (float)($contratoResumo['valor_total'] ?? 0);
     $totalFolhas += (int)($contratoResumo['qtd_folhas'] ?? 0);
+    $totalFaturados += !empty($contratoResumo['faturado']) ? 1 : 0;
 }
 ?>
 <!DOCTYPE html>
@@ -51,6 +53,10 @@ foreach ($contratos as $contratoResumo) {
                             <strong>R$ <?php echo number_format($valorAcumulado, 2, ',', '.'); ?></strong>
                             <span>Valor total</span>
                         </div>
+                        <div class="contrato-stat">
+                            <strong><?php echo (int)$totalFaturados; ?></strong>
+                            <span>Ja faturados</span>
+                        </div>
                     </div>
                 </section>
 
@@ -75,6 +81,7 @@ foreach ($contratos as $contratoResumo) {
                                 <th>Título do Pedido</th>
                                 <th>Notas</th>
                                 <th>Valor Total</th>
+                                <th>Faturamento</th>
                                 <th>Média por Nota</th>
                                 <th>Data de Registro</th>
                                 <th style="text-align: center;">Ações</th>
@@ -83,15 +90,16 @@ foreach ($contratos as $contratoResumo) {
                         <tbody>
                             <?php if (empty($contratos)): ?>
                                 <tr>
-                                    <td colspan="7" class="muted-cell">Nenhum pedido encontrado no sistema.</td>
+                                    <td colspan="8" class="muted-cell">Nenhum pedido encontrado no sistema.</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($contratos as $c): ?>
                                     <?php
                                     $qtdFolhas = max(1, (int)$c['qtd_folhas']);
                                     $mediaPorFolha = ((float)$c['valor_total']) / $qtdFolhas;
+                                    $faturado = !empty($c['faturado']);
                                     ?>
-                                    <tr>
+                                    <tr class="<?php echo $faturado ? 'contrato-row-faturado' : ''; ?>">
                                         <td><span class="table-id">#</span><?php echo (int)$c['id']; ?></td>
                                         <td>
                                             <strong><?php echo e($c['titulo']); ?></strong>
@@ -101,6 +109,11 @@ foreach ($contratos as $contratoResumo) {
                                             <span class="badge-folhas"><?php echo $qtdFolhas; ?> nota(s)</span>
                                         </td>
                                         <td class="money-primary">R$ <?php echo number_format($c['valor_total'], 2, ',', '.'); ?></td>
+                                        <td>
+                                            <span class="<?php echo $faturado ? 'badge-faturado' : 'badge-nao-faturado'; ?>">
+                                                <?php echo $faturado ? 'Faturado' : 'Nao faturado'; ?>
+                                            </span>
+                                        </td>
                                         <td><span class="badge-media">R$ <?php echo number_format($mediaPorFolha, 2, ',', '.'); ?></span></td>
                                         <td class="table-date">
                                             <?php echo date('d/m/Y', strtotime($c['criado_em'])); ?>
