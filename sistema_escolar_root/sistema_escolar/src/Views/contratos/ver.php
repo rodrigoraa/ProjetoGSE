@@ -38,7 +38,7 @@
                 $saldo_geral = $contrato['valor_total'] - $total_produtos_geral;
                 $total_notas = count($folhas);
                 $notas_faturadas = count(array_filter($folhas, static function ($folha) {
-                    return !empty($folha['data_faturamento']);
+                    return !empty($folha['faturado']);
                 }));
                 $todas_notas_faturadas = $total_notas > 0 && $notas_faturadas === $total_notas;
                 ?>
@@ -72,7 +72,7 @@
                 <div class="tabs-container">
                     <div class="tabs-header">
                         <?php foreach ($folhas as $f): ?>
-                            <?php $notaFaturada = !empty($f['data_faturamento']); ?>
+                            <?php $notaFaturada = !empty($f['faturado']); ?>
                             <button class="tab-btn <?php echo $notaFaturada ? 'tab-btn-faturada' : ''; ?> <?php echo ($f['numero_folha'] == ($aba_ativa ?? 1)) ? 'active' : ''; ?>" type="button" onclick="abrirAba(event, <?php echo (int)$f['numero_folha']; ?>)">
                                 Nota <?php echo (int)$f['numero_folha']; ?>
                             </button>
@@ -87,7 +87,7 @@
                     <?php foreach ($folhas as $f): ?>
                         <?php
                         $num_folha = $f['numero_folha'];
-                        $nota_faturada = !empty($f['data_faturamento']);
+                        $nota_faturada = !empty($f['faturado']);
                         $produtos_desta_folha = array_filter($produtos, function ($p) use ($num_folha) {
                             return ($p['numero_folha'] ?: 1) == $num_folha;
                         });
@@ -101,10 +101,13 @@
                                             <span>
                                                 Total acumulado desta nota: <strong style="font-size: 1.1em; color: #007bff;">R$ <?php echo number_format($f['valor_folha'], 2, ',', '.'); ?></strong>
                                             </span>
-                                            <?php if (!empty($f['data_faturamento'])): ?>
-                                                <span class="badge-faturado">Faturada em <?php echo date('d/m/Y', strtotime($f['data_faturamento'])); ?></span>
+                                            <?php if ($nota_faturada): ?>
+                                                <span class="badge-faturado">Pedido faturado</span>
                                             <?php else: ?>
                                                 <span class="badge-nao-faturado">Nao faturada</span>
+                                            <?php endif; ?>
+                                            <?php if (!empty($f['data_faturamento'])): ?>
+                                                <span class="badge-folhas">Lembrete: <?php echo date('d/m/Y', strtotime($f['data_faturamento'])); ?></span>
                                             <?php endif; ?>
                                         </div>
                                     </div>
@@ -114,10 +117,10 @@
                                             <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                                             <label class="contrato-check-inline">
                                                 <input type="checkbox" name="faturado" value="1" <?php echo $nota_faturada ? 'checked' : ''; ?> onchange="atualizarFaturamentoNota(this)">
-                                                <span>Nota faturada</span>
+                                                <span>Pedido faturado</span>
                                             </label>
                                             <label class="contrato-status-date">
-                                                <span>Faturamento da nota</span>
+                                                <span>Data para faturamento</span>
                                                 <input type="date" name="data_faturamento" class="sistema contrato-status-date-input" value="<?php echo e($f['data_faturamento'] ?? ''); ?>">
                                             </label>
                                             <button type="submit" class="btn-secondary btn-sm">Confirmar</button>
@@ -241,27 +244,17 @@
             const form = checkbox.closest('form');
             const dataInput = form.querySelector('input[name="data_faturamento"]');
 
-            dataInput.required = checkbox.checked;
-            dataInput.disabled = !checkbox.checked;
-
-            if (!checkbox.checked) {
-                dataInput.value = '';
-            }
+            dataInput.required = false;
+            dataInput.disabled = false;
         }
 
         function confirmarFaturamentoNota(form, numeroFolha) {
             const checkbox = form.querySelector('input[name="faturado"]');
             const dataInput = form.querySelector('input[name="data_faturamento"]');
 
-            if (checkbox.checked && !dataInput.value) {
-                alert('Informe a data do faturamento da nota antes de confirmar.');
-                dataInput.focus();
-                return false;
-            }
-
             const mensagem = checkbox.checked
-                ? 'Confirmar faturamento da nota ' + numeroFolha + '?'
-                : 'Remover o faturamento da nota ' + numeroFolha + '?';
+                ? 'Marcar a nota ' + numeroFolha + ' como faturada?'
+                : 'Marcar a nota ' + numeroFolha + ' como nao faturada?';
 
             return confirm(mensagem);
         }

@@ -238,27 +238,27 @@ class ContratoController extends Controller
             exit;
         }
 
-        if ($faturado && ($data_faturamento === '' || !$this->validarDataIso($data_faturamento))) {
-            definir_flash('erro', 'Data de faturamento obrigatoria', 'Informe uma data valida para faturar a nota.');
+        if ($data_faturamento !== '' && !$this->validarDataIso($data_faturamento)) {
+            definir_flash('erro', 'Data invalida', 'Informe uma data valida para o lembrete de faturamento.');
             redirect("/contrato/ver/{$id_contrato}?folha={$numero_folha}");
             exit;
         }
 
-        $valorSalvar = $faturado ? $data_faturamento : null;
+        $valorSalvar = $data_faturamento !== '' ? $data_faturamento : null;
 
-        if ($this->contratoModel->atualizarDataFaturamentoFolha($id_contrato, $numero_folha, $valorSalvar)) {
-            $mensagem = $valorSalvar
-                ? "A data de faturamento da nota {$numero_folha} foi atualizada."
-                : "A data de faturamento da nota {$numero_folha} foi removida.";
+        if ($this->contratoModel->atualizarFaturamentoFolha($id_contrato, $numero_folha, $faturado, $valorSalvar)) {
+            $mensagem = $faturado
+                ? "A nota {$numero_folha} foi marcada como faturada."
+                : "A nota {$numero_folha} foi marcada como nao faturada.";
 
-            definir_flash('sucesso', 'Data de faturamento salva', $mensagem);
+            definir_flash('sucesso', 'Faturamento salvo', $mensagem);
             registrar_log(
                 Model::getConexao(),
                 'Contrato - Editar Folha',
-                "Atualizou data de faturamento da folha {$numero_folha} do contrato #{$id_contrato}."
+                "Atualizou faturamento da folha {$numero_folha} do contrato #{$id_contrato}."
             );
         } else {
-            definir_flash('erro', 'Nao foi possivel salvar', 'A data de faturamento da nota nao pode ser atualizada agora.');
+            definir_flash('erro', 'Nao foi possivel salvar', 'O faturamento da nota nao pode ser atualizado agora.');
         }
 
         redirect("/contrato/ver/{$id_contrato}?folha={$numero_folha}");

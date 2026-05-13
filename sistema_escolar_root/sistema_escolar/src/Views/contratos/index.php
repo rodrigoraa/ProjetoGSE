@@ -115,8 +115,8 @@ foreach ($contratos as $contratoResumo) {
                                             <span class="<?php echo $temFaturamento ? 'badge-faturado' : 'badge-nao-faturado'; ?>">
                                                 <?php echo $notasFaturadas; ?> de <?php echo $qtdFolhas; ?> nota(s)
                                             </span>
-                                            <?php if ($temFaturamento && !empty($c['ultima_data_faturamento'])): ?>
-                                                <small class="contrato-meta">Ultima em <?php echo date('d/m/Y', strtotime($c['ultima_data_faturamento'])); ?></small>
+                                            <?php if (!empty($c['ultima_data_faturamento'])): ?>
+                                                <small class="contrato-meta">Lembrete: <?php echo date('d/m/Y', strtotime($c['ultima_data_faturamento'])); ?></small>
                                             <?php endif; ?>
                                         </td>
                                         <td><span class="badge-media">R$ <?php echo number_format($mediaPorFolha, 2, ',', '.'); ?></span></td>
