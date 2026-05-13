@@ -255,9 +255,33 @@ input.sistema::placeholder {
     box-shadow: 0 10px 24px rgba(0, 102, 204, 0.18);
 }
 
+.tab-btn-faturada {
+    background: #e4f8eb;
+    color: var(--success-green-dark);
+    border-color: #9bd8ad;
+    box-shadow: inset 0 -3px 0 rgba(40, 167, 69, 0.2);
+}
+
+.tab-btn-faturada.active {
+    background: var(--success-green);
+    color: #fff;
+    border-color: var(--success-green-dark);
+    box-shadow: 0 10px 24px rgba(40, 167, 69, 0.2);
+}
+
 .tab-btn:hover {
     background: #e4edf7;
     color: var(--primary-blue);
+}
+
+.tab-btn-faturada:hover {
+    background: #d7f3e0;
+    color: var(--success-green-dark);
+}
+
+.tab-btn-faturada.active:hover {
+    background: var(--success-green-dark);
+    color: #fff;
 }
 
 .tab-content {
@@ -267,6 +291,16 @@ input.sistema::placeholder {
 
 .tab-content.active {
     display: block;
+}
+
+.nota-painel {
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nota-painel-faturada {
+    background: linear-gradient(180deg, #f0fff6 0%, #ffffff 100%);
+    border-color: #9bd8ad;
+    box-shadow: inset 5px 0 0 var(--success-green), 0 12px 26px rgba(31, 127, 53, 0.08);
 }
 
 /* ==========================================================================

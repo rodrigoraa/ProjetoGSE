@@ -176,6 +176,7 @@ Rode uma vez no terminal do VSCode:
 ```bash
 sqlite3 database/secretaria.db "ALTER TABLE contratos ADD COLUMN faturado INTEGER NOT NULL DEFAULT 0;"
 sqlite3 database/secretaria.db "ALTER TABLE contratos ADD COLUMN data_faturamento TEXT DEFAULT NULL;"
+sqlite3 database/secretaria.db "ALTER TABLE contrato_folhas ADD COLUMN data_faturamento TEXT DEFAULT NULL;"
 sqlite3 database/secretaria.db "ALTER TABLE usuarios ADD COLUMN recebe_avisos_email INTEGER NOT NULL DEFAULT 1;"
 ```
 
@@ -234,10 +235,10 @@ Depois de entrar:
 3. Abra a tela de alunos.
 4. Cadastre e edite um aluno.
 5. Abra contratos/pedidos.
-6. Marque `Pedido faturado`.
-7. Tente salvar sem `Data do faturamento` e confira se o sistema bloqueia.
-8. Informe a data e salve.
-9. Confira se o contrato faturado fica destacado na listagem.
+6. Abra os detalhes de um pedido e escolha uma nota.
+7. Preencha `Faturamento da nota` e salve.
+8. Apague a data e salve novamente para conferir que a nota volta a ficar sem faturamento.
+9. Confira se a listagem mostra a quantidade correta de notas faturadas.
 10. Abra usuários como administrador.
 11. Marque e desmarque `Receber avisos por e-mail`.
 12. Abra certidões, agenda, relatórios e passivo.

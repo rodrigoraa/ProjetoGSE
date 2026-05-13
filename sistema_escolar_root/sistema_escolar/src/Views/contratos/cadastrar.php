@@ -44,19 +44,6 @@
                         <input type="number" name="qtd_folhas" id="qtd_folhas" class="sistema" value="1" min="1" required oninput="calcularTotais()">
                     </div>
 
-                    <label class="contrato-check-option">
-                        <input type="checkbox" id="pedido_faturado" name="faturado" value="1" <?php echo isset($_POST['faturado']) ? 'checked' : ''; ?> onchange="atualizarObrigatoriedadeFaturamento()">
-                        <span>
-                            <strong>Pedido ja faturado</strong>
-                            <small>Quando marcado, informe tambem a data do faturamento.</small>
-                        </span>
-                    </label>
-
-                    <div class="form-group contrato-data-faturamento-geral" id="grupo_data_faturamento">
-                        <label for="data_faturamento">Data do faturamento</label>
-                        <input type="date" name="data_faturamento" id="data_faturamento" class="sistema" value="<?php echo e($_POST['data_faturamento'] ?? ''); ?>">
-                    </div>
-
                     <h3 class="form-section-title" style="margin-top: 30px;">Produtos do Pedido</h3>
 
                     <div id="lista-produtos">
@@ -163,21 +150,7 @@
             }
         }
 
-        function atualizarObrigatoriedadeFaturamento() {
-            const checkbox = document.getElementById('pedido_faturado');
-            const dataInput = document.getElementById('data_faturamento');
-            const grupoData = document.getElementById('grupo_data_faturamento');
-
-            dataInput.required = checkbox.checked;
-            dataInput.disabled = !checkbox.checked;
-            grupoData.classList.toggle('is-disabled', !checkbox.checked);
-
-            if (!checkbox.checked) {
-                dataInput.value = '';
-            }
-        }
-
-        atualizarObrigatoriedadeFaturamento();
+        calcularTotais();
     </script>
 </body>
 

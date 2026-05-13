@@ -36,32 +36,22 @@
                 <?php
                 $total_produtos_geral = array_sum(array_column($produtos, 'valor_total'));
                 $saldo_geral = $contrato['valor_total'] - $total_produtos_geral;
+                $total_notas = count($folhas);
+                $notas_faturadas = count(array_filter($folhas, static function ($folha) {
+                    return !empty($folha['data_faturamento']);
+                }));
+                $todas_notas_faturadas = $total_notas > 0 && $notas_faturadas === $total_notas;
                 ?>
 
-                <div class="contrato-header <?php echo !empty($contrato['faturado']) ? 'contrato-header-faturado' : ''; ?>">
+                <div class="contrato-header <?php echo $todas_notas_faturadas ? 'contrato-header-faturado' : ''; ?>">
                     <div class="contrato-title-row">
                         <div>
                             <h2 class="contrato-summary-title"><?php echo e($contrato['titulo']); ?></h2>
-                            <span class="<?php echo !empty($contrato['faturado']) ? 'badge-faturado' : 'badge-nao-faturado'; ?>">
-                                <?php echo !empty($contrato['faturado']) ? 'Faturado' : 'Nao faturado'; ?>
+                            <span class="<?php echo $todas_notas_faturadas ? 'badge-faturado' : 'badge-nao-faturado'; ?>">
+                                <?php echo $notas_faturadas; ?> de <?php echo $total_notas; ?> nota(s) faturada(s)
                             </span>
-                            <?php if (!empty($contrato['faturado']) && !empty($contrato['data_faturamento'])): ?>
-                                <small class="contrato-data-faturamento-info">Faturado em <?php echo date('d/m/Y', strtotime($contrato['data_faturamento'])); ?></small>
-                            <?php endif; ?>
+                            <small class="contrato-data-faturamento-info">O faturamento e controlado individualmente por nota.</small>
                         </div>
-
-                        <form action="/contrato/salvar_faturamento/<?php echo (int)$contrato['id']; ?>" method="POST" class="contrato-status-form">
-                            <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
-                            <label class="contrato-check-inline">
-                                <input type="checkbox" id="pedido_faturado_status" name="faturado" value="1" <?php echo !empty($contrato['faturado']) ? 'checked' : ''; ?> onchange="atualizarObrigatoriedadeFaturamentoStatus()">
-                                <span>Pedido faturado</span>
-                            </label>
-                            <label class="contrato-status-date">
-                                <span>Data do faturamento</span>
-                                <input type="date" id="data_faturamento_status" name="data_faturamento" class="sistema contrato-status-date-input" value="<?php echo e($contrato['data_faturamento'] ?? ''); ?>">
-                            </label>
-                            <button type="submit" class="btn-secondary btn-sm">Salvar status</button>
-                        </form>
                     </div>
                     <div class="resumo-financeiro">
                         <div>
@@ -82,7 +72,8 @@
                 <div class="tabs-container">
                     <div class="tabs-header">
                         <?php foreach ($folhas as $f): ?>
-                            <button class="tab-btn <?php echo ($f['numero_folha'] == ($aba_ativa ?? 1)) ? 'active' : ''; ?>" type="button" onclick="abrirAba(event, <?php echo (int)$f['numero_folha']; ?>)">
+                            <?php $notaFaturada = !empty($f['data_faturamento']); ?>
+                            <button class="tab-btn <?php echo $notaFaturada ? 'tab-btn-faturada' : ''; ?> <?php echo ($f['numero_folha'] == ($aba_ativa ?? 1)) ? 'active' : ''; ?>" type="button" onclick="abrirAba(event, <?php echo (int)$f['numero_folha']; ?>)">
                                 Nota <?php echo (int)$f['numero_folha']; ?>
                             </button>
                         <?php endforeach; ?>
@@ -96,12 +87,13 @@
                     <?php foreach ($folhas as $f): ?>
                         <?php
                         $num_folha = $f['numero_folha'];
+                        $nota_faturada = !empty($f['data_faturamento']);
                         $produtos_desta_folha = array_filter($produtos, function ($p) use ($num_folha) {
                             return ($p['numero_folha'] ?: 1) == $num_folha;
                         });
                         ?>
                         <div id="aba-<?php echo (int)$num_folha; ?>" class="tab-content <?php echo ($num_folha == ($aba_ativa ?? 1)) ? 'active' : ''; ?>">
-                            <div class="relatorio">
+                            <div class="relatorio nota-painel <?php echo $nota_faturada ? 'nota-painel-faturada' : ''; ?>">
                                 <div class="folha-header">
                                     <div>
                                         <h3 class="form-section-title contrato-summary-title">Itens da nota <?php echo (int)$num_folha; ?></h3>
@@ -109,10 +101,23 @@
                                             <span>
                                                 Total acumulado desta nota: <strong style="font-size: 1.1em; color: #007bff;">R$ <?php echo number_format($f['valor_folha'], 2, ',', '.'); ?></strong>
                                             </span>
+                                            <?php if (!empty($f['data_faturamento'])): ?>
+                                                <span class="badge-faturado">Faturada em <?php echo date('d/m/Y', strtotime($f['data_faturamento'])); ?></span>
+                                            <?php else: ?>
+                                                <span class="badge-nao-faturado">Nao faturada</span>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
 
-                                    <div class="action-group" style="display: flex; gap: 10px; align-items: center;">
+                                    <div class="action-group" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                        <form action="/contrato/salvar_data_faturamento_folha/<?php echo (int)$contrato['id']; ?>/<?php echo (int)$num_folha; ?>" method="POST" class="contrato-status-form">
+                                            <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
+                                            <label class="contrato-status-date">
+                                                <span>Faturamento da nota</span>
+                                                <input type="date" name="data_faturamento" class="sistema contrato-status-date-input" value="<?php echo e($f['data_faturamento'] ?? ''); ?>">
+                                            </label>
+                                            <button type="submit" class="btn-secondary btn-sm">Salvar</button>
+                                        </form>
                                         <button type="button" onclick="toggleFormProduto(<?php echo (int)$num_folha; ?>)" class="btn-primary">+ Adicionar Produto</button>
                                         <a href="/contrato/imprimir/<?php echo (int)$contrato['id']; ?>?folha=<?php echo (int)$num_folha; ?>" target="_blank" class="btn-secondary">🖨️ Imprimir nota</a>
 
@@ -227,20 +232,6 @@
             const form = document.getElementById('form-produto-' + numeroFolha);
             form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
         }
-
-        function atualizarObrigatoriedadeFaturamentoStatus() {
-            const checkbox = document.getElementById('pedido_faturado_status');
-            const dataInput = document.getElementById('data_faturamento_status');
-
-            dataInput.required = checkbox.checked;
-            dataInput.disabled = !checkbox.checked;
-
-            if (!checkbox.checked) {
-                dataInput.value = '';
-            }
-        }
-
-        atualizarObrigatoriedadeFaturamentoStatus();
     </script>
 </body>
 
