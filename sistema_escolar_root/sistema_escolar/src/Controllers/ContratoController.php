@@ -229,6 +229,7 @@ class ContratoController extends Controller
 
         $id_contrato = (int)$id_contrato;
         $numero_folha = (int)$numero_folha;
+        $faturado = isset($_POST['faturado']);
         $data_faturamento = trim((string)($_POST['data_faturamento'] ?? ''));
 
         if (!$this->contratoModel->folhaExiste($id_contrato, $numero_folha)) {
@@ -237,13 +238,13 @@ class ContratoController extends Controller
             exit;
         }
 
-        if ($data_faturamento !== '' && !$this->validarDataIso($data_faturamento)) {
-            definir_flash('erro', 'Data invalida', 'Informe uma data de faturamento valida.');
+        if ($faturado && ($data_faturamento === '' || !$this->validarDataIso($data_faturamento))) {
+            definir_flash('erro', 'Data de faturamento obrigatoria', 'Informe uma data valida para faturar a nota.');
             redirect("/contrato/ver/{$id_contrato}?folha={$numero_folha}");
             exit;
         }
 
-        $valorSalvar = $data_faturamento !== '' ? $data_faturamento : null;
+        $valorSalvar = $faturado ? $data_faturamento : null;
 
         if ($this->contratoModel->atualizarDataFaturamentoFolha($id_contrato, $numero_folha, $valorSalvar)) {
             $mensagem = $valorSalvar

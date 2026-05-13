@@ -110,13 +110,17 @@
                                     </div>
 
                                     <div class="action-group" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                                        <form action="/contrato/salvar_data_faturamento_folha/<?php echo (int)$contrato['id']; ?>/<?php echo (int)$num_folha; ?>" method="POST" class="contrato-status-form">
+                                        <form action="/contrato/salvar_data_faturamento_folha/<?php echo (int)$contrato['id']; ?>/<?php echo (int)$num_folha; ?>" method="POST" class="contrato-status-form" onsubmit="return confirmarFaturamentoNota(this, <?php echo (int)$num_folha; ?>)">
                                             <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
+                                            <label class="contrato-check-inline">
+                                                <input type="checkbox" name="faturado" value="1" <?php echo $nota_faturada ? 'checked' : ''; ?> onchange="atualizarFaturamentoNota(this)">
+                                                <span>Nota faturada</span>
+                                            </label>
                                             <label class="contrato-status-date">
                                                 <span>Faturamento da nota</span>
                                                 <input type="date" name="data_faturamento" class="sistema contrato-status-date-input" value="<?php echo e($f['data_faturamento'] ?? ''); ?>">
                                             </label>
-                                            <button type="submit" class="btn-secondary btn-sm">Salvar</button>
+                                            <button type="submit" class="btn-secondary btn-sm">Confirmar</button>
                                         </form>
                                         <button type="button" onclick="toggleFormProduto(<?php echo (int)$num_folha; ?>)" class="btn-primary">+ Adicionar Produto</button>
                                         <a href="/contrato/imprimir/<?php echo (int)$contrato['id']; ?>?folha=<?php echo (int)$num_folha; ?>" target="_blank" class="btn-secondary">🖨️ Imprimir nota</a>
@@ -232,6 +236,39 @@
             const form = document.getElementById('form-produto-' + numeroFolha);
             form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
         }
+
+        function atualizarFaturamentoNota(checkbox) {
+            const form = checkbox.closest('form');
+            const dataInput = form.querySelector('input[name="data_faturamento"]');
+
+            dataInput.required = checkbox.checked;
+            dataInput.disabled = !checkbox.checked;
+
+            if (!checkbox.checked) {
+                dataInput.value = '';
+            }
+        }
+
+        function confirmarFaturamentoNota(form, numeroFolha) {
+            const checkbox = form.querySelector('input[name="faturado"]');
+            const dataInput = form.querySelector('input[name="data_faturamento"]');
+
+            if (checkbox.checked && !dataInput.value) {
+                alert('Informe a data do faturamento da nota antes de confirmar.');
+                dataInput.focus();
+                return false;
+            }
+
+            const mensagem = checkbox.checked
+                ? 'Confirmar faturamento da nota ' + numeroFolha + '?'
+                : 'Remover o faturamento da nota ' + numeroFolha + '?';
+
+            return confirm(mensagem);
+        }
+
+        document.querySelectorAll('.contrato-status-form input[name="faturado"]').forEach((checkbox) => {
+            atualizarFaturamentoNota(checkbox);
+        });
     </script>
 </body>
 
