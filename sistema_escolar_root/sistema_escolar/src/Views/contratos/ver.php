@@ -106,9 +106,6 @@
                                             <?php else: ?>
                                                 <span class="badge-nao-faturado">Nao faturada</span>
                                             <?php endif; ?>
-                                            <?php if (!empty($f['data_faturamento'])): ?>
-                                                <span class="badge-folhas">Lembrete: <?php echo date('d/m/Y', strtotime($f['data_faturamento'])); ?></span>
-                                            <?php endif; ?>
                                         </div>
                                     </div>
 
