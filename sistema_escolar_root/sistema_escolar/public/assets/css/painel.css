@@ -649,6 +649,35 @@ button,
     border-radius: 14px;
 }
 
+.painel-feriados {
+    color: #7c2d12;
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+    border-color: #fed7aa;
+}
+
+.painel-feriados h2 {
+    color: #9a3412;
+}
+
+.painel-feriado-card {
+    color: #7c2d12;
+    border: 1px solid #fed7aa;
+    background: rgba(255, 251, 235, 0.88);
+}
+
+.painel-feriado-card small {
+    display: block;
+    margin-top: 5px;
+    color: #9a3412;
+    font-weight: 700;
+}
+
+.painel-feriado-data {
+    display: inline-block;
+    margin-right: 10px;
+    color: #c2410c;
+}
+
 .grid-niver {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));

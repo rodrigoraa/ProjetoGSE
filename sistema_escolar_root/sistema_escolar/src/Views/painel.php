@@ -50,6 +50,27 @@
                     </div>
                 <?php endif; ?>
 
+                <?php if (!empty($feriados_painel)): ?>
+                    <div class="niver-hoje painel-feriados">
+                        <h2>Feriados próximos</h2>
+                        <?php foreach ($feriados_painel as $feriado):
+                            $data_br = date('d/m/Y', strtotime($feriado['date']));
+                            $eh_hoje = ($feriado['date'] === date('Y-m-d'));
+                            $tipo = ($feriado['type'] ?? '') === 'municipal' ? 'Municipal' : 'Nacional';
+                        ?>
+                            <div class="niver-card painel-feriado-card">
+                                <span>
+                                    <strong class="painel-feriado-data">
+                                        <?php echo $eh_hoje ? 'HOJE' : $data_br; ?>
+                                    </strong>
+                                    <strong><?php echo e($feriado['name']); ?></strong>
+                                    <small><?php echo e($tipo); ?></small>
+                                </span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+
                 <?php if (!empty($certidoes_alerta)): ?>
                     <div class="alerta-container">
                         <div class="alerta-header" onclick="toggleSanfona('listaCertidoes', 'setaCert')">
