@@ -34,7 +34,8 @@
 
                 <div class="relatorio">
                     <h3>Histórico Local (<?php echo count($lista); ?> arquivos)</h3>
-                    <p style="font-size:0.9em; color:#666; margin-bottom:15px;">O sistema protege automaticamente o arquivo mais recente contra exclusão acidental.</p>
+                    <p style="font-size:0.9em; color:#666; margin-bottom:8px;">O sistema protege automaticamente o arquivo mais recente contra exclusão acidental.</p>
+                    <p class="backup-path-info">Pasta monitorada: <?php echo e($pasta_backups ?? 'database/backups/'); ?></p>
 
                     <table class="tabela-filtrada">
                         <thead>
@@ -52,11 +53,14 @@
                                 </tr>
                             <?php endif; ?>
 
-                            <?php foreach ($lista as $index => $caminho): ?>
+                            <?php foreach ($lista as $index => $backup): ?>
                                 <?php
-                                $nome = basename($caminho);
-                                $data = date('d/m/Y H:i:s', filemtime($caminho));
-                                $tamanho = round(filesize($caminho) / 1024, 2) . ' KB';
+                                $caminhoFallback = is_array($backup) ? ($backup['caminho'] ?? '') : (string)$backup;
+                                $nome = is_array($backup) ? ($backup['nome'] ?? basename($caminhoFallback)) : basename($caminhoFallback);
+                                $timestamp = is_array($backup) ? (int)($backup['timestamp'] ?? 0) : (int)filemtime($caminhoFallback);
+                                $data = $timestamp > 0 ? date('d/m/Y H:i:s', $timestamp) : 'Data indisponível';
+                                $tamanhoBytes = is_array($backup) ? (int)($backup['tamanho'] ?? 0) : (int)filesize($caminhoFallback);
+                                $tamanho = round($tamanhoBytes / 1024, 2) . ' KB';
                                 $eh_o_ultimo = ($index === 0);
                                 $classe_linha = $eh_o_ultimo ? 'class="backup-recent"' : '';
                                 ?>

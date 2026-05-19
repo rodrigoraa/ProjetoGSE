@@ -38,6 +38,11 @@ foreach (($avisos ?? []) as $avisoResumo) {
             </header>
 
             <main>
+                <?php $flash = consumir_flash(); ?>
+                <?php if (!empty($flash)): ?>
+                    <?php echo $flash; ?>
+                <?php endif; ?>
+
                 <section class="agenda-hero">
                     <div>
                         <h2>Painel central dos avisos da equipe</h2>
@@ -61,28 +66,29 @@ foreach (($avisos ?? []) as $avisoResumo) {
 
                 <div class="agenda-grid">
                     <div class="relatorio agenda-card agenda-card-form">
-                        <h3 class="form-section-title">Novo Aviso</h3>
-                        <form action="/agenda/cadastrar" method="POST" class="sistema">
+                        <h3 class="form-section-title" id="agendaFormTitle">Novo Aviso</h3>
+                        <form action="/agenda/cadastrar" method="POST" class="sistema" id="agendaForm" data-create-action="/agenda/cadastrar">
                             <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
 
                             <div class="grid-form-inline agenda-form-grid">
                                 <div class="form-group">
                                     <label>Data do Aviso</label>
-                                    <input type="date" name="data_aviso" class="sistema" required value="<?php echo date('Y-m-d'); ?>">
+                                    <input type="date" name="data_aviso" class="sistema" id="agendaDataAviso" required value="<?php echo date('Y-m-d'); ?>">
                                 </div>
                                 <div class="form-group">
                                     <label>Título / Assunto</label>
-                                    <input type="text" name="titulo" class="sistema" required placeholder="Ex: Reunião de Pais e Mestres">
+                                    <input type="text" name="titulo" class="sistema" id="agendaTitulo" required placeholder="Ex: Reunião de Pais e Mestres">
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label>Descrição (Opcional)</label>
-                                <textarea name="descricao" class="sistema" rows="2" placeholder="Detalhes extras sobre o aviso..."></textarea>
+                                <textarea name="descricao" class="sistema" id="agendaDescricao" rows="2" placeholder="Detalhes extras sobre o aviso..."></textarea>
                             </div>
 
                             <div class="toolbar-actions toolbar-actions--end agenda-form-actions">
-                                <button type="submit" class="btn-primary">Adicionar à Agenda</button>
+                                <button type="button" class="btn-secondary agenda-cancel-edit" id="agendaCancelEdit" hidden>Cancelar edição</button>
+                                <button type="submit" class="btn-primary" id="agendaSubmitButton">Adicionar à Agenda</button>
                             </div>
                         </form>
                     </div>
@@ -111,7 +117,7 @@ foreach (($avisos ?? []) as $avisoResumo) {
                                 <th>Assunto</th>
                                 <th>Descrição</th>
                                 <th>Registrado por</th>
-                                <th style="text-align: center; width: 100px;">Ações</th>
+                                <th style="text-align: center; width: 170px;">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -142,9 +148,19 @@ foreach (($avisos ?? []) as $avisoResumo) {
 
                                                 if ($is_admin || $is_dono):
                                                 ?>
+                                                    <button
+                                                        type="button"
+                                                        class="btn-secondary btn-sm agenda-edit-button"
+                                                        title="Editar aviso"
+                                                        data-id="<?php echo (int)$aviso['id']; ?>"
+                                                        data-data="<?php echo e($aviso['data_aviso']); ?>"
+                                                        data-titulo="<?php echo e($aviso['titulo']); ?>"
+                                                        data-descricao="<?php echo e($aviso['descricao'] ?? ''); ?>">
+                                                        Editar
+                                                    </button>
                                                     <form action="/agenda/excluir/<?php echo (int)$aviso['id']; ?>" method="POST" onsubmit="return confirm('Tem certeza que deseja apagar este aviso?');">
                                                         <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
-                                                        <button type="submit" class="btn-danger btn-sm" title="Apagar aviso">🗑️ Apagar</button>
+                                                        <button type="submit" class="btn-danger btn-sm" title="Apagar aviso">Apagar</button>
                                                     </form>
                                                 <?php endif; ?>
                                             </div>
@@ -212,8 +228,13 @@ foreach (($avisos ?? []) as $avisoResumo) {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const calendarEl = document.getElementById('calendar');
-            const formDataAviso = document.querySelector('input[name="data_aviso"]');
-            const formTitulo = document.querySelector('input[name="titulo"]');
+            const agendaForm = document.getElementById('agendaForm');
+            const agendaFormTitle = document.getElementById('agendaFormTitle');
+            const formDataAviso = document.getElementById('agendaDataAviso');
+            const formTitulo = document.getElementById('agendaTitulo');
+            const formDescricao = document.getElementById('agendaDescricao');
+            const submitButton = document.getElementById('agendaSubmitButton');
+            const cancelEditButton = document.getElementById('agendaCancelEdit');
             const modal = document.getElementById('agendaModal');
             const modalTitulo = document.getElementById('agendaModalTitulo');
             const modalData = document.getElementById('agendaModalData');
@@ -221,6 +242,34 @@ foreach (($avisos ?? []) as $avisoResumo) {
             const modalDescricao = document.getElementById('agendaModalDescricao');
             const modalClose = document.getElementById('agendaModalClose');
             const eventos = <?php echo json_encode($eventos_calendario, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
+
+            function resetarFormularioAgenda() {
+                agendaForm.setAttribute('action', agendaForm.dataset.createAction);
+                agendaFormTitle.textContent = 'Novo Aviso';
+                submitButton.textContent = 'Adicionar à Agenda';
+                submitButton.disabled = false;
+                cancelEditButton.hidden = true;
+                formDataAviso.value = '<?php echo date('Y-m-d'); ?>';
+                formTitulo.value = '';
+                formDescricao.value = '';
+            }
+
+            function ativarEdicaoAviso(botao) {
+                agendaForm.setAttribute('action', '/agenda/editar/' + botao.dataset.id);
+                agendaFormTitle.textContent = 'Editar Aviso';
+                submitButton.textContent = 'Salvar alterações';
+                submitButton.disabled = false;
+                cancelEditButton.hidden = false;
+                formDataAviso.value = botao.dataset.data || '<?php echo date('Y-m-d'); ?>';
+                formTitulo.value = botao.dataset.titulo || '';
+                formDescricao.value = botao.dataset.descricao || '';
+                formTitulo.focus();
+
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
 
             function formatarData(dataIso) {
                 const partes = String(dataIso).split('-');
@@ -266,6 +315,10 @@ foreach (($avisos ?? []) as $avisoResumo) {
                     abrirModalAviso(info.event);
                 },
                 dateClick: function(info) {
+                    if (agendaForm.getAttribute('action') !== agendaForm.dataset.createAction) {
+                        resetarFormularioAgenda();
+                    }
+
                     formDataAviso.value = info.dateStr;
                     formTitulo.focus();
 
@@ -277,6 +330,19 @@ foreach (($avisos ?? []) as $avisoResumo) {
             });
 
             calendar.render();
+
+            document.querySelectorAll('.agenda-edit-button').forEach(function(botao) {
+                botao.addEventListener('click', function() {
+                    ativarEdicaoAviso(botao);
+                });
+            });
+
+            cancelEditButton.addEventListener('click', resetarFormularioAgenda);
+
+            agendaForm.addEventListener('submit', function() {
+                submitButton.disabled = true;
+                submitButton.textContent = agendaForm.getAttribute('action') === agendaForm.dataset.createAction ? 'Adicionando...' : 'Salvando...';
+            });
 
             modalClose.addEventListener('click', fecharModalAviso);
 

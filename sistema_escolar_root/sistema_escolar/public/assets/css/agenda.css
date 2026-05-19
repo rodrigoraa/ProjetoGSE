@@ -88,6 +88,11 @@
     justify-content: center;
     align-items: center;
     gap: 8px;
+    flex-wrap: wrap;
+}
+
+.table-actions form {
+    margin: 0;
 }
 
 .btn-sm {
@@ -95,6 +100,17 @@
     padding: 7px 12px;
     border-radius: 10px;
     font-size: 0.82rem;
+}
+
+.btn-danger {
+    color: #ffffff;
+    background: linear-gradient(135deg, #cf453c 0%, #a92f28 100%);
+    box-shadow: 0 10px 22px rgba(207, 69, 60, 0.18);
+}
+
+.btn-danger:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgba(207, 69, 60, 0.24);
 }
 
 .agenda-grid {

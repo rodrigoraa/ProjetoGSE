@@ -66,7 +66,8 @@ class SistemaController extends Controller
 
         $this->view('sistema/backups', [
             'lista' => $lista,
-            'caminho_nuvem' => $caminho_nuvem
+            'caminho_nuvem' => $caminho_nuvem,
+            'pasta_backups' => $this->sistemaModel->obterPastaBackups()
         ]);
     }
 
@@ -74,7 +75,7 @@ class SistemaController extends Controller
     {
         $arquivo_alvo = basename($filename);
         $lista_atual = $this->sistemaModel->listarBackups();
-        $mais_recente = !empty($lista_atual) ? basename($lista_atual[0]) : null;
+        $mais_recente = !empty($lista_atual) ? ($lista_atual[0]['nome'] ?? null) : null;
 
         if ($arquivo_alvo === $mais_recente) {
             definir_flash('aviso', 'Ação protegida', 'O backup mais recente não pode ser excluído.');
@@ -82,8 +83,7 @@ class SistemaController extends Controller
             exit;
         }
 
-        $pasta_backups = $_ENV['BACKUP_PATH'] ?? 'database/backups/';
-        $caminho = ROOT_PATH . '/' . rtrim($pasta_backups, '/') . '/' . $arquivo_alvo;
+        $caminho = $this->sistemaModel->obterPastaBackups() . DIRECTORY_SEPARATOR . $arquivo_alvo;
 
         if (file_exists($caminho) && unlink($caminho)) {
             definir_flash('sucesso', 'Backup excluído', "O arquivo {$arquivo_alvo} foi removido.");
@@ -99,8 +99,7 @@ class SistemaController extends Controller
     private function processarDownloadBackup($filename)
     {
         $arquivo = basename($filename);
-        $pasta_backups = $_ENV['BACKUP_PATH'] ?? 'database/backups/';
-        $caminho = ROOT_PATH . '/' . rtrim($pasta_backups, '/') . '/' . $arquivo;
+        $caminho = $this->sistemaModel->obterPastaBackups() . DIRECTORY_SEPARATOR . $arquivo;
 
         if (!file_exists($caminho) || !is_file($caminho)) {
             definir_flash('erro', 'Arquivo não encontrado', 'O backup solicitado não está mais disponível.');
