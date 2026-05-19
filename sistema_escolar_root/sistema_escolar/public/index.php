@@ -25,6 +25,8 @@ if (file_exists(ROOT_PATH . '/.env')) {
     carregar_env(ROOT_PATH . '/.env');
 }
 
+configurar_fuso_horario();
+
 $appUrl = trim($_ENV['APP_URL'] ?? '');
 $hostHeader = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $hostSeguro = preg_match('/^[a-z0-9\.\-]+(?::[0-9]+)?$/i', $hostHeader) ? $hostHeader : 'localhost';

@@ -29,7 +29,10 @@ class AgendaController extends Controller
             }
         }
 
-        $feriados = $_SESSION["feriados_$anoAtual"];
+        $feriados = array_merge(
+            $_SESSION["feriados_$anoAtual"],
+            $this->listarFeriadosMunicipaisVicentina((int)$anoAtual)
+        );
 
         $this->view('agenda/index', [
             'avisos' => $avisos,
@@ -154,5 +157,24 @@ class AgendaController extends Controller
             redirect('/agenda');
             exit;
         }
+    }
+
+    private function listarFeriadosMunicipaisVicentina($ano)
+    {
+        $feriados = [
+            ['date' => sprintf('%04d-05-25', $ano), 'name' => 'Feriado Municipal de Vicentina'],
+            ['date' => sprintf('%04d-06-20', $ano), 'name' => 'Aniversário de Vicentina'],
+            ['date' => sprintf('%04d-09-12', $ano), 'name' => 'Morte do Padre Roberto'],
+            ['date' => sprintf('%04d-10-01', $ano), 'name' => 'Santa Terezinha'],
+            ['date' => sprintf('%04d-12-08', $ano), 'name' => 'Morte do Padre José Daniel'],
+        ];
+
+        return array_map(function ($feriado) {
+            return [
+                'date' => $feriado['date'],
+                'name' => $feriado['name'],
+                'type' => 'municipal'
+            ];
+        }, $feriados);
     }
 }

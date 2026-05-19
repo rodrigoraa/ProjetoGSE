@@ -34,8 +34,7 @@
 
                 <div class="relatorio">
                     <h3>Histórico Local (<?php echo count($lista); ?> arquivos)</h3>
-                    <p style="font-size:0.9em; color:#666; margin-bottom:8px;">O sistema protege automaticamente o arquivo mais recente contra exclusão acidental.</p>
-                    <p class="backup-path-info">Pasta monitorada: <?php echo e($pasta_backups ?? 'database/backups/'); ?></p>
+                    <p style="font-size:0.9em; color:#666; margin-bottom:15px;">O sistema protege automaticamente o arquivo mais recente contra exclusão acidental.</p>
 
                     <table class="tabela-filtrada">
                         <thead>

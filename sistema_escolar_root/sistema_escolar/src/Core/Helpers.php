@@ -151,3 +151,15 @@ function carregar_env($caminho_arquivo)
 
     return true;
 }
+
+function configurar_fuso_horario()
+{
+    $timezone = $_ENV['APP_TIMEZONE'] ?? getenv('APP_TIMEZONE') ?: 'America/Campo_Grande';
+
+    if (!in_array($timezone, timezone_identifiers_list(), true)) {
+        error_log("Fuso horario invalido em APP_TIMEZONE: {$timezone}");
+        $timezone = 'America/Campo_Grande';
+    }
+
+    date_default_timezone_set($timezone);
+}

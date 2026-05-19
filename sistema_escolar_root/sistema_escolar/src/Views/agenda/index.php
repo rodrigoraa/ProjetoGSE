@@ -191,14 +191,17 @@ foreach (($avisos ?? []) as $avisoResumo) {
     }
     if (!empty($feriados)) {
         foreach ($feriados as $indice => $feriado) {
+            $tipoFeriado = $feriado['type'] ?? 'nacional';
+            $rotuloFeriado = $tipoFeriado === 'municipal' ? 'Feriado Municipal' : 'Feriado Nacional Oficial';
+            $corFeriado = $tipoFeriado === 'municipal' ? '#d97706' : '#28a745';
+
             $eventos_calendario[] = [
                 'id' => 'feriado_' . $indice,
                 'title' => '🌟 ' . $feriado['name'],
                 'start' => $feriado['date'],
-                'description' => 'Feriado Nacional Oficial',
+                'description' => $rotuloFeriado,
                 'author' => 'Calendário',
-                'color' => '#28a745', // Verde (Destaque para os feriados)
-                // 'display' => 'background' // Descomente esta linha se preferir que o dia todo fique pintado em vez de aparecer um bloco de texto.
+                'color' => $corFeriado
             ];
         }
     }

@@ -12,6 +12,8 @@ if (file_exists(ROOT_PATH . '/.env')) {
     carregar_env(ROOT_PATH . '/.env');
 }
 
+configurar_fuso_horario();
+
 require_once ROOT_PATH . '/src/Core/Database.php';
 require_once ROOT_PATH . '/src/Core/EmailService.php';
 

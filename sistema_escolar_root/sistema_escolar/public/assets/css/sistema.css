@@ -96,18 +96,6 @@
     margin-top: 0;
 }
 
-.backup-path-info {
-    margin: 0 0 15px;
-    padding: 8px 10px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius);
-    background: var(--bg-light);
-    color: var(--text-muted);
-    font-family: Consolas, "Courier New", monospace;
-    font-size: 0.85rem;
-    overflow-wrap: anywhere;
-}
-
 .cloud-status-box {
     background: var(--bg-light);
     padding: 15px;

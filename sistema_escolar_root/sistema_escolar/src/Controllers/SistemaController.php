@@ -66,8 +66,7 @@ class SistemaController extends Controller
 
         $this->view('sistema/backups', [
             'lista' => $lista,
-            'caminho_nuvem' => $caminho_nuvem,
-            'pasta_backups' => $this->sistemaModel->obterPastaBackups()
+            'caminho_nuvem' => $caminho_nuvem
         ]);
     }
 
