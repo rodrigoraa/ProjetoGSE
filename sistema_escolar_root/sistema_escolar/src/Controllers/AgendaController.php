@@ -1,9 +1,12 @@
 <?php
 require_once ROOT_PATH . '/src/Models/Agenda.php';
+require_once ROOT_PATH . '/src/Services/CalendarioEscolarImportador.php';
+require_once ROOT_PATH . '/src/Services/FeriadosService.php';
 
 class AgendaController extends Controller
 {
     private $agendaModel;
+    private $feriadosService;
 
     public function __construct()
     {
@@ -12,27 +15,12 @@ class AgendaController extends Controller
             exit;
         }
         $this->agendaModel = new Agenda();
+        $this->feriadosService = new FeriadosService();
     }
     public function index()
     {
         $avisos = $this->agendaModel->listarProximosAvisos();
-        
-        $anoAtual = date('Y');
-        
-        if (!isset($_SESSION["feriados_$anoAtual"])) {
-            $jsonFeriados = @file_get_contents("https://brasilapi.com.br/api/feriados/v1/{$anoAtual}");
-            
-            if ($jsonFeriados) {
-                $_SESSION["feriados_$anoAtual"] = json_decode($jsonFeriados, true);
-            } else {
-                $_SESSION["feriados_$anoAtual"] = []; 
-            }
-        }
-
-        $feriados = array_merge(
-            $_SESSION["feriados_$anoAtual"],
-            $this->listarFeriadosMunicipaisVicentina((int)$anoAtual)
-        );
+        $feriados = $this->feriadosService->listarPorAno((int)date('Y'));
 
         $this->view('agenda/index', [
             'avisos' => $avisos,
@@ -136,6 +124,39 @@ class AgendaController extends Controller
         }
     }
 
+    public function importarCalendario()
+    {
+        $this->verificarAdmin();
+        $resultado = null;
+        $eventos = $_SESSION['calendario_importacao_eventos'] ?? [];
+        $ano = (int)($_POST['ano'] ?? $_GET['ano'] ?? date('Y'));
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            verificar_csrf_token($_POST['csrf_token'] ?? '');
+            $acao = $_POST['acao'] ?? 'analisar';
+
+            if ($acao === 'salvar') {
+                $this->salvarEventosImportados();
+            }
+
+            $importador = new CalendarioEscolarImportador();
+            $resultado = $importador->importar(
+                $_FILES['calendario_pdf'] ?? [],
+                $ano,
+                $_POST['texto_calendario'] ?? ''
+            );
+
+            $eventos = $resultado['eventos'] ?? [];
+            $_SESSION['calendario_importacao_eventos'] = $eventos;
+        }
+
+        $this->view('agenda/importar_calendario', [
+            'resultado' => $resultado,
+            'eventos' => $eventos,
+            'ano' => $ano
+        ]);
+    }
+
     public function excluir($id_aviso)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -159,22 +180,72 @@ class AgendaController extends Controller
         }
     }
 
-    private function listarFeriadosMunicipaisVicentina($ano)
+    private function salvarEventosImportados()
     {
-        $feriados = [
-            ['date' => sprintf('%04d-05-25', $ano), 'name' => 'Feriado Municipal de Vicentina'],
-            ['date' => sprintf('%04d-06-20', $ano), 'name' => 'Aniversário de Vicentina'],
-            ['date' => sprintf('%04d-09-12', $ano), 'name' => 'Morte do Padre Roberto'],
-            ['date' => sprintf('%04d-10-01', $ano), 'name' => 'Santa Terezinha'],
-            ['date' => sprintf('%04d-12-08', $ano), 'name' => 'Morte do Padre José Daniel'],
-        ];
+        $selecionados = $_POST['eventos'] ?? [];
+        $eventos = $_SESSION['calendario_importacao_eventos'] ?? [];
 
-        return array_map(function ($feriado) {
-            return [
-                'date' => $feriado['date'],
-                'name' => $feriado['name'],
-                'type' => 'municipal'
-            ];
-        }, $feriados);
+        if (empty($selecionados) || empty($eventos)) {
+            definir_flash('aviso', 'Nenhum item selecionado', 'Marque pelo menos um item importado antes de salvar.');
+            redirect('/agenda/importarCalendario');
+            exit;
+        }
+
+        $salvos = 0;
+        $ignorados = 0;
+        $usuario_id = $_SESSION['usuario_id'];
+
+        foreach ($selecionados as $indice) {
+            $indice = (int)$indice;
+            $evento = $eventos[$indice] ?? null;
+
+            if (!$this->eventoImportadoValido($evento)) {
+                $ignorados++;
+                continue;
+            }
+
+            $titulo = '[Calendário] ' . trim($evento['titulo']);
+            $descricao = trim(($evento['tipo'] ?? 'Evento') . "\n" . ($evento['descricao'] ?? ''));
+
+            if ($this->agendaModel->existePorDataTitulo($evento['data'], $titulo)) {
+                $ignorados++;
+                continue;
+            }
+
+            if ($this->agendaModel->adicionar($usuario_id, $evento['data'], $titulo, $descricao)) {
+                $salvos++;
+            } else {
+                $ignorados++;
+            }
+        }
+
+        unset($_SESSION['calendario_importacao_eventos']);
+
+        definir_flash(
+            $salvos > 0 ? 'sucesso' : 'aviso',
+            $salvos > 0 ? 'Calendário importado' : 'Nenhum item novo foi salvo',
+            "Itens salvos: {$salvos}. Itens ignorados: {$ignorados}."
+        );
+        registrar_log(Model::getConexao(), 'Agenda - Importar calendário', "Salvou {$salvos} itens do calendário escolar.");
+
+        redirect('/agenda');
+        exit;
+    }
+
+    private function eventoImportadoValido($evento)
+    {
+        return is_array($evento)
+            && !empty($evento['data'])
+            && !empty($evento['titulo'])
+            && DateTimeImmutable::createFromFormat('Y-m-d', $evento['data']) !== false;
+    }
+
+    private function verificarAdmin()
+    {
+        if (($_SESSION['usuario_tipo'] ?? '') !== 'admin') {
+            definir_flash('erro', 'Acesso restrito', 'Somente administradores podem importar calendário escolar.');
+            redirect('/agenda');
+            exit;
+        }
     }
 }

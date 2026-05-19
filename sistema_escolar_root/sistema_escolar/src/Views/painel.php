@@ -56,7 +56,13 @@
                         <?php foreach ($feriados_painel as $feriado):
                             $data_br = date('d/m/Y', strtotime($feriado['date']));
                             $eh_hoje = ($feriado['date'] === date('Y-m-d'));
-                            $tipo = ($feriado['type'] ?? '') === 'municipal' ? 'Municipal' : 'Nacional';
+                            if (($feriado['type'] ?? '') === 'municipal') {
+                                $tipo = 'Municipal';
+                            } elseif (($feriado['type'] ?? '') === 'ponto_facultativo') {
+                                $tipo = 'Ponto facultativo';
+                            } else {
+                                $tipo = 'Nacional';
+                            }
                         ?>
                             <div class="niver-card painel-feriado-card">
                                 <span>

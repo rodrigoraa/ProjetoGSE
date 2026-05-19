@@ -33,8 +33,13 @@ foreach (($avisos ?? []) as $avisoResumo) {
 
         <div class="main-content-wrapper">
             <header>
-                <h1>Agenda de Avisos</h1>
-                <p class="agenda-subtitle">Acompanhe os próximos compromissos no calendário e gerencie os avisos da equipe em um só lugar.</p>
+                <div>
+                    <h1>Agenda de Avisos</h1>
+                    <p class="agenda-subtitle">Acompanhe os próximos compromissos no calendário e gerencie os avisos da equipe em um só lugar.</p>
+                </div>
+                <?php if (($_SESSION['usuario_tipo'] ?? '') === 'admin'): ?>
+                    <a href="/agenda/importarCalendario" class="btn-secondary">Importar calendário escolar</a>
+                <?php endif; ?>
             </header>
 
             <main>
@@ -192,8 +197,16 @@ foreach (($avisos ?? []) as $avisoResumo) {
     if (!empty($feriados)) {
         foreach ($feriados as $indice => $feriado) {
             $tipoFeriado = $feriado['type'] ?? 'nacional';
-            $rotuloFeriado = $tipoFeriado === 'municipal' ? 'Feriado Municipal' : 'Feriado Nacional Oficial';
-            $corFeriado = $tipoFeriado === 'municipal' ? '#d97706' : '#28a745';
+            $rotuloFeriado = 'Feriado Nacional Oficial';
+            $corFeriado = '#28a745';
+
+            if ($tipoFeriado === 'municipal') {
+                $rotuloFeriado = 'Feriado Municipal';
+                $corFeriado = '#d97706';
+            } elseif ($tipoFeriado === 'ponto_facultativo') {
+                $rotuloFeriado = 'Ponto facultativo / Data móvel';
+                $corFeriado = '#7c3aed';
+            }
 
             $eventos_calendario[] = [
                 'id' => 'feriado_' . $indice,

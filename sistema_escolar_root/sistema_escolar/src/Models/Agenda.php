@@ -31,6 +31,15 @@ class Agenda extends Model
         return self::$pdo->prepare($sql)->execute([$usuario_id, $data_aviso, $titulo, $descricao]);
     }
 
+    public function existePorDataTitulo($data_aviso, $titulo)
+    {
+        $sql = "SELECT id FROM agenda_avisos WHERE data_aviso = ? AND titulo = ? LIMIT 1";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([$data_aviso, $titulo]);
+
+        return (bool)$stmt->fetch();
+    }
+
     public function existeDuplicadoRecente($usuario_id, $data_aviso, $titulo, $descricao)
     {
         $sql = "SELECT id

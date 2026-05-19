@@ -138,6 +138,32 @@
     margin-top: 15px;
 }
 
+.agenda-import-card {
+    margin-bottom: 24px;
+}
+
+.agenda-import-grid {
+    grid-template-columns: 180px minmax(0, 1fr);
+}
+
+.agenda-import-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 18px 0;
+}
+
+.agenda-import-table td {
+    vertical-align: top;
+}
+
+.agenda-import-desc {
+    display: block;
+    margin-top: 5px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
 .agenda-tip-list {
     display: grid;
     gap: 12px;
@@ -364,7 +390,8 @@
 }
 
 @media (max-width: 640px) {
-    .agenda-form-grid {
+    .agenda-form-grid,
+    .agenda-import-grid {
         grid-template-columns: 1fr;
     }
 
