@@ -1,0 +1,51 @@
+# Banco de dados
+*.db
+*.sqlite3
+
+# --- SISTEMA OPERACIONAL ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- IDE / EDITORES ---
+.idea/
+.vscode/
+*.swp
+*.sublime-project
+*.sublime-workspace
+
+# --- DEPENDÊNCIAS PHP (Se usar Composer no futuro) ---
+/vendor/
+composer.lock
+
+# --- BANCO DE DADOS (SQLite) ---
+# Ignora o banco real para não sobrescrever dados de produção/teste
+database/escola.db
+database/escola.db-journal
+database/escola.db-wal
+
+# --- BACKUPS ---
+# Ignora os backups automáticos gerados pelo sistema
+database/backups/*.db
+
+# --- LOGS ---
+# Ignora logs de erro
+*.log
+database/*.log
+
+# --- UPLOADS (IMPORTANTE) ---
+# Ignora os arquivos PDF e CSV, mas mantém a estrutura de pastas
+public/uploads/certidoes/*
+!public/uploads/certidoes/.gitkeep
+sistema_escolar_root/sistema_escolar/public/uploads/certidoes/*
+!sistema_escolar_root/sistema_escolar/public/uploads/certidoes/.gitkeep
+
+# --- ARQUIVOS TEMPORÁRIOS ---
+tmp/
+temp/
+
+# --- CONFIGURAÇÕES LOCAIS ---
+# Se você criar um arquivo .env no futuro com senhas
+.env
+
+atualizar_banco.php

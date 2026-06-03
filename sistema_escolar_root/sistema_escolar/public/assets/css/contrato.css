@@ -1,0 +1,780 @@
+/* Customizações para o Módulo de Contratos */
+
+:root {
+    --primary-blue: #0066cc;
+    --primary-blue-dark: #004f9f;
+    --success-green: #28a745;
+    --success-green-dark: #1f7f35;
+    --danger-red: #ff4c4c;
+    --danger-red-dark: #d93636;
+    --warning-yellow: #ffc107;
+    --warning-yellow-dark: #d39e00;
+    --bg-light: #f8f9fa;
+    --border-color: #ddd;
+    --input-focus: #80bdff;
+    --text-dark: #1f2937;
+    --text-muted: #6b7280;
+    --surface-soft: #f4f8fc;
+}
+
+/* ==========================================================================
+   6. Estilização de Inputs (Classe .sistema usada nos PHPs)
+   ========================================================================== */
+
+/* Input padrão do sistema */
+input.sistema, 
+select.sistema, 
+textarea.sistema {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: #fff;
+    color: #495057;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    outline: none;
+    box-sizing: border-box; /* Garante que o padding não aumente o tamanho final */
+}
+
+/* Efeito ao clicar/focar no input */
+input.sistema:focus {
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
+}
+
+/* Inputs desabilitados ou apenas leitura */
+input.sistema:read-only {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+/* Estilo para placeholders */
+input.sistema::placeholder {
+    color: #adb5bd;
+    opacity: 1;
+}
+
+/* Ajuste específico para grupos de formulário (label + input) */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   1. Cabeçalho e Resumo Financeiro 
+   ========================================================================== */
+.contrato-header {
+    background: linear-gradient(145deg, #ffffff 0%, #f8fbff 100%);
+    padding: 25px;
+    border-radius: 16px;
+    border: 1px solid #dbe6f2;
+    box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
+    margin-bottom: 25px;
+}
+
+.contrato-header-faturado {
+    background: linear-gradient(145deg, #f0fff6 0%, #ffffff 100%);
+    border-color: #9bd8ad;
+    box-shadow: 0 14px 35px rgba(31, 127, 53, 0.1);
+}
+
+.contrato-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.contrato-status-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.contrato-status-date {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.contrato-status-date-input {
+    min-width: 150px;
+    margin: 0;
+}
+
+.contrato-data-faturamento-geral {
+    transition: opacity 0.2s ease;
+}
+
+.contrato-data-faturamento-geral.is-disabled {
+    opacity: 0.55;
+}
+
+.contrato-data-faturamento-info {
+    display: block;
+    margin-top: 6px;
+    color: var(--success-green-dark);
+    font-weight: 700;
+}
+
+.contrato-check-option,
+.contrato-check-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-dark);
+    cursor: pointer;
+}
+
+.contrato-check-option {
+    padding: 14px 16px;
+    border: 1px solid #dbe6f2;
+    border-radius: 12px;
+    background: #f8fbff;
+    margin-bottom: 18px;
+}
+
+.contrato-check-option input,
+.contrato-check-inline input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--success-green);
+    cursor: pointer;
+}
+
+.contrato-check-option small {
+    display: block;
+    margin-top: 3px;
+    color: var(--text-muted);
+}
+
+.contrato-row-faturado {
+    background: #f0fff6;
+    box-shadow: inset 4px 0 0 var(--success-green);
+}
+
+.contrato-row-faturado td {
+    border-bottom-color: #c8ebd1;
+}
+
+.badge-faturado,
+.badge-nao-faturado {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.badge-faturado {
+    background: #dff7e6;
+    color: var(--success-green-dark);
+    border-color: #aee0bb;
+}
+
+.badge-nao-faturado {
+    background: #fff7df;
+    color: #856404;
+    border-color: #ffe08a;
+}
+
+.resumo-financeiro {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    background: linear-gradient(180deg, #f8fbff 0%, #f4f7fb 100%);
+    padding: 20px;
+    border-radius: 14px;
+    border: 1px solid #e3ebf4;
+    margin-top: 15px;
+    gap: 20px;
+}
+
+.resumo-label {
+    color: #666;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.resumo-valor {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* ==========================================================================
+   2. Sistema de Abas (Tabs)
+   ========================================================================== */
+.tabs-header {
+    display: flex;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 20px;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+}
+
+.tab-btn {
+    background: #eef3f8;
+    border: 1px solid #d7e0eb;
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border-radius: 999px;
+    font-weight: 600;
+    color: #4b5563;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.tab-btn.active {
+    background: var(--primary-blue);
+    color: white;
+    border-color: var(--primary-blue);
+    box-shadow: 0 10px 24px rgba(0, 102, 204, 0.18);
+}
+
+.tab-btn-faturada {
+    background: #e4f8eb;
+    color: var(--success-green-dark);
+    border-color: #9bd8ad;
+    box-shadow: inset 0 -3px 0 rgba(40, 167, 69, 0.2);
+}
+
+.tab-btn-faturada.active {
+    background: var(--success-green);
+    color: #fff;
+    border-color: var(--success-green-dark);
+    box-shadow: 0 10px 24px rgba(40, 167, 69, 0.2);
+}
+
+.tab-btn:hover {
+    background: #e4edf7;
+    color: var(--primary-blue);
+}
+
+.tab-btn-faturada:hover {
+    background: #d7f3e0;
+    color: var(--success-green-dark);
+}
+
+.tab-btn-faturada.active:hover {
+    background: var(--success-green-dark);
+    color: #fff;
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.nota-painel {
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nota-painel-faturada {
+    background: linear-gradient(180deg, #f0fff6 0%, #ffffff 100%);
+    border-color: #9bd8ad;
+    box-shadow: inset 5px 0 0 var(--success-green), 0 12px 26px rgba(31, 127, 53, 0.08);
+}
+
+/* ==========================================================================
+   3. Formulário de Adição Rápida (Inline)
+   ========================================================================== */
+.inline-form-container {
+    background: #f7fbff;
+    padding: 20px;
+    border-radius: 14px;
+    border: 1px dashed #99bfeb;
+    margin-bottom: 25px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.contrato-observacao-card {
+    background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+    border: 1px solid #dbe6f2;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+}
+
+.contrato-observacao-input {
+    resize: vertical;
+    min-height: 92px;
+    margin-bottom: 12px;
+}
+
+.contrato-observacao-actions {
+    justify-content: flex-end;
+}
+
+.grid-form-inline {
+    display: grid; 
+    /* Ajustado para 6 colunas para incluir Marca */
+    grid-template-columns: 2fr 1.2fr 0.8fr 0.8fr 1fr auto; 
+    gap: 15px; 
+    align-items: end;
+}
+
+/* ==========================================================================
+   5. Linhas de Produtos Dinâmicos (Telas de Cadastro/Edição)
+   ========================================================================== */
+.produto-linha {
+    display: grid; 
+    grid-template-columns: 2fr 1.2fr 0.8fr 0.8fr 1fr auto; 
+    gap: 10px; 
+    align-items: center; 
+    background: #fff; 
+    padding: 15px; 
+    border: 1px solid #dde5ee; 
+    border-radius: 12px; 
+    margin-bottom: 10px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+}
+
+.btn-remover {
+    background: var(--danger-red);
+    color: white;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-remover:hover {
+    background: var(--danger-red-dark);
+    transform: translateY(-1px);
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-warning,
+.btn-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    text-decoration: none;
+    font-weight: 700;
+    line-height: 1;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover,
+.btn-warning:hover,
+.btn-danger:hover {
+    transform: translateY(-1px);
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+    box-shadow: 0 12px 26px rgba(0, 102, 204, 0.2);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0b74e0 0%, var(--primary-blue-dark) 100%);
+}
+
+.btn-secondary {
+    background: #eef2f6;
+    color: #334155;
+    border-color: #d7e0ea;
+}
+
+.btn-secondary:hover {
+    background: #e4ebf3;
+    color: #1e293b;
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #ffd65a 0%, var(--warning-yellow-dark) 100%);
+    color: #3f2d00;
+    border-color: #efc14d;
+    box-shadow: 0 10px 22px rgba(211, 158, 0, 0.2);
+}
+
+.btn-warning:hover {
+    color: #2e2200;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger-red) 0%, var(--danger-red-dark) 100%);
+    color: #fff;
+    box-shadow: 0 12px 24px rgba(217, 54, 54, 0.16);
+}
+
+.btn-danger:hover {
+    color: #fff;
+}
+
+.btn-sm {
+    min-height: 34px;
+    padding: 7px 12px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+}
+
+.btn-icon {
+    min-width: 36px;
+    padding-inline: 10px;
+}
+
+.toolbar-actions,
+.action-group,
+.table-actions,
+.inline-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.toolbar-actions {
+    justify-content: space-between;
+    width: 100%;
+}
+
+.toolbar-actions--end {
+    justify-content: flex-end;
+}
+
+.contrato-meta {
+    color: var(--text-muted);
+}
+
+.contrato-summary-title {
+    margin-bottom: 5px;
+}
+
+.folha-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 15px;
+}
+
+.folha-meta {
+    margin: 5px 0 0;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    color: var(--text-dark);
+}
+
+.folha-saldo {
+    font-weight: 700;
+}
+
+.valor-folha-editor {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 8px 10px;
+    background: #fff;
+    border: 1px solid #dbe6f2;
+    border-radius: 12px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.valor-folha-editor.is-open {
+    display: inline-flex;
+}
+
+.valor-folha-input {
+    width: 140px;
+    margin: 0;
+}
+
+.form-grid-label {
+    font-size: 0.8rem;
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.section-card {
+    background: linear-gradient(180deg, #ffffff 0%, #f9fbfd 100%);
+    border: 1px solid #e4ebf2;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
+}
+
+.table-id {
+    color: #999;
+}
+
+.money-primary {
+    color: var(--primary-blue);
+    font-weight: 700;
+}
+
+.money-success {
+    color: var(--success-green);
+    font-weight: 700;
+}
+
+.muted-cell {
+    text-align: center;
+    padding: 30px;
+    color: #666;
+}
+
+.table-date {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.table-date small {
+    display: block;
+    color: #aaa;
+}
+
+.badge-folhas,
+.badge-unidade {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border: 1px solid #d9e2ec;
+    background: #f6f9fc;
+    color: #475569;
+}
+
+.summary-card {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    border: 1px solid #dbe6f2;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.05);
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.summary-row p {
+    margin: 0 0 8px;
+}
+
+.summary-highlight {
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+.produtos-header-grid {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr auto;
+    gap: 10px;
+    padding: 0 10px;
+    margin-bottom: 8px;
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.full-width-submit {
+    width: 100%;
+    min-height: 52px;
+    font-size: 1rem;
+}
+
+.page-back-link {
+    text-decoration: none;
+}
+
+.table-actions {
+    justify-content: center;
+}
+
+.table-actions form {
+    margin: 0;
+}
+
+.section-heading {
+    margin-top: 30px;
+}
+
+.contrato-hero {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+    color: #fff;
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.contrato-hero h2 {
+    color: white;
+    margin: 0 0 8px;
+    font-size: 1.25rem;
+}
+
+.contrato-hero p {
+    margin: 0;
+    color: #fff;
+    font-weight: 700;
+    line-height: 1.55;
+}
+
+.contrato-hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.contrato-stat {
+    min-width: 120px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.contrato-stat strong {
+    display: block;
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+}
+
+.contrato-stat span {
+    font-size: 0.85rem;
+    color: #fff;
+    font-weight: 700;
+}
+
+.contrato-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+}
+
+.contrato-toolbar-copy h3 {
+    margin: 0 0 4px;
+    color: var(--text-dark);
+}
+
+.contrato-toolbar-copy p {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.badge-media {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: #eef4fa;
+    color: var(--primary-blue);
+    border: 1px solid #d5e3f2;
+}
+
+@media (max-width: 960px) {
+    .grid-form-inline,
+    .produto-linha,
+    .produtos-header-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .resumo-financeiro,
+    .folha-header,
+    .summary-row,
+    .contrato-title-row,
+    .toolbar-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .contrato-status-form {
+        justify-content: flex-start;
+    }
+
+    .grid-form-inline,
+    .produto-linha,
+    .produtos-header-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .produtos-header-grid {
+        display: none;
+    }
+
+    .table-actions,
+    .action-group,
+    .inline-form-actions {
+        width: 100%;
+    }
+
+    .table-actions .btn-primary,
+    .table-actions .btn-secondary,
+    .table-actions .btn-warning,
+    .table-actions .btn-danger,
+    .action-group .btn-primary,
+    .action-group .btn-secondary,
+    .action-group .btn-warning,
+    .action-group .btn-danger,
+    .inline-form-actions .btn-primary,
+    .inline-form-actions .btn-secondary {
+        width: 100%;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}

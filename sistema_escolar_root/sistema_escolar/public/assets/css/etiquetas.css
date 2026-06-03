@@ -1,0 +1,589 @@
+* {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    margin: 0;
+    padding: 0;
+}
+
+body.pagina-etiqueta {
+    background: #525659;
+    font-family: Arial, sans-serif;
+}
+
+body.pagina-etiqueta .layout-container {
+    display: block;
+}
+
+body.pagina-etiqueta .main-content-wrapper.etiqueta-print-wrapper {
+    width: calc(100vw - var(--sidebar-width));
+    max-width: calc(100vw - var(--sidebar-width));
+    margin-left: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+body.pagina-etiqueta .main-content-wrapper.etiqueta-print-wrapper main {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.etiqueta-hero {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+    color: #fff;
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.etiqueta-hero h2 {
+    color: white;
+    margin: 0 0 8px;
+    font-size: 1.25rem;
+}
+
+.etiqueta-hero p {
+    margin: 0;
+    color: #fff;
+    font-weight: 700;
+    line-height: 1.55;
+}
+
+.etiqueta-hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.etiqueta-stat {
+    min-width: 120px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.etiqueta-stat strong {
+    display: block;
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+}
+
+.etiqueta-stat span {
+    font-size: 0.85rem;
+    color: #fff;
+    font-weight: 700;
+}
+
+.no-print-bar {
+    background: #333;
+    padding: 15px;
+    text-align: center;
+    color: #fff;
+}
+
+.btn-imprimir,
+.btn-limpar,
+.btn-voltar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.btn-imprimir {
+    background: #28a745;
+    color: #fff;
+}
+
+.btn-limpar {
+    background: #dc3545;
+    color: #fff;
+    margin-left: 10px;
+}
+
+.btn-limpar:hover {
+    background: #c82333;
+}
+
+.btn-voltar {
+    color: #fff;
+    background: #666;
+}
+
+.folha-ambiente,
+.folha-ambiente-passivo {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.folha-ambiente {
+    padding: 20px 0;
+}
+
+.folha-ambiente-passivo {
+    padding: 1cm 0;
+}
+
+.folha-a4 {
+    width: 21cm;
+    height: 29.7cm;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.etiqueta-ficha {
+    flex: 1;
+    width: 100%;
+    padding: 0.6cm;
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px dashed #000;
+    overflow: hidden;
+}
+
+.etiqueta-ficha:last-child {
+    border-bottom: none;
+}
+
+.cabecalho-escola {
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.logo-ficha {
+    height: 42px;
+    vertical-align: middle;
+}
+
+.nome-escola {
+    font-size: 18pt;
+    font-weight: 700;
+}
+
+.tabela-principal {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1.5px solid #000;
+    table-layout: fixed;
+}
+
+.tabela-interna {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.tabela-principal td,
+.tabela-interna td {
+    height: 33px;
+    max-height: 33px;
+    padding: 0;
+    font-size: 10pt;
+    border: none;
+    vertical-align: middle;
+    overflow: hidden;
+}
+
+.celula-travada {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 0 8px;
+    overflow: hidden;
+}
+
+.label-ficha {
+    font-weight: 700;
+    font-size: 9pt;
+    white-space: nowrap;
+    margin-right: 5px;
+    flex-shrink: 0;
+}
+
+.input-ficha {
+    flex-grow: 1;
+    outline: none;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: text;
+    min-width: 0;
+}
+
+[contenteditable="true"] {
+    -webkit-user-modify: read-write-plaintext-only;
+}
+
+[contenteditable="true"] br {
+    display: none;
+}
+
+.borda-baixo {
+    border-bottom: 1px solid #000 !important;
+}
+
+.borda-direita {
+    border-right: 1px solid #000 !important;
+}
+
+.centralizado {
+    justify-content: center;
+    text-align: center;
+}
+
+.header-grade td {
+    font-weight: 700;
+    font-size: 8pt;
+    text-align: center;
+    background: #f2f2f2;
+}
+
+.linha-grade td,
+.linha-grade .input-ficha {
+    text-align: center;
+}
+
+.container-selecao {
+    padding: 50px 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.container-selecao h2 {
+    color: #2c3e50;
+    font-size: 28px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.container-selecao p {
+    color: #7f8c8d;
+    margin-bottom: 40px;
+}
+
+.btn-voltar-home {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: #555;
+    font-weight: 600;
+    margin-bottom: 30px;
+    font-size: 14px;
+    padding: 10px 18px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.btn-voltar-home:hover {
+    background: #f8f9fa;
+    color: #007bff;
+    border-color: #007bff;
+    transform: translateX(-5px);
+}
+
+.grid-etiquetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.card-etiqueta {
+    background: #fff;
+    border-radius: 16px;
+    padding: 40px 30px;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+}
+
+.card-etiqueta:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    border-color: #007bff;
+}
+
+.card-etiqueta .icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background: #f0f7ff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    margin-bottom: 20px;
+    transition: background 0.3s;
+}
+
+.card-etiqueta:hover .icon-wrapper {
+    background: #007bff;
+    color: #fff;
+}
+
+.card-etiqueta h3 {
+    color: #333;
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+.card-etiqueta p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.btn-abrir {
+    width: 100%;
+    background: #007bff;
+    color: #fff;
+    padding: 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s;
+    border: none;
+    display: block;
+}
+
+.btn-abrir:hover {
+    background: #0056b3;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+body.pagina-etiqueta-passivo .container-duplo-passivo {
+    display: flex;
+    flex-direction: column;
+    gap: 2cm;
+    align-items: center;
+}
+
+body.pagina-etiqueta-passivo .etiqueta-passivo-container,
+body.pagina-etiqueta-passivo .etiqueta-livro-container {
+    width: 17cm;
+    min-height: 25cm;
+    background: #fff;
+    padding: 1.5cm;
+    font-family: "Times New Roman", Times, serif;
+    color: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 0 auto;
+}
+
+body.pagina-etiqueta-passivo .etiqueta-passivo-container {
+    border: 2px solid #000;
+}
+
+body.pagina-etiqueta-passivo .etiqueta-livro-container {
+    border: none;
+}
+
+body.pagina-etiqueta-passivo .bloco-conteudo-central {
+    display: block;
+    text-align: left;
+    padding-left: 0.5cm;
+    width: 100%;
+}
+
+body.pagina-etiqueta-passivo .header-passivo {
+    margin-bottom: 20px;
+}
+
+body.pagina-etiqueta-passivo .escola-titulo {
+    font-size: 12pt;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 5px;
+}
+
+body.pagina-etiqueta-passivo .caixa-numero {
+    font-size: 24pt;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 20px;
+}
+
+body.pagina-etiqueta-passivo .corpo-passivo {
+    font-size: 14pt;
+    line-height: 1.5;
+    outline: none;
+    margin-top: 10px;
+}
+
+body.pagina-etiqueta-passivo .corpo-passivo div {
+    white-space: nowrap;
+}
+
+body.pagina-etiqueta .etiqueta-print-wrapper {
+    overflow: visible;
+}
+
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 0;
+    }
+
+    html,
+    body.pagina-etiqueta {
+        width: 210mm;
+        min-height: 297mm;
+        background: #fff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    body.pagina-etiqueta .sidebar,
+    body.pagina-etiqueta .no-print-bar,
+    body.pagina-etiqueta .no-print {
+        display: none !important;
+    }
+
+    body.pagina-etiqueta .layout-container,
+    body.pagina-etiqueta .main-content-wrapper,
+    body.pagina-etiqueta .etiqueta-print-wrapper,
+    body.pagina-etiqueta main,
+    body.pagina-etiqueta .folha-ambiente,
+    body.pagina-etiqueta .folha-ambiente-passivo,
+    body.pagina-etiqueta .container-duplo-passivo {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+    }
+
+    body.pagina-etiqueta .main-content-wrapper.etiqueta-print-wrapper {
+        margin-left: 0 !important;
+    }
+
+    body.pagina-etiqueta .folha-a4 {
+        width: 210mm !important;
+        height: 297mm !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: 0 !important;
+        overflow: hidden !important;
+        break-inside: avoid-page;
+        page-break-inside: avoid;
+    }
+
+    body.pagina-etiqueta .etiqueta-ficha {
+        height: 148.5mm !important;
+        min-height: 148.5mm !important;
+        max-height: 148.5mm !important;
+        padding: 3mm 4mm !important;
+        overflow: hidden !important;
+        break-inside: avoid-page;
+        page-break-inside: avoid;
+    }
+
+    body.pagina-etiqueta .cabecalho-escola {
+        margin-bottom: 1.5mm !important;
+    }
+
+    body.pagina-etiqueta .logo-ficha {
+        height: 11mm !important;
+    }
+
+    body.pagina-etiqueta .nome-escola {
+        font-size: 16pt !important;
+    }
+
+    body.pagina-etiqueta .tabela-principal td,
+    body.pagina-etiqueta .tabela-interna td {
+        height: 8.3mm !important;
+        max-height: 8.3mm !important;
+        font-size: 9pt !important;
+    }
+
+    body.pagina-etiqueta .celula-travada {
+        padding: 0 2mm !important;
+    }
+
+    body.pagina-etiqueta .label-ficha {
+        font-size: 8pt !important;
+    }
+
+    body.pagina-etiqueta .input-ficha {
+        font-size: 9pt !important;
+    }
+
+    body.pagina-etiqueta .header-grade td {
+        font-size: 7.5pt !important;
+    }
+
+    body.pagina-etiqueta .tabela-principal,
+    body.pagina-etiqueta .tabela-interna {
+        width: 100% !important;
+    }
+
+    body.pagina-etiqueta-passivo .etiqueta-passivo-container,
+    body.pagina-etiqueta-passivo .etiqueta-livro-container {
+        width: 170mm !important;
+        min-height: 250mm !important;
+        margin: 10mm auto !important;
+        padding: 15mm !important;
+        box-shadow: none !important;
+        break-inside: avoid-page;
+        page-break-inside: avoid;
+    }
+
+    body.pagina-etiqueta-passivo .etiqueta-passivo-container {
+        border: 2px solid #000 !important;
+        page-break-after: always !important;
+    }
+
+    body.pagina-etiqueta-passivo .etiqueta-livro-container {
+        border: none !important;
+        page-break-after: avoid !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .etiqueta-hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .etiqueta-hero-stats {
+        justify-content: flex-start;
+    }
+}

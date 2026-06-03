@@ -1,0 +1,118 @@
+:root {
+    --primary-color: #004a91;
+    --accent-color: #00c2ff;
+    --border-color: #ced4da;
+    --radius: 8px;
+}
+
+.main-content-wrapper input[type="text"],
+.main-content-wrapper input[type="email"],
+.main-content-wrapper input[type="password"],
+.main-content-wrapper input[type="date"],
+.main-content-wrapper input[type="search"],
+.main-content-wrapper select,
+.main-content-wrapper textarea {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    color: #333;
+    background-color: #fff;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    display: block;
+    font-family: inherit;
+}
+
+.main-content-wrapper input:focus,
+.main-content-wrapper select:focus,
+.main-content-wrapper textarea:focus {
+    border-color: var(--accent-color);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(0, 194, 255, 0.15);
+}
+
+.main-content-wrapper label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: #444;
+    font-size: 0.9rem;
+}
+
+.main-content-wrapper form {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.tabela-filtrada {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.tabela-filtrada th {
+    background: #f1f3f5;
+    padding: 15px;
+    text-align: left;
+    font-weight: 700;
+    color: #555;
+    border-bottom: 2px solid #ddd;
+}
+
+.tabela-filtrada td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.col-acoes a {
+    text-decoration: none;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.main-content-wrapper div[style*="display: grid"],
+.main-content-wrapper div[style*="display:grid"] {
+    gap: 20px !important;
+}
+
+.main-content-wrapper .usuario-check-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border: 1px solid #dbe6f2;
+    border-radius: 10px;
+    background: #f8fbff;
+    margin: 4px 0 20px;
+    cursor: pointer;
+}
+
+.main-content-wrapper .usuario-check-option input {
+    width: 18px;
+    height: 18px;
+    accent-color: #28a745;
+    cursor: pointer;
+    margin: 0;
+}
+
+.main-content-wrapper .usuario-check-option strong,
+.main-content-wrapper .usuario-check-option small {
+    display: block;
+}
+
+.main-content-wrapper .usuario-check-option small {
+    margin-top: 3px;
+    color: #6b7280;
+    font-weight: 400;
+}
