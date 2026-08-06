@@ -25,7 +25,7 @@
 
                     <div class="box-pdf-existente">
                         <span><i class="fa-solid fa-paperclip" style="margin-right: 8px;"></i> Consulte o PDF atual desta certidão.</span>
-                        <a href="/certidao/visualizarPdf/<?php echo (int)$certidao['id']; ?>?origem=editar" class="link-ver-pdf">
+                        <a href="/certidao/visualizarPdf/<?php echo (int)$certidao['id']; ?>?origem=editar" class="link-ver-pdf" target="_blank" rel="noopener noreferrer">
                             <i class="fa-solid fa-eye"></i> Visualizar PDF
                         </a>
                     </div>
@@ -74,7 +74,22 @@
 
                     <div class="form-group">
                         <label><i class="fa-solid fa-file-arrow-up inline-icon"></i> Substituir PDF (opcional):</label>
-                        <input type="file" name="arquivo_pdf" accept="application/pdf">
+                        <input type="file" name="arquivo_pdf" accept=".pdf,application/pdf" data-pdf-input>
+
+                        <div class="pdf-preview" data-pdf-preview hidden aria-live="polite">
+                            <div class="pdf-preview-header">
+                                <div class="pdf-preview-file">
+                                    <span>Pré-visualização do novo documento</span>
+                                    <strong data-pdf-name></strong>
+                                    <small data-pdf-meta></small>
+                                </div>
+                                <button type="button" class="pdf-preview-clear" data-pdf-clear>
+                                    <i class="fa-solid fa-xmark"></i> Remover seleção
+                                </button>
+                            </div>
+                            <iframe class="pdf-preview-frame" data-pdf-frame title="Pré-visualização do novo PDF selecionado"></iframe>
+                            <p class="pdf-preview-help"><i class="fa-solid fa-circle-info"></i> Confira o documento. Ao salvar, ele substituirá o PDF atual.</p>
+                        </div>
                     </div>
 
                     <div class="form-group compact">
@@ -121,6 +136,7 @@
         inpVencimento.addEventListener('change', calcularDiferenca);
         calcularDiferenca();
     </script>
+    <script src="/assets/js/certidao-pdf-preview.js?v=<?php echo filemtime(ROOT_PATH . '/public/assets/js/certidao-pdf-preview.js'); ?>"></script>
 </body>
 
 </html>

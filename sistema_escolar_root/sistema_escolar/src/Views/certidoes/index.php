@@ -186,7 +186,7 @@ foreach ($dados_organizados as $grupoFornecedor) {
                                                                 <button type="submit" class="action-btn text-warning" title="Arquivar certidão" style="border:0; cursor:pointer;"><i class="fa-solid fa-box-archive"></i></button>
                                                             </form>
 
-                                                            <a href="/certidao/visualizarPdf/<?php echo (int)$d['id']; ?>?origem=lista" class="action-btn text-info" title="Ver PDF"><i class="fa-solid fa-file-pdf"></i></a>
+                                                            <a href="/certidao/visualizarPdf/<?php echo (int)$d['id']; ?>?origem=lista" class="action-btn text-info" title="Ver PDF em nova aba" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-file-pdf"></i></a>
 
                                                             <a href="/certidao/editar/<?php echo (int)$d['id']; ?>" class="action-btn text-primary" title="Editar informações"><i class="fa-solid fa-pen"></i></a>
 

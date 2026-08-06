@@ -62,7 +62,7 @@
                             <?php endif; ?>
 
                             <?php foreach ($logs as $log):
-                                $data = date('d/m/Y H:i:s', strtotime($log['data_hora']));
+                                $data = formatar_data_hora_utc_para_local($log['data_hora']);
 
                                 $classeAcao = '';
                                 $textoAcao = strtolower($log['acao']);

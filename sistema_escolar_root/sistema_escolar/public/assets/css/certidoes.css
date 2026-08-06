@@ -535,6 +535,97 @@ input[type="file"]::file-selector-button:hover {
     background-color: #e2e8f0;
 }
 
+.pdf-preview[hidden] {
+    display: none;
+}
+
+.pdf-preview {
+    margin-top: 14px;
+    overflow: hidden;
+    border: 1px solid #bfd1e4;
+    border-radius: var(--radius);
+    background: #f8fbff;
+}
+
+.pdf-preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #dbe5f0;
+}
+
+.pdf-preview-file {
+    min-width: 0;
+}
+
+.pdf-preview-file span,
+.pdf-preview-file strong,
+.pdf-preview-file small {
+    display: block;
+}
+
+.pdf-preview-file span {
+    margin-bottom: 4px;
+    color: var(--primary-dark);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.pdf-preview-file strong {
+    overflow: hidden;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pdf-preview-file small {
+    margin-top: 3px;
+    color: var(--text-muted);
+}
+
+.pdf-preview-clear {
+    flex: 0 0 auto;
+    padding: 8px 12px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #fff;
+    color: #b42318;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.pdf-preview-clear:hover {
+    border-color: #fca5a5;
+    background: #fff1f2;
+}
+
+.pdf-preview-frame {
+    display: block;
+    width: 100%;
+    height: 520px;
+    border: 0;
+    background: #e8eef5;
+}
+
+.pdf-preview-help {
+    margin: 0;
+    padding: 10px 16px;
+    border-top: 1px solid #dbe5f0;
+    color: var(--text-muted);
+    font-size: 0.84rem;
+}
+
+.pdf-preview-help i {
+    margin-right: 5px;
+    color: var(--accent-color);
+}
+
 input#dias_calculados {
     background-color: var(--bg-light) !important;
     font-weight: bold;
@@ -1213,6 +1304,19 @@ body.cert-fullscreen .filtro-box-busca {
 
     .config-chip {
         white-space: normal;
+    }
+
+    .pdf-preview-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .pdf-preview-clear {
+        width: 100%;
+    }
+
+    .pdf-preview-frame {
+        height: 380px;
     }
 
     .cert-overview,

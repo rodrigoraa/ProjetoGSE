@@ -126,6 +126,25 @@ function e($valor)
     return htmlspecialchars((string)$valor, ENT_QUOTES, 'UTF-8');
 }
 
+function formatar_data_hora_utc_para_local($data_hora, $formato = 'd/m/Y H:i:s')
+{
+    $valor = trim((string)$data_hora);
+
+    if ($valor === '') {
+        return '';
+    }
+
+    try {
+        $dataUtc = new DateTimeImmutable($valor, new DateTimeZone('UTC'));
+        $fusoLocal = new DateTimeZone(date_default_timezone_get());
+
+        return $dataUtc->setTimezone($fusoLocal)->format($formato);
+    } catch (Exception $e) {
+        error_log("Falha ao converter data UTC para o fuso local: {$valor}");
+        return $valor;
+    }
+}
+
 function carregar_env($caminho_arquivo)
 {
     if (!file_exists($caminho_arquivo)) {
