@@ -16,7 +16,10 @@
 
 <aside class="sidebar">
     <div class="sidebar-header">
-        <h2>GSE</h2>
+        <div class="sidebar-brand">
+            <span class="sidebar-brand-icon" aria-hidden="true">G</span>
+            <span class="sidebar-brand-text">GSE</span>
+        </div>
     </div>
 
     <nav>
@@ -85,7 +88,13 @@
     </nav>
 
     <div class="sidebar-footer">
-        <div>Olá, <strong><?php echo e($_SESSION['usuario_nome'] ?? 'User'); ?></strong></div>
-        <a href="/login/sair" class="btn-sair">Sair do Sistema</a>
+        <div class="sidebar-user">
+            <span class="sidebar-footer-icon" aria-hidden="true">&#128100;</span>
+            <span class="sidebar-footer-label">Olá, <strong><?php echo e($_SESSION['usuario_nome'] ?? 'User'); ?></strong></span>
+        </div>
+        <a href="/login/sair" class="btn-sair" aria-label="Sair do Sistema">
+            <span class="sidebar-footer-icon" aria-hidden="true">&#10140;</span>
+            <span class="sidebar-footer-label">Sair do Sistema</span>
+        </a>
     </div>
 </aside>
