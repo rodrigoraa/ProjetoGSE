@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Editar Passivo</title>
-    <link rel="stylesheet" href="/assets/css/painel.css">
+    <link rel="stylesheet" href="/assets/css/painel.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/painel.css'); ?>">
     <link rel="stylesheet" href="/assets/css/passivo.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/passivo.css'); ?>">
 </head>
 

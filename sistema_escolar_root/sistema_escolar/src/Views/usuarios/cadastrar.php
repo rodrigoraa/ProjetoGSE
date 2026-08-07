@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Novo Usuário</title>
-    <link rel="stylesheet" href="/assets/css/painel.css">
+    <link rel="stylesheet" href="/assets/css/painel.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/painel.css'); ?>">
     <link rel="stylesheet" href="/assets/css/usuarios.css">
 </head>
 

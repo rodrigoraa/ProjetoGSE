@@ -17,7 +17,7 @@
 <aside class="sidebar">
     <div class="sidebar-header">
         <div class="sidebar-brand">
-            <span class="sidebar-brand-icon" aria-hidden="true">G</span>
+            <img src="/assets/image/logo_escola.png" class="sidebar-brand-icon" alt="">
             <span class="sidebar-brand-text">GSE</span>
         </div>
     </div>

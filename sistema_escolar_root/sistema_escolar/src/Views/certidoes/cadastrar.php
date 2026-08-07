@@ -9,7 +9,7 @@ $renovar_id = $_GET['renovar_id'] ?? '';
 <head>
     <meta charset="UTF-8">
     <title>Nova Certidão</title>
-    <link rel="stylesheet" href="/assets/css/painel.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="/assets/css/painel.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/painel.css'); ?>">
     <link rel="stylesheet" href="/assets/css/certidoes.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>

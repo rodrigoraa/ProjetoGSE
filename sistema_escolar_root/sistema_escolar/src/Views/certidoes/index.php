@@ -12,7 +12,7 @@ foreach ($dados_organizados as $grupoFornecedor) {
 <head>
     <meta charset="UTF-8">
     <title>Painel de Certidões</title>
-    <link rel="stylesheet" href="/assets/css/painel.css">
+    <link rel="stylesheet" href="/assets/css/painel.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/painel.css'); ?>">
     <link rel="stylesheet" href="/assets/css/certidoes.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/certidoes.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>

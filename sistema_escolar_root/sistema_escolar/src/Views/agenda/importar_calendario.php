@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Importar Calendário Escolar</title>
-    <link rel="stylesheet" href="/assets/css/painel.css">
+    <link rel="stylesheet" href="/assets/css/painel.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/painel.css'); ?>">
     <link rel="stylesheet" href="/assets/css/agenda.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/agenda.css'); ?>">
 </head>
 

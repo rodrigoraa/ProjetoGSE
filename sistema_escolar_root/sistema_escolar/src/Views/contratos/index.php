@@ -16,7 +16,7 @@ foreach ($contratos as $contratoResumo) {
 <head>
     <meta charset="UTF-8">
     <title>Gerenciar Pedidos</title>
-    <link rel="stylesheet" href="/assets/css/painel.css">
+    <link rel="stylesheet" href="/assets/css/painel.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/painel.css'); ?>">
     <link rel="stylesheet" href="/assets/css/contrato.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/contrato.css'); ?>">
 </head>
 

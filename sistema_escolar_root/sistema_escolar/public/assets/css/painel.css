@@ -106,15 +106,13 @@ label {
 }
 
 .sidebar-brand-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     width: 30px;
     height: 30px;
     flex: 0 0 30px;
+    padding: 2px;
     border-radius: 9px;
-    background: rgba(255, 255, 255, 0.14);
-    font-size: 1rem;
+    background: #ffffff;
+    object-fit: contain;
 }
 
 .sidebar-brand-text {
@@ -1194,7 +1192,7 @@ button,
     }
 
     .sidebar:hover,
-    .sidebar:focus-within {
+    .sidebar:has(:focus-visible) {
         width: var(--sidebar-expanded-width);
         box-shadow: 22px 0 48px rgba(5, 19, 36, 0.24);
     }
@@ -1212,7 +1210,7 @@ button,
     }
 
     .sidebar:hover nav,
-    .sidebar:focus-within nav {
+    .sidebar:has(:focus-visible) nav {
         padding-right: 14px;
         padding-left: 14px;
     }
@@ -1236,11 +1234,11 @@ button,
     }
 
     .sidebar:hover .sidebar-link > span:not(.sidebar-icon),
-    .sidebar:focus-within .sidebar-link > span:not(.sidebar-icon),
+    .sidebar:has(:focus-visible) .sidebar-link > span:not(.sidebar-icon),
     .sidebar:hover .sidebar-brand-text,
-    .sidebar:focus-within .sidebar-brand-text,
+    .sidebar:has(:focus-visible) .sidebar-brand-text,
     .sidebar:hover .sidebar-footer-label,
-    .sidebar:focus-within .sidebar-footer-label {
+    .sidebar:has(:focus-visible) .sidebar-footer-label {
         max-width: 190px;
         opacity: 1;
         transform: translateX(0);
@@ -1256,7 +1254,7 @@ button,
     }
 
     .sidebar:hover .sidebar-section-label,
-    .sidebar:focus-within .sidebar-section-label {
+    .sidebar:has(:focus-visible) .sidebar-section-label {
         max-height: 28px;
         padding-left: 16px;
         margin-bottom: 10px;

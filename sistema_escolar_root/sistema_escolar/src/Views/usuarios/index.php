@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Gerenciar Usuários</title>
-    <link rel="stylesheet" href="/assets/css/painel.css">
+    <link rel="stylesheet" href="/assets/css/painel.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/painel.css'); ?>">
     <style>
         .btn-acao { text-decoration: none; font-weight: bold; padding: 5px 10px; border-radius: 4px; font-size: 0.9em; }
         .btn-editar { color: #007bff; background: #e7f1ff; }
