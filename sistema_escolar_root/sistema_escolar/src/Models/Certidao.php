@@ -140,7 +140,7 @@ class Certidao extends Model
             if ($dados) {
                 $del = self::$pdo->prepare("DELETE FROM certidoes WHERE id = ?");
                 $del->execute([$id]);
-                return $dados;
+                return $del->rowCount() === 1 ? $dados : false;
             }
             return false;
         } catch (Exception $e) {
@@ -152,11 +152,28 @@ class Certidao extends Model
     public function alternarArquivo($id, $status_novo)
     {
         try {
+            $id = (int)$id;
+            $status_novo = (int)$status_novo === 1 ? 1 : 0;
+
+            $consulta = self::$pdo->prepare("SELECT arquivado, status FROM certidoes WHERE id = ?");
+            $consulta->execute([$id]);
+            $registro = $consulta->fetch();
+
+            if (!$registro) {
+                return false;
+            }
+
             $st_db = ($status_novo == 1) ? 0 : 1;
+
+            if ((int)($registro['arquivado'] ?? 0) === $status_novo
+                && (int)($registro['status'] ?? 1) === $st_db) {
+                return true;
+            }
 
             $sql = "UPDATE certidoes SET arquivado = ?, status = ? WHERE id = ?";
             $stmt = self::$pdo->prepare($sql);
-            return $stmt->execute([$status_novo, $st_db, $id]);
+            $stmt->execute([$status_novo, $st_db, $id]);
+            return $stmt->rowCount() === 1;
         } catch (Exception $e) {
             error_log("Erro ao arquivar/desarquivar certidao ID $id: " . $e->getMessage());
             return false;
@@ -211,8 +228,19 @@ class Certidao extends Model
             return false;
         }
 
-        $stmt = self::$pdo->prepare("INSERT INTO {$tabela} (nome) VALUES (?)");
-        return $stmt->execute([$nome]);
+        try {
+            $stmtDuplicado = self::$pdo->prepare("SELECT 1 FROM {$tabela} WHERE LOWER(TRIM(nome)) = LOWER(TRIM(?)) LIMIT 1");
+            $stmtDuplicado->execute([$nome]);
+            if ($stmtDuplicado->fetchColumn()) {
+                return false;
+            }
+
+            $stmt = self::$pdo->prepare("INSERT INTO {$tabela} (nome) VALUES (?)");
+            return $stmt->execute([$nome]);
+        } catch (Exception $e) {
+            error_log("Erro ao adicionar opção em {$tabela}: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function atualizarOpcaoLista($tipoLista, $id, $nome)
@@ -222,8 +250,27 @@ class Certidao extends Model
             return false;
         }
 
-        $stmt = self::$pdo->prepare("UPDATE {$tabela} SET nome = ? WHERE id = ?");
-        return $stmt->execute([$nome, $id]);
+        try {
+            $stmtDuplicado = self::$pdo->prepare("SELECT 1 FROM {$tabela} WHERE LOWER(TRIM(nome)) = LOWER(TRIM(?)) AND id <> ? LIMIT 1");
+            $stmtDuplicado->execute([$nome, $id]);
+            if ($stmtDuplicado->fetchColumn()) {
+                return false;
+            }
+
+            $stmt = self::$pdo->prepare("UPDATE {$tabela} SET nome = ? WHERE id = ?");
+            $stmt->execute([$nome, $id]);
+
+            if ($stmt->rowCount() === 1) {
+                return true;
+            }
+
+            $verificar = self::$pdo->prepare("SELECT 1 FROM {$tabela} WHERE id = ?");
+            $verificar->execute([$id]);
+            return (bool)$verificar->fetchColumn();
+        } catch (Exception $e) {
+            error_log("Erro ao atualizar opção em {$tabela} ID {$id}: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function excluirOpcaoLista($tipoLista, $id)
@@ -233,8 +280,14 @@ class Certidao extends Model
             return false;
         }
 
-        $stmt = self::$pdo->prepare("DELETE FROM {$tabela} WHERE id = ?");
-        return $stmt->execute([$id]);
+        try {
+            $stmt = self::$pdo->prepare("DELETE FROM {$tabela} WHERE id = ?");
+            $stmt->execute([$id]);
+            return $stmt->rowCount() === 1;
+        } catch (Exception $e) {
+            error_log("Erro ao excluir opção de {$tabela} ID {$id}: " . $e->getMessage());
+            return false;
+        }
     }
 
     private function validarTabelaConfiguracao($tipoLista)

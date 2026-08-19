@@ -4,6 +4,7 @@ require_once ROOT_PATH . '/src/Models/Certidao.php';
 class CertidaoController extends Controller
 {
     private $certidaoModel;
+    private $erroUploadPdf = '';
     private const TIPOS_CONFIG = [
         'lista_fornecedores' => 'fornecedor',
         'lista_tipos_certidao' => 'tipo de certidão'
@@ -56,20 +57,38 @@ class CertidaoController extends Controller
             $emissao = trim($_POST['data_emissao'] ?? '');
             $vencimento = trim($_POST['data_vencimento'] ?? '');
             $obs = strip_tags(trim($_POST['observacao'] ?? ''));
+            $renovarId = filter_var($_POST['renovar_id'] ?? null, FILTER_VALIDATE_INT, [
+                'options' => ['min_range' => 1]
+            ]);
 
             if (!$this->validarFormularioCertidao($fornecedor, $tipo, $emissao, $vencimento)) {
                 $mensagem = '<p class="error-message">Preencha fornecedor, tipo, emissão e vencimento com dados válidos.</p>';
+            } elseif ($renovarId !== false && !$this->renovacaoCompativel($renovarId, $fornecedor, $tipo)) {
+                $mensagem = '<p class="error-message">A certidão selecionada para renovação não corresponde ao fornecedor e ao tipo informados.</p>';
             } else {
                 $nomeArquivoFinal = $this->processarUploadPdf();
 
                 if ($nomeArquivoFinal !== false) {
-                    if ($this->certidaoModel->cadastrar($fornecedor, $tipo, $emissao, $vencimento, $obs, $nomeArquivoFinal)) {
-                        if (!empty($_POST['renovar_id'])) {
-                            $this->certidaoModel->alternarArquivo((int)$_POST['renovar_id'], 1);
+                    $pdo = Model::getConexao();
+
+                    try {
+                        $pdo->beginTransaction();
+
+                        if (!$this->certidaoModel->cadastrar($fornecedor, $tipo, $emissao, $vencimento, $obs, $nomeArquivoFinal)) {
+                            throw new RuntimeException('Falha ao cadastrar a certidão.');
+                        }
+
+                        if ($renovarId !== false && !$this->certidaoModel->alternarArquivo($renovarId, 1)) {
+                            throw new RuntimeException('Falha ao arquivar a certidão renovada.');
+                        }
+
+                        $pdo->commit();
+
+                        if ($renovarId !== false) {
                             registrar_log(
                                 Model::getConexao(),
                                 'Certidao - Arquivar',
-                                'Arquivou certidão renovada ID: ' . (int)$_POST['renovar_id']
+                                'Arquivou certidão renovada ID: ' . $renovarId
                             );
                         }
 
@@ -82,11 +101,20 @@ class CertidaoController extends Controller
                         );
                         redirect('/certidao');
                         exit;
-                    }
+                    } catch (Throwable $e) {
+                        if ($pdo->inTransaction()) {
+                            $pdo->rollBack();
+                        }
 
-                    $mensagem = '<p class="error-message">Erro ao salvar no banco de dados.</p>';
+                        if (!empty($nomeArquivoFinal)) {
+                            $this->removerArquivoPdf($nomeArquivoFinal);
+                        }
+
+                        error_log('Erro ao concluir cadastro/renovação de certidão: ' . $e->getMessage());
+                        $mensagem = '<p class="error-message">Não foi possível salvar a certidão. Nenhuma alteração foi concluída.</p>';
+                    }
                 } else {
-                    $mensagem = '<p class="error-message">Apenas arquivos PDF são permitidos.</p>';
+                    $mensagem = '<p class="error-message">' . e($this->erroUploadPdf ?: 'Não foi possível processar o arquivo PDF.') . '</p>';
                 }
             }
         }
@@ -124,8 +152,12 @@ class CertidaoController extends Controller
             } else {
                 $novoArquivo = $this->processarUploadPdf($certidao['arquivo_pdf']);
                 if ($novoArquivo === false) {
-                    $mensagem = '<p class="error-message">Apenas arquivos PDF são permitidos.</p>';
+                    $mensagem = '<p class="error-message">' . e($this->erroUploadPdf ?: 'Não foi possível processar o arquivo PDF.') . '</p>';
                 } elseif ($this->certidaoModel->atualizar($id, $fornecedor, $tipo, $emissao, $vencimento, $obs, $novoArquivo)) {
+                    if ($novoArquivo !== $certidao['arquivo_pdf'] && !empty($certidao['arquivo_pdf'])) {
+                        $this->removerArquivoPdf($certidao['arquivo_pdf']);
+                    }
+
                     registrar_log(
                         Model::getConexao(),
                         'Certidao - Editar',
@@ -140,6 +172,10 @@ class CertidaoController extends Controller
                     redirect('/certidao');
                     exit;
                 } else {
+                    if ($novoArquivo !== $certidao['arquivo_pdf'] && !empty($novoArquivo)) {
+                        $this->removerArquivoPdf($novoArquivo);
+                    }
+
                     $mensagem = '<p class="error-message">Erro ao atualizar a certidão.</p>';
                 }
             }
@@ -182,9 +218,9 @@ class CertidaoController extends Controller
         }
 
         $nomeArquivo = basename((string)$certidao['arquivo_pdf']);
-        $caminhoFisico = ROOT_PATH . '/public/uploads/certidoes/' . $nomeArquivo;
+        $caminhoFisico = $this->localizarArquivoPdf($nomeArquivo);
 
-        if (!is_file($caminhoFisico)) {
+        if ($caminhoFisico === null) {
             definir_flash(
                 'erro',
                 'Arquivo PDF não encontrado',
@@ -198,6 +234,9 @@ class CertidaoController extends Controller
         header('Content-Length: ' . filesize($caminhoFisico));
         header('Content-Disposition: inline; filename="' . rawurlencode($nomeArquivo) . '"');
         header('X-Content-Type-Options: nosniff');
+        header('Cache-Control: private, no-store, max-age=0');
+        header('Pragma: no-cache');
+        session_write_close();
         readfile($caminhoFisico);
         exit;
     }
@@ -266,16 +305,40 @@ class CertidaoController extends Controller
         }
 
         verificar_csrf_token($_POST['csrf_token'] ?? '');
+        $this->exigirAdministrador();
 
-        if ($id) {
-            $dadosExcluidos = $this->certidaoModel->excluir($id);
+        $id = (int)$id;
+        $certidao = $id > 0 ? $this->certidaoModel->buscarPorId($id) : false;
 
-            if ($dadosExcluidos) {
-                if (!empty($dadosExcluidos['arquivo_pdf'])) {
-                    $caminhoFisico = ROOT_PATH . '/public/uploads/certidoes/' . $dadosExcluidos['arquivo_pdf'];
-                    if (file_exists($caminhoFisico)) {
-                        unlink($caminhoFisico);
+        if ($certidao) {
+            $caminhoOriginal = !empty($certidao['arquivo_pdf'])
+                ? $this->localizarArquivoPdf($certidao['arquivo_pdf'])
+                : null;
+            $caminhoTemporario = null;
+            $pdo = Model::getConexao();
+
+            try {
+                if ($caminhoOriginal !== null) {
+                    $caminhoTemporario = dirname($caminhoOriginal)
+                        . DIRECTORY_SEPARATOR
+                        . '.exclusao_' . bin2hex(random_bytes(8)) . '.pdf';
+
+                    if (!rename($caminhoOriginal, $caminhoTemporario)) {
+                        throw new RuntimeException('Não foi possível proteger o PDF durante a exclusão.');
                     }
+                }
+
+                $pdo->beginTransaction();
+                $dadosExcluidos = $this->certidaoModel->excluir($id);
+
+                if (!$dadosExcluidos) {
+                    throw new RuntimeException('O registro não foi excluído do banco.');
+                }
+
+                $pdo->commit();
+
+                if ($caminhoTemporario !== null && is_file($caminhoTemporario) && !unlink($caminhoTemporario)) {
+                    error_log("Certidão ID {$id} excluída, mas o PDF temporário não pôde ser removido: {$caminhoTemporario}");
                 }
 
                 $detalhes = 'Apagou: ' . ($dadosExcluidos['tipo_certidao'] ?? 'N/A') . ' - ' . ($dadosExcluidos['fornecedor'] ?? 'N/A');
@@ -286,7 +349,18 @@ class CertidaoController extends Controller
                     'O registro selecionado foi removido permanentemente do sistema.',
                     'Se isso foi um engano, será necessário cadastrar a certidão novamente.'
                 );
-            } else {
+            } catch (Throwable $e) {
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+
+                if ($caminhoTemporario !== null && is_file($caminhoTemporario)) {
+                    if ($caminhoOriginal === null || !rename($caminhoTemporario, $caminhoOriginal)) {
+                        error_log("CRÍTICO: não foi possível restaurar o PDF da certidão ID {$id} após falha de exclusão.");
+                    }
+                }
+
+                error_log("Erro ao excluir certidão ID {$id}: " . $e->getMessage());
                 definir_flash(
                     'erro',
                     'Não foi possível excluir a certidão',
@@ -294,6 +368,13 @@ class CertidaoController extends Controller
                     'Verifique se ele ainda existe e tente novamente.'
                 );
             }
+        } else {
+            definir_flash(
+                'erro',
+                'Certidão não encontrada',
+                'O registro informado não existe ou já foi removido.',
+                'Atualize a lista antes de tentar novamente.'
+            );
         }
 
         $origem = $_POST['origem'] ?? 'lista';
@@ -408,7 +489,8 @@ class CertidaoController extends Controller
             && $tipo !== false
             && $tipo > 0
             && $this->isDataValida($emissao)
-            && $this->isDataValida($vencimento);
+            && $this->isDataValida($vencimento)
+            && $vencimento > $emissao;
     }
 
     private function isDataValida($data)
@@ -424,6 +506,38 @@ class CertidaoController extends Controller
     private function getTipoConfiguracaoLabel($tipoLista)
     {
         return self::TIPOS_CONFIG[$tipoLista] ?? null;
+    }
+
+    private function renovacaoCompativel($id, $fornecedor, $tipo)
+    {
+        $certidao = $this->certidaoModel->buscarPorId((int)$id);
+
+        if (!$certidao) {
+            return false;
+        }
+
+        $estaAtiva = ((int)($certidao['arquivado'] ?? 0) === 0)
+            && ((int)($certidao['status'] ?? 1) === 1);
+
+        return $estaAtiva
+            && (int)$certidao['id_fornecedor'] === (int)$fornecedor
+            && (int)$certidao['id_tipo_certidao'] === (int)$tipo;
+    }
+
+    private function exigirAdministrador()
+    {
+        if (($_SESSION['usuario_tipo'] ?? '') === 'admin') {
+            return;
+        }
+
+        definir_flash(
+            'erro',
+            'Acesso negado',
+            'Somente administradores podem excluir certidões permanentemente.',
+            'Você ainda pode editar ou arquivar o registro, se necessário.'
+        );
+        redirect('/certidao');
+        exit;
     }
 
     private function redirecionarRetornoPdf($id)
@@ -447,21 +561,33 @@ class CertidaoController extends Controller
 
     private function processarUploadPdf($arquivoAtual = null)
     {
+        $this->erroUploadPdf = '';
+
         if (!isset($_FILES['arquivo_pdf']) || $_FILES['arquivo_pdf']['error'] === UPLOAD_ERR_NO_FILE) {
             return $arquivoAtual;
         }
 
         if ($_FILES['arquivo_pdf']['error'] !== UPLOAD_ERR_OK) {
+            $this->erroUploadPdf = $this->mensagemErroUpload((int)$_FILES['arquivo_pdf']['error']);
             return false;
         }
 
         $extensao = strtolower(pathinfo($_FILES['arquivo_pdf']['name'], PATHINFO_EXTENSION));
         if ($extensao !== 'pdf') {
+            $this->erroUploadPdf = 'Selecione um arquivo no formato PDF.';
+            return false;
+        }
+
+        $limiteBytes = (int)($_ENV['CERTIDAO_PDF_MAX_BYTES'] ?? getenv('CERTIDAO_PDF_MAX_BYTES') ?: 0);
+        $tamanhoArquivo = (int)($_FILES['arquivo_pdf']['size'] ?? 0);
+        if ($limiteBytes > 0 && $tamanhoArquivo > $limiteBytes) {
+            $this->erroUploadPdf = 'O PDF excede o limite de tamanho configurado para o sistema.';
             return false;
         }
 
         $tmpPath = $_FILES['arquivo_pdf']['tmp_name'];
         if (!is_uploaded_file($tmpPath)) {
+            $this->erroUploadPdf = 'O arquivo enviado não pôde ser validado pelo servidor.';
             return false;
         }
 
@@ -474,28 +600,97 @@ class CertidaoController extends Controller
         $mimePermitido = in_array($mimeType, ['application/pdf', 'application/x-pdf'], true);
         $cabecalho = file_get_contents($tmpPath, false, null, 0, 4);
         if (!$mimePermitido || $cabecalho !== '%PDF') {
+            $this->erroUploadPdf = 'O arquivo selecionado não contém um PDF válido.';
             return false;
         }
 
-        $diretorio = ROOT_PATH . '/public/uploads/certidoes/';
-        if (!is_dir($diretorio)) {
-            mkdir($diretorio, 0755, true);
+        $diretorio = $this->getDiretorioUploadsCertidoes();
+        if (!is_dir($diretorio) && !mkdir($diretorio, 0755, true) && !is_dir($diretorio)) {
+            $this->erroUploadPdf = 'O servidor não conseguiu preparar a pasta de documentos.';
+            return false;
         }
 
-        $novoNome = uniqid('cert_', true) . '.pdf';
+        if (!is_writable($diretorio)) {
+            $this->erroUploadPdf = 'A pasta de documentos não possui permissão de escrita.';
+            return false;
+        }
+
+        try {
+            $novoNome = 'cert_' . bin2hex(random_bytes(16)) . '.pdf';
+        } catch (Throwable $e) {
+            error_log('Falha ao gerar nome seguro para PDF de certidão: ' . $e->getMessage());
+            $this->erroUploadPdf = 'Não foi possível preparar o arquivo para armazenamento.';
+            return false;
+        }
+
         $destino = $diretorio . $novoNome;
 
         if (!move_uploaded_file($_FILES['arquivo_pdf']['tmp_name'], $destino)) {
+            $this->erroUploadPdf = 'O servidor não conseguiu salvar o PDF enviado.';
             return false;
         }
 
-        if (!empty($arquivoAtual)) {
-            $caminhoAtual = $diretorio . basename($arquivoAtual);
-            if (is_file($caminhoAtual)) {
-                unlink($caminhoAtual);
+        return $novoNome;
+    }
+
+    private function getDiretorioUploadsCertidoes()
+    {
+        $configurado = trim((string)($_ENV['CERTIDOES_UPLOAD_PATH'] ?? getenv('CERTIDOES_UPLOAD_PATH') ?: ''));
+        $diretorio = $configurado !== ''
+            ? $configurado
+            : ROOT_PATH . '/public/uploads/certidoes';
+
+        return rtrim($diretorio, "\\/") . DIRECTORY_SEPARATOR;
+    }
+
+    private function localizarArquivoPdf($nomeArquivo)
+    {
+        $nomeSeguro = basename((string)$nomeArquivo);
+        if ($nomeSeguro === '' || $nomeSeguro === '.' || $nomeSeguro === '..') {
+            return null;
+        }
+
+        $diretorios = [
+            $this->getDiretorioUploadsCertidoes(),
+            ROOT_PATH . '/public/uploads/certidoes/'
+        ];
+
+        foreach (array_unique($diretorios) as $diretorio) {
+            $caminho = rtrim($diretorio, "\\/") . DIRECTORY_SEPARATOR . $nomeSeguro;
+            if (is_file($caminho)) {
+                return $caminho;
             }
         }
 
-        return $novoNome;
+        return null;
+    }
+
+    private function removerArquivoPdf($nomeArquivo)
+    {
+        $caminho = $this->localizarArquivoPdf($nomeArquivo);
+        if ($caminho === null) {
+            return true;
+        }
+
+        if (@unlink($caminho)) {
+            return true;
+        }
+
+        error_log('Não foi possível remover o PDF de certidão: ' . $caminho);
+        return false;
+    }
+
+    private function mensagemErroUpload($codigo)
+    {
+        $mensagens = [
+            UPLOAD_ERR_INI_SIZE => 'O PDF excede o limite permitido pelo servidor.',
+            UPLOAD_ERR_FORM_SIZE => 'O PDF excede o limite permitido pelo formulário.',
+            UPLOAD_ERR_PARTIAL => 'O envio do PDF foi interrompido antes de terminar.',
+            UPLOAD_ERR_NO_TMP_DIR => 'O servidor está sem a pasta temporária necessária para o upload.',
+            UPLOAD_ERR_CANT_WRITE => 'O servidor não conseguiu gravar o PDF no disco.',
+            UPLOAD_ERR_EXTENSION => 'Uma extensão do servidor interrompeu o envio do PDF.'
+        ];
+
+        return $mensagens[$codigo] ?? 'Não foi possível receber o PDF enviado.';
     }
 }

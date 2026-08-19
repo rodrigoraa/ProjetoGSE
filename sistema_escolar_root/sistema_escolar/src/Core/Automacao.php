@@ -85,7 +85,17 @@ class Automacao
             $hoje = date('Y-m-d');
             $dataLimite = date('Y-m-d', strtotime('+30 days'));
 
-            $sql = "SELECT fornecedor, tipo_certidao FROM certidoes WHERE data_vencimento BETWEEN ? AND ?";
+            $sql = "SELECT
+                        f.nome AS fornecedor,
+                        t.nome AS tipo_certidao,
+                        c.data_vencimento
+                    FROM certidoes c
+                    JOIN lista_fornecedores f ON f.id = c.id_fornecedor
+                    JOIN lista_tipos_certidao t ON t.id = c.id_tipo_certidao
+                    WHERE c.data_vencimento BETWEEN ? AND ?
+                      AND (c.arquivado = 0 OR c.arquivado IS NULL)
+                      AND (c.status = 1 OR c.status IS NULL)
+                    ORDER BY c.data_vencimento ASC";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([$hoje, $dataLimite]);
             $lista = $stmt->fetchAll();
@@ -94,7 +104,9 @@ class Automacao
                 $html = "<h2>⚠️ Aviso de Vencimento de Certidões</h2>";
                 $html .= "<p>As seguintes certidões da escola vencem em 30 dias ($dataLimite):</p><ul>";
                 foreach ($lista as $c) {
-                    $html .= "<li><strong>{$c['tipo_certidao']}</strong> ({$c['fornecedor']})</li>";
+                    $tipoCertidao = htmlspecialchars((string)$c['tipo_certidao'], ENT_QUOTES, 'UTF-8');
+                    $fornecedor = htmlspecialchars((string)$c['fornecedor'], ENT_QUOTES, 'UTF-8');
+                    $html .= "<li><strong>{$tipoCertidao}</strong> ({$fornecedor})</li>";
                 }
                 $html .= "</ul><p>Acesse o sistema para renovar ou atualizar as certidões.</p>";
 

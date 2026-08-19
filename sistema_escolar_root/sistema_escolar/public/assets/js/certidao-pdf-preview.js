@@ -24,6 +24,7 @@
         const nome = preview.querySelector('[data-pdf-name]');
         const meta = preview.querySelector('[data-pdf-meta]');
         const botaoRemover = preview.querySelector('[data-pdf-clear]');
+        const linkAbrir = preview.querySelector('[data-pdf-open]');
         let urlTemporaria = null;
 
         function limparPreview() {
@@ -33,6 +34,10 @@
             }
 
             frame.removeAttribute('src');
+            if (linkAbrir) {
+                linkAbrir.removeAttribute('href');
+                linkAbrir.hidden = true;
+            }
             nome.textContent = '';
             meta.textContent = '';
             preview.hidden = true;
@@ -60,6 +65,10 @@
             input.setCustomValidity('');
             urlTemporaria = URL.createObjectURL(arquivo);
             frame.src = urlTemporaria;
+            if (linkAbrir) {
+                linkAbrir.href = urlTemporaria;
+                linkAbrir.hidden = false;
+            }
             nome.textContent = arquivo.name;
             meta.textContent = formatarTamanho(arquivo.size);
             preview.hidden = false;

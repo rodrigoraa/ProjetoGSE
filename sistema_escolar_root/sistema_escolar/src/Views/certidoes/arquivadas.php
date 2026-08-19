@@ -4,6 +4,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arquivo de Certidões</title>
     <link rel="stylesheet" href="/assets/css/painel.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/painel.css'); ?>">
     <link rel="stylesheet" href="/assets/css/certidoes.css?v=<?php echo time(); ?>">
@@ -110,7 +111,7 @@
 
                                                 <a href="/certidao/editar/<?php echo (int)$reg['id']; ?>" class="action-btn text-primary" title="Editar informações"><i class="fa-solid fa-pen"></i></a>
 
-                                                <?php if ($_SESSION['usuario_tipo'] == 'admin'): ?>
+                                                <?php if (($_SESSION['usuario_tipo'] ?? '') === 'admin'): ?>
                                                     <form action="/certidao/excluir/<?php echo (int)$reg['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Deseja excluir esta certidão permanentemente do histórico?');">
                                                         <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                                                         <input type="hidden" name="origem" value="arquivo">

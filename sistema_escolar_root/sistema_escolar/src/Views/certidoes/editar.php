@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Certidão</title>
     <link rel="stylesheet" href="/assets/css/painel.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/painel.css'); ?>">
     <link rel="stylesheet" href="/assets/css/certidoes.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/certidoes.css'); ?>">
@@ -88,6 +89,9 @@
                                 </button>
                             </div>
                             <iframe class="pdf-preview-frame" data-pdf-frame title="Pré-visualização do novo PDF selecionado"></iframe>
+                            <a class="pdf-preview-open" data-pdf-open href="#" target="_blank" rel="noopener noreferrer" hidden>
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir PDF para conferir
+                            </a>
                             <p class="pdf-preview-help"><i class="fa-solid fa-circle-info"></i> Confira o documento. Ao salvar, ele substituirá o PDF atual.</p>
                         </div>
                     </div>

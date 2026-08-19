@@ -11,6 +11,7 @@ foreach ($dados_organizados as $grupoFornecedor) {
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel de Certidões</title>
     <link rel="stylesheet" href="/assets/css/painel.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/painel.css'); ?>">
     <link rel="stylesheet" href="/assets/css/certidoes.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/certidoes.css'); ?>">
@@ -136,11 +137,12 @@ foreach ($dados_organizados as $grupoFornecedor) {
                             <?php endif; ?>
 
                             <?php foreach ($tipos_certidoes as $tipo): ?>
+                                <?php $tipoChave = mb_strtoupper($tipo, 'UTF-8'); ?>
                                 <tr class="matriz-row" data-tipo="<?php echo e(mb_strtolower($tipo, 'UTF-8')); ?>">
                                     <td class="nome-tipo"><?php echo e($tipo); ?></td>
 
                                     <?php foreach ($lista_fornecedores as $fornecedor): ?>
-                                        <?php $lista = $dados_organizados[$fornecedor][$tipo] ?? []; ?>
+                                        <?php $lista = $dados_organizados[$fornecedor][$tipoChave] ?? []; ?>
                                         <td class="td-fornecedor" data-fornecedor="<?php echo e($fornecedor); ?>" data-fornecedor-texto="<?php echo e(mb_strtolower($fornecedor, 'UTF-8')); ?>">
                                             <?php if (empty($lista)): ?>
                                                 <span class="cell-empty">-</span>
@@ -190,11 +192,13 @@ foreach ($dados_organizados as $grupoFornecedor) {
 
                                                             <a href="/certidao/editar/<?php echo (int)$d['id']; ?>" class="action-btn text-primary" title="Editar informações"><i class="fa-solid fa-pen"></i></a>
 
-                                                            <form action="/certidao/excluir/<?php echo (int)$d['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Apagar permanentemente?');">
-                                                                <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
-                                                                <input type="hidden" name="origem" value="lista">
-                                                                <button type="submit" class="action-btn text-danger" title="Apagar" style="border:0; cursor:pointer;"><i class="fa-solid fa-trash-can"></i></button>
-                                                            </form>
+                                                            <?php if (($_SESSION['usuario_tipo'] ?? '') === 'admin'): ?>
+                                                                <form action="/certidao/excluir/<?php echo (int)$d['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Apagar permanentemente?');">
+                                                                    <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
+                                                                    <input type="hidden" name="origem" value="lista">
+                                                                    <button type="submit" class="action-btn text-danger" title="Apagar" style="border:0; cursor:pointer;"><i class="fa-solid fa-trash-can"></i></button>
+                                                                </form>
+                                                            <?php endif; ?>
                                                         </div>
                                                     </div>
                                                 <?php endforeach; ?>

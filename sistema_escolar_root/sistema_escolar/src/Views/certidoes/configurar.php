@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configurações de Certidões</title>
     <link rel="stylesheet" href="/assets/css/painel.css?v=<?php echo filemtime(ROOT_PATH . '/public/assets/css/painel.css'); ?>">
     <link rel="stylesheet" href="/assets/css/certidoes.css?v=<?php echo time(); ?>">
@@ -54,8 +55,8 @@
                                     <li class="config-item">
                                         <span class="config-item-name"><?php echo e($f['nome']); ?></span>
                                         <div class="config-item-actions">
-                                            <button type="button" onclick="abrirModalRenomear(<?php echo (int)$f['id']; ?>, 'lista_fornecedores', <?php echo json_encode($f['nome']); ?>, 'fornecedor')" class="action-btn text-primary" title="Renomear" style="background:none; border:none; cursor:pointer;"><i class="fa-solid fa-pen"></i></button>
-                                            <form action="/certidao/excluirOpcao" method="POST" onsubmit="return confirm('Deseja excluir o fornecedor <?php echo e($f['nome']); ?> da lista?');">
+                                            <button type="button" data-rename-option data-id="<?php echo (int)$f['id']; ?>" data-tipo="lista_fornecedores" data-nome="<?php echo e($f['nome']); ?>" data-label="fornecedor" class="action-btn text-primary" title="Renomear" style="background:none; border:none; cursor:pointer;"><i class="fa-solid fa-pen"></i></button>
+                                            <form action="/certidao/excluirOpcao" method="POST" onsubmit="return confirm('Deseja excluir este fornecedor da lista?');">
                                                 <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                                                 <input type="hidden" name="id" value="<?php echo (int)$f['id']; ?>">
                                                 <input type="hidden" name="tipo" value="lista_fornecedores">
@@ -91,8 +92,8 @@
                                     <li class="config-item">
                                         <span class="config-item-name"><?php echo e($t['nome']); ?></span>
                                         <div class="config-item-actions">
-                                            <button type="button" onclick="abrirModalRenomear(<?php echo (int)$t['id']; ?>, 'lista_tipos_certidao', <?php echo json_encode($t['nome']); ?>, 'tipo de certidão')" class="action-btn text-primary" title="Renomear" style="background:none; border:none; cursor:pointer;"><i class="fa-solid fa-pen"></i></button>
-                                            <form action="/certidao/excluirOpcao" method="POST" onsubmit="return confirm('Deseja excluir o tipo <?php echo e($t['nome']); ?> da lista?');">
+                                            <button type="button" data-rename-option data-id="<?php echo (int)$t['id']; ?>" data-tipo="lista_tipos_certidao" data-nome="<?php echo e($t['nome']); ?>" data-label="tipo de certidão" class="action-btn text-primary" title="Renomear" style="background:none; border:none; cursor:pointer;"><i class="fa-solid fa-pen"></i></button>
+                                            <form action="/certidao/excluirOpcao" method="POST" onsubmit="return confirm('Deseja excluir este tipo da lista?');">
                                                 <input type="hidden" name="csrf_token" value="<?php echo gerar_csrf_token(); ?>">
                                                 <input type="hidden" name="id" value="<?php echo (int)$t['id']; ?>">
                                                 <input type="hidden" name="tipo" value="lista_tipos_certidao">
@@ -144,6 +145,17 @@
         const renameNome = document.getElementById('renameNome');
         const renameModalTitle = document.getElementById('renameModalTitle');
         const renameModalDescription = document.getElementById('renameModalDescription');
+
+        document.querySelectorAll('[data-rename-option]').forEach((button) => {
+            button.addEventListener('click', () => {
+                abrirModalRenomear(
+                    Number.parseInt(button.dataset.id || '0', 10),
+                    button.dataset.tipo || '',
+                    button.dataset.nome || '',
+                    button.dataset.label || 'opção'
+                );
+            });
+        });
 
         function abrirModalRenomear(id, tipoTabela, nomeAntigo, label) {
             renameId.value = id;

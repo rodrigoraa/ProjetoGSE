@@ -80,7 +80,9 @@ try {
 
         foreach ($lista as $l) {
             $dataVenc = date('d/m/Y', strtotime($l['data_vencimento']));
-            $html .= "<li><strong>{$l['fornecedor']}</strong> - {$l['tipo_certidao']} (Vence em: {$dataVenc})</li>";
+            $fornecedor = htmlspecialchars((string)$l['fornecedor'], ENT_QUOTES, 'UTF-8');
+            $tipoCertidao = htmlspecialchars((string)$l['tipo_certidao'], ENT_QUOTES, 'UTF-8');
+            $html .= "<li><strong>{$fornecedor}</strong> - {$tipoCertidao} (Vence em: {$dataVenc})</li>";
         }
 
         $html .= "</ul>";
